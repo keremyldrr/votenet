@@ -123,6 +123,7 @@ def eval_det_cls(pred, gt, ovthresh=0.25, use_07_metric=False, get_iou_func=get_
     nd = len(image_ids)
     tp = np.zeros(nd)
     fp = np.zeros(nd)
+    
     for d in range(nd):
         #if d%100==0: print(d)
         R = class_recs[image_ids[d]]
@@ -199,10 +200,19 @@ def eval_det(pred_all, gt_all, ovthresh=0.25, use_07_metric=False, get_iou_func=
     rec = {}
     prec = {}
     ap = {}
+    mydict = {'cabinet':0, 'bed':1, 'chair':2, 'sofa':3, 'table':4, 'door':5,
+            'window':6,'bookshelf':7,'picture':8, 'counter':9, 'desk':10, 'curtain':11,
+            'refrigerator':12, 'showercurtrain':13, 'toilet':14, 'sink':15, 'bathtub':16, 'garbagebin':17} 
+    revDict = {}
+    for a in mydict.keys():
+        revDict[mydict[a]] = a
+    
+    print("Existing classes in scene: ", [(revDict[k],len([gt[k][a] for a in sorted(gt[k].keys()) if len(gt[k][a]) is not 0])) for k in sorted(gt.keys())])
+    print("Predicted classes in scene ",[(revDict[k],len(pred[k])) for k in sorted(pred.keys())])
     for classname in gt.keys():
-        print('Computing AP for class: ', classname)
+        # print('Computing AP for class: ', classname)
         rec[classname], prec[classname], ap[classname] = eval_det_cls(pred[classname], gt[classname], ovthresh, use_07_metric, get_iou_func)
-        print(classname, ap[classname])
+        # print(classname, ap[classname])
     
     return rec, prec, ap 
 
@@ -241,7 +251,7 @@ def eval_det_multiprocessing(pred_all, gt_all, ovthresh=0.25, use_07_metric=Fals
     rec = {}
     prec = {}
     ap = {}
-    p = Pool(processes=10)
+    p = Pool(processes=1)
     ret_values = p.map(eval_det_cls_wrapper, [(pred[classname], gt[classname], ovthresh, use_07_metric, get_iou_func) for classname in gt.keys() if classname in pred])
     p.close()
     for i, classname in enumerate(gt.keys()):

@@ -1,0 +1,7 @@
+settings.json
+logs/
+evals/
+scannet
+sunrgbd
+.vscode/launch.json
+*.pyc

@@ -69,6 +69,9 @@ class ProposalModule(nn.Module):
         # Object proposal/detection
         # Objectness scores (2), center residual (3),
         # heading class+residual (num_heading_bin*2), size class+residual(num_size_cluster*4)
+        # self.drop1 = torch.nn.Dropout(p=0.1)
+        # self.drop2 = torch.nn.Dropout(p=0.1)
+        # self.drop3 = torch.nn.Dropout(p=0.1)
         self.conv1 = torch.nn.Conv1d(128,128,1)
         self.conv2 = torch.nn.Conv1d(128,128,1)
         self.conv3 = torch.nn.Conv1d(128,2+3+num_heading_bin*2+num_size_cluster*4+self.num_class,1)
@@ -102,11 +105,15 @@ class ProposalModule(nn.Module):
             log_string('Unknown sampling strategy: %s. Exiting!'%(self.sampling))
             exit()
         end_points['aggregated_vote_xyz'] = xyz # (batch_size, num_proposal, 3)
-        end_points['aggregated_vote_inds'] = sample_inds # (batch_size, num_proposal,) # should be 0,1,2,...,num_proposal
+        end_points['aggregated_vote_inds'] = sample_inds # (batch_size, num_proposal,) # should be 0,1,2,...,num_PROPOSAL
 
-        # --------- PROPOSAL GENERATION ---------
-        net = F.relu(self.bn1(self.conv1(features))) 
-        net = F.relu(self.bn2(self.conv2(net))) 
+        # --------- Proposal Generation with Variational Inference ---------
+        # net = F.relu(self.bn1(self.conv1(self.drop1(features))))
+        # net = F.relu(self.bn2(self.conv2(self.drop2(net))))
+        # net = self.conv3(self.drop3(net)) # (batch_size, 2+3+num_heading_bin*2+num_size_cluster*4, num_proposal)
+        # --------- proposal GENERATION ---------
+        net = F.relu(self.bn1(self.conv1(features)))
+        net = F.relu(self.bn2(self.conv2(net)))
         net = self.conv3(net) # (batch_size, 2+3+num_heading_bin*2+num_size_cluster*4, num_proposal)
 
         end_points = decode_scores(net, end_points, self.num_class, self.num_heading_bin, self.num_size_cluster, self.mean_size_arr)

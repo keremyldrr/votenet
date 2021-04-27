@@ -328,7 +328,7 @@ def train(start_epoch):
             save_dict['model_state_dict'] = net.module.state_dict()
         except:
             save_dict['model_state_dict'] = net.state_dict()
-        torch.save(save_dict, os.path.join(LOG_DIR, 'checkpoint.tar'))
+        torch.save(save_dict, os.path.join(LOG_DIR, 'checkpoint' + str(epoch)+ '.tar'))
 
 if __name__=='__main__':
     train(start_epoch)
