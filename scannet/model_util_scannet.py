@@ -67,6 +67,17 @@ class ScannetDatasetConfig(object):
         obb[6] = heading_angle*-1
         return obb
 
+    def param2colorobb(self, center, heading_class, heading_residual, size_class, size_residual,color):
+        heading_angle = self.class2angle(heading_class, heading_residual)
+        box_size = self.class2size(int(size_class), size_residual)
+        obb = np.zeros((10,))
+        obb[0:3] = center
+        obb[3:6] = box_size
+        obb[6] = heading_angle*-1
+        obb[7]  = color[0]
+        obb[8]= color[1]
+        obb[9]= color[2]
+        return obb
 def rotate_aligned_boxes(input_boxes, rot_mat):    
     centers, lengths = input_boxes[:,0:3], input_boxes[:,3:6]    
     new_centers = np.dot(centers, np.transpose(rot_mat))

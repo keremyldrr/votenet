@@ -19,7 +19,7 @@ sys.path.append(BASE_DIR)
 from backbone_module import Pointnet2Backbone
 from voting_module import VotingModule
 from proposal_module import ProposalModule
-from dump_helper import dump_results
+from dump_helper import dump_results,dump_results_with_color
 from loss_helper import get_loss
 
 

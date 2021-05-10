@@ -5,3 +5,4 @@ scannet
 sunrgbd
 .vscode/launch.json
 *.pyc
+pointnet2

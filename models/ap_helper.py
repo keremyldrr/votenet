@@ -120,7 +120,8 @@ def parse_predictions(end_points, config_dict):
 
     K = pred_center.shape[1]  # K==num_proposal
     nonempty_box_mask = np.ones((bsize, K))
-    end_points["pred_box_sizes"] = pred_box_sizes
+    end_points["pred_box_sizes"] = torch.Tensor(pred_box_sizes)
+    end_points["raw_pred_boxes"] = pred_corners_3d_upright_camera
     if config_dict['remove_empty_box']:
         # -------------------------------------
         # Remove predicted boxes without any point within them..
@@ -230,6 +231,7 @@ def parse_predictions(end_points, config_dict):
         else:
             batch_pred_map_cls.append([(pred_sem_cls[i,j].item(), pred_corners_3d_upright_camera[i,j], obj_prob[i,j]) \
                 for j in range(pred_center.shape[1]) if pred_mask[i,j]==1 and obj_prob[i,j]>config_dict['conf_thresh']])
+                
     end_points['batch_pred_map_cls'] = batch_pred_map_cls
 
     return batch_pred_map_cls
@@ -289,6 +291,7 @@ def parse_groundtruths(end_points, config_dict):
         # gt_box_sizes[i] = gt_box_sizes[i,:np.argmin(gt_box_sizes[i])]
 
     end_points["gt_box_sizes"] = gt_box_sizes
+    end_points["raw_gt_boxes"] = gt_corners_3d_upright_camera
     batch_gt_map_cls = []
     for i in range(bsize):
         batch_gt_map_cls.append([
