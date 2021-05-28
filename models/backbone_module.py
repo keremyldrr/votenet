@@ -70,7 +70,15 @@ class Pointnet2Backbone(nn.Module):
 
         self.fp1 = PointnetFPModule(mlp=[256+256,256,256])
         self.fp2 = PointnetFPModule(mlp=[256+256,256,256])
+        self.drop1 = nn.Dropout(0.1)
+        self.drop2 = nn.Dropout(0.1)
+        self.drop3 = nn.Dropout(0.1)
+        self.drop4 = nn.Dropout(0.1)
+        self.drop5 = nn.Dropout(0.1)
+        self.drop6 = nn.Dropout(0.1)
 
+
+        
     def _break_up_pc(self, pc):
         xyz = pc[..., 0:3].contiguous()
         features = (
@@ -106,26 +114,32 @@ class Pointnet2Backbone(nn.Module):
 
         # --------- 4 SET ABSTRACTION LAYERS ---------
         xyz, features, fps_inds = self.sa1(xyz, features)
+        # features = self.drop1(features)
         end_points['sa1_inds'] = fps_inds
         end_points['sa1_xyz'] = xyz
         end_points['sa1_features'] = features
-
+        
         xyz, features, fps_inds = self.sa2(xyz, features) # this fps_inds is just 0,1,...,1023
+        # features = self.drop2(features)
         end_points['sa2_inds'] = fps_inds
         end_points['sa2_xyz'] = xyz
         end_points['sa2_features'] = features
 
         xyz, features, fps_inds = self.sa3(xyz, features) # this fps_inds is just 0,1,...,511
+        # features = self.drop3(features)
         end_points['sa3_xyz'] = xyz
         end_points['sa3_features'] = features
 
         xyz, features, fps_inds = self.sa4(xyz, features) # this fps_inds is just 0,1,...,255
+        # features = self.drop4(features)
         end_points['sa4_xyz'] = xyz
         end_points['sa4_features'] = features
 
         # --------- 2 FEATURE UPSAMPLING LAYERS --------
         features = self.fp1(end_points['sa3_xyz'], end_points['sa4_xyz'], end_points['sa3_features'], end_points['sa4_features'])
+        # features = self.drop5(features)
         features = self.fp2(end_points['sa2_xyz'], end_points['sa3_xyz'], end_points['sa2_features'], features)
+        # features = self.drop6(features)
         end_points['fp2_features'] = features
         end_points['fp2_xyz'] = end_points['sa2_xyz']
         num_seed = end_points['fp2_xyz'].shape[1]

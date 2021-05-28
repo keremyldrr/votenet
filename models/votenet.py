@@ -65,7 +65,7 @@ class VoteNet(nn.Module):
         # Vote aggregation and detection
         self.pnet = ProposalModule(num_class, num_heading_bin, num_size_cluster,
             mean_size_arr, num_proposal, sampling)
-
+        self.drop = nn.Dropout(0.1)
     def forward(self, inputs):
         """ Forward pass of the network
 
@@ -92,16 +92,28 @@ class VoteNet(nn.Module):
         end_points['seed_inds'] = end_points['fp2_inds']
         end_points['seed_xyz'] = xyz
         end_points['seed_features'] = features
-        
+        features = self.drop(features)
         xyz, features = self.vgen(xyz, features)
         features_norm = torch.norm(features, p=2, dim=1)
         features = features.div(features_norm.unsqueeze(1))
         end_points['vote_xyz'] = xyz
         end_points['vote_features'] = features
-
+        
         end_points = self.pnet(xyz, features, end_points)
 
         return end_points
+
+    def enable_dropouts(self):
+        self.drop.train()
+        self.pnet.drop1.train()
+        self.pnet.drop2.train()
+        self.backbone_net.drop1.train()
+        self.backbone_net.drop2.train()
+        self.backbone_net.drop3.train()
+        self.backbone_net.drop4.train()
+        self.backbone_net.drop5.train()
+        self.backbone_net.drop6.train()
+
 
 
 if __name__=='__main__':

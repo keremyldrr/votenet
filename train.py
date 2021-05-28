@@ -56,8 +56,8 @@ parser.add_argument('--learning_rate', type=float, default=0.001, help='Initial 
 parser.add_argument('--weight_decay', type=float, default=0, help='Optimization L2 weight decay [default: 0]')
 parser.add_argument('--bn_decay_step', type=int, default=20, help='Period of BN decay (in epochs) [default: 20]')
 parser.add_argument('--bn_decay_rate', type=float, default=0.5, help='Decay rate for BN decay [default: 0.5]')
-parser.add_argument('--lr_decay_steps', default='80,120,160', help='When to decay the learning rate (in epochs) [default: 80,120,160]')
-parser.add_argument('--lr_decay_rates', default='0.1,0.1,0.1', help='Decay rates for lr decay [default: 0.1,0.1,0.1]')
+parser.add_argument('--lr_decay_steps', default='80,120,160,200,240,280,320', help='When to decay the learning rate (in epochs) [default: 80,120,160]')
+parser.add_argument('--lr_decay_rates', default='0.1,0.1,0.1,0.1,0.1,0.1,0.1', help='Decay rates for lr decay [default: 0.1,0.1,0.1]')
 parser.add_argument('--no_height', action='store_true', help='Do NOT use height signal in input.')
 parser.add_argument('--use_color', action='store_true', help='Use RGB color in input.')
 parser.add_argument('--use_sunrgbd_v2', action='store_true', help='Use V2 box labels for SUN RGB-D dataset')
@@ -247,7 +247,7 @@ def train_one_epoch():
         if (batch_idx+1) % batch_interval == 0:
             log_string(' ---- batch: %03d ----' % (batch_idx+1))
             TRAIN_VISUALIZER.log_scalars({key:stat_dict[key]/batch_interval for key in stat_dict},
-                (EPOCH_CNT*len(TRAIN_DATALOADER)+batch_idx)*BATCH_SIZE)
+                step=(EPOCH_CNT*len(TRAIN_DATALOADER)+batch_idx)*BATCH_SIZE)
             for key in sorted(stat_dict.keys()):
                 log_string('mean %s: %f'%(key, stat_dict[key]/batch_interval))
                 stat_dict[key] = 0

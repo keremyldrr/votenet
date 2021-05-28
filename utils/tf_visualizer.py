@@ -27,12 +27,12 @@ class Visualizer():
     def log_images(self, visuals, step):
             for label, image_numpy in visuals.items():
                 self.logger.image_summary(
-                    label, [image_numpy], step)
+                    label, [image_numpy], step=step)
 
     # scalars: dictionary of scalar labels and values
     def log_scalars(self, scalars, step):
         for label, val in scalars.items():
-            self.logger.scalar_summary(label, val, step)
+            self.logger.scalar_summary(label, val, step=step)
 
     # scatter plots
     def plot_current_points(self, points, disp_offset=10):
