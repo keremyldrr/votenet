@@ -6,8 +6,6 @@
 """
 #!/usr/bin/env python
 
-# %%
-from models.ap_helper import parse_predictions_with_objectness_prob
 from torch.utils.tensorboard import SummaryWriter
 import os
 import sys
@@ -25,47 +23,76 @@ import pandas as pd
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
 sys.path.append(os.path.join(ROOT_DIR, 'models'))
-from ap_helper import APCalculator, parse_predictions_with_objectness_prob, parse_groundtruths,parse_predictions_with_custom_mask,parse_predictions
+from ap_helper import APCalculator, parse_predictions_ensemble, parse_groundtruths,parse_predictions_with_custom_mask,parse_predictions
 from utils.uncertainty_utils import map_zero_one, box_size_uncertainty, semantic_cls_uncertainty, objectness_uncertainty, center_uncertainty, apply_softmax, compute_objectness_accuracy, compute_iou_masks,compute_iou_masks_with_classification
 from utils.binary_filter import UncertaintyFilter
+parser = argparse.ArgumentParser()
+parser.add_argument('--model', default='votenet', help='Model file name [default: votenet]')
+parser.add_argument('--dataset', default='sunrgbd', help='Dataset name. sunrgbd or scannet. [default: sunrgbd]')
+parser.add_argument('--checkpoint_path', default=None, help='Model checkpoint path [default: None]')
+parser.add_argument('--dump_dir', default=None, help='Dump dir to save sample outputs [default: None]')
+parser.add_argument('--num_point', type=int, default=20000, help='Point Number [default: 20000]')
+parser.add_argument('--num_target', type=int, default=256, help='Point Number [default: 256]')
+parser.add_argument('--batch_size', type=int, default=8, help='Batch Size during training [default: 8]')
+parser.add_argument('--vote_factor', type=int, default=1, help='Number of votes generated from each seed [default: 1]')
+parser.add_argument('--cluster_sampling', default='vote_fps', help='Sampling strategy for vote clusters: vote_fps, seed_fps, random [default: vote_fps]')
+parser.add_argument('--ap_iou_thresholds', default='0.25,0.5', help='A list of AP IoU thresholds [default: 0.25,0.5]')
+parser.add_argument('--no_height', action='store_true', help='Do NOT use height signal in input.')
+parser.add_argument('--use_color', action='store_true', help='Use RGB color in input.')
+parser.add_argument('--use_sunrgbd_v2', action='store_true', help='Use SUN RGB-D V2 box labels.')
+parser.add_argument('--use_3d_nms', action='store_true', help='Use 3D NMS instead of 2D NMS.')
+parser.add_argument('--use_cls_nms', action='store_true', help='Use per class NMS.')
+parser.add_argument('--use_old_type_nms', action='store_true', help='Use old type of NMS, IoBox2Area.')
+parser.add_argument('--per_class_proposal', action='store_true', help='Duplicate each proposal num_class times.')
+parser.add_argument('--nms_iou', type=float, default=0.25, help='NMS IoU threshold. [default: 0.25]')
+parser.add_argument('--conf_thresh', type=float, default=0.05, help='Filter out predictions with obj prob less than it. [default: 0.05]')
+parser.add_argument('--faster_eval', action='store_true', help='Faster evaluation by skippling empty bounding box removal.')
+parser.add_argument('--shuffle_dataset', action='store_true', help='Shuffle the dataset (random order).')
+parser.add_argument('--num_samples',type=int,default=20, help='Number of monte carlo sampling.')
+parser.add_argument('--num_runs',type=int,default=10, help='Number of runs for the experiment.')
+
+FLAGS = parser.parse_args()
+
+if FLAGS.use_cls_nms:
+    assert(FLAGS.use_3d_nms)
 
 
-class AttrDict(dict):
-    def __init__(self, *args, **kwargs):
-        super(AttrDict, self).__init__(*args, **kwargs)
-        self.__dict__ = self
+# class AttrDict(dict):
+#     def __init__(self, *args, **kwargs):
+#         super(AttrDict, self).__init__(*args, **kwargs)
+#         self.__dict__ = self
 
-def create_class_dict():
-    class_dict = {}
-    for i in range(18):
-        class_dict[i] = (0,0)
-    return class_dict
+# def create_class_dict():
+#     class_dict = {}
+#     for i in range(18):
+#         class_dict[i] = (0,0)
+#     return class_dict
 
-FLAGS = AttrDict()
-FLAGS.ap_iou_thresholds = '0.25,0.5'
-FLAGS.batch_size = 1
-# FLAGS.checkpoint_path = 'logs/dropoutsNotinBackbone/checkpoint208.tar'
-FLAGS.checkpoint_path='logs/log_scannet120/checkpoint.tar'
-# FLAGS.checkpoint_path='logs/log_scannet_dropout_0_1_200/checkpoint129.tar'
-FLAGS.cluster_sampling = 'seed_fps'
-FLAGS.conf_thresh = 0.5
-FLAGS.dataset = 'scannet'
-FLAGS.dump_dir = 'evals/test_colors'
-FLAGS.faster_eval = True
-FLAGS.model = 'votenet'
-FLAGS.nms_iou = 0.25
-FLAGS.no_height = False
-FLAGS.num_point = 40000
-FLAGS.num_target = 256
-FLAGS.per_class_proposal = False
-FLAGS.shuffle_dataset = False
-FLAGS.use_3d_nms = True
-FLAGS.use_cls_nms = True
-FLAGS.use_color = False
-FLAGS.use_old_type_nms = False
-FLAGS.use_sunrgbd_v2 = False
-FLAGS.vote_factor = 1
-FLAGS.logdir = "logs/sanity_check_partialdropouts"
+# FLAGS = AttrDict()
+# FLAGS.ap_iou_thresholds = '0.25,0.5'
+# FLAGS.batch_size = 8
+# FLAGS.checkpoint_path = '/home/yildirir/workspace/votenet/demo_files/pretrained_votenet_on_scannet.tar'
+# # FLAGS.checkpoint_path='logs/log_scannet120/checkpoint.tar'
+# # FLAGS.checkpoint_path='logs/log_scannet_dropout_0_1_200/checkpoint128.tar'
+# FLAGS.cluster_sampling = 'seed_fps'
+# FLAGS.conf_thresh = 0.05
+# FLAGS.dataset = 'scannet'
+# FLAGS.dump_dir = 'evals/test_colors'
+# FLAGS.faster_eval = False
+# FLAGS.model = 'votenet'
+# FLAGS.nms_iou = 0.25
+# FLAGS.no_height = False
+# FLAGS.num_point = 40000
+# FLAGS.num_target = 256
+# FLAGS.per_class_proposal = True
+# FLAGS.shuffle_dataset = False
+# FLAGS.use_3d_nms = True
+# FLAGS.use_cls_nms = True
+# FLAGS.use_color = False
+# FLAGS.use_old_type_nms = False
+# FLAGS.use_sunrgbd_v2 = False
+# FLAGS.vote_factor = 1
+# FLAGS.logdir = "logs/sanity_check_partialdropouts"
 BATCH_SIZE = FLAGS.batch_size
 NUM_POINT = FLAGS.num_point
 DUMP_DIR = FLAGS.dump_dir
@@ -73,8 +100,10 @@ CHECKPOINT_PATH = FLAGS.checkpoint_path
 assert (CHECKPOINT_PATH is not None)
 FLAGS.DUMP_DIR = DUMP_DIR
 AP_IOU_THRESHOLDS = [float(x) for x in FLAGS.ap_iou_thresholds.split(',')]
-NUM_SAMPLES = 1
+NUM_SAMPLES = FLAGS.num_samples
+NUM_RUNS = FLAGS.num_runs
 # Prepare DUMP_DIR
+print(FLAGS)
 if not os.path.exists(DUMP_DIR):
     os.mkdir(DUMP_DIR)
 DUMP_FOUT = open(os.path.join(DUMP_DIR, 'log_eval.txt'), 'w')
@@ -156,10 +185,10 @@ if CHECKPOINT_PATH is not None and os.path.isfile(CHECKPOINT_PATH):
     epoch = checkpoint['epoch']
     log_string("Loaded checkpoint %s (epoch: %d)" % (CHECKPOINT_PATH, epoch))
 
-
 CONFIG_DICT = {'remove_empty_box': (not FLAGS.faster_eval), 'use_3d_nms': FLAGS.use_3d_nms, 'nms_iou': FLAGS.nms_iou,
     'use_old_type_nms': FLAGS.use_old_type_nms, 'cls_nms': FLAGS.use_cls_nms, 'per_class_proposal': FLAGS.per_class_proposal,
     'conf_thresh': FLAGS.conf_thresh, 'dataset_config':DATASET_CONFIG}
+# -------------------
 # ----------------------------------------------------------------------
 
 # ------------------------------------------------------------------------- GLOBAL CONFIG END
@@ -195,13 +224,20 @@ def create_filters():
 
 def evaluate_one_epoch_with_uncertainties():
     stat_dict = {}
-    tb = SummaryWriter(FLAGS.logdir)
-
-    ap_calculator_list_original = [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
+    # tb = SummaryWriter(FLAGS.logdir)
+    methods = ["Native","objectness","classification", #TODO: add box size
+        "obj_and_cls"]
+    # methods = ["Native"]
+    # methods = ["obj_and_cls","Native"]
+    met_dict = {}
+    for m in methods:
+        met_dict[m] =  [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
                           for iou_thresh in AP_IOU_THRESHOLDS]
-    ap_calculator_list_custom = [APCalculator(iou_thresh, DATASET_CONFIG.class2type) for iou_thresh in AP_IOU_THRESHOLDS]
-    net.eval()  # set model to eval mode (for bn and dp)
-    # net.enable_dropouts()
+    # ap_calculator_list_original = [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
+    #                       for iou_thresh in AP_IOU_THRESHOLDS]
+    net.eval()  # set model sem_cls_probs[i,j,ii]to eval mode (for bn and dp)
+    #TODO: Unlock this
+    net.enable_dropouts()
     
     stats = []
     class_acc_dict = {}
@@ -212,8 +248,8 @@ def evaluate_one_epoch_with_uncertainties():
         if batch_idx % 10 == 0:
             print('Eval batch: %d' % (batch_idx))
 
-        # 
-        
+        # if batch_idx == 1:
+        #     break
         for key in batch_data_label:
             batch_data_label[key] = batch_data_label[key].to(device)
 
@@ -224,240 +260,40 @@ def evaluate_one_epoch_with_uncertainties():
             mc_samples = [net(inputs) for i in range(NUM_SAMPLES)]
 
         # Compute loss
-        print("Sampling done")
         for idx, end_points in enumerate(mc_samples):
             for key in batch_data_label:
                 assert (key not in end_points)
                 end_points[key] = batch_data_label[key]
             local_loss, end_points = criterion(end_points, DATASET_CONFIG)
-            loss[idx] = local_loss.cpu().detach().numpy().item()
-        #     print(loss)
-            # Accumulate statistics and print out
-            for key in end_points:
-                if 'loss' in key or 'acc' in key or 'ratio' in key:
-                    if key not in stat_dict:
-                        stat_dict[key] = 0
-                    stat_dict[key] += end_points[key].item()
 
-            # batch_pred_map_cls = parse_predictions_with_objectness_prob(end_points, CONFIG_DICT)
-            # import copy
-            # ep2 = copy.deepcopy(end_points)
-            org_batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT)
-            org_batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
-        # apply_softmax(mc_samples)
 
-        # print("Softmaxed")
+        
+        #This guy has len(methods) elements
+        import copy
+        batch_pred_map_cls =[parse_predictions_ensemble(copy.deepcopy(mc_samples), CONFIG_DICT,m) for m in methods]
+        
+        org_batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
 
-        # check = False
+
+        for idx,m in enumerate(methods):
+            for ap_calculator in met_dict[m]:
+                ap_calculator.step(batch_pred_map_cls[idx], org_batch_gt_map_cls)
+
+
+    
    
-        # thresh = None
-        # box_size_mask, box_size_var = box_size_uncertainty(mc_samples,thresh)
-        # cls_entropy_mask, cls_entropy = semantic_cls_uncertainty(mc_samples,thresh)
-        # obj_entropy_mask, obj_entropy = objectness_uncertainty(mc_samples,thresh)        
-        
-        # no_filter_mask = np.ones_like(box_size_mask)
-        # models_masks = [sm["final_masks"][0] for sm in mc_samples]
-        # models_mask = np.array(np.sum(np.array(models_masks),axis=0) > len(models_masks)*0.5,dtype=np.int)
-        
-    
-        # all_filters["objectness"].set_mask(obj_entropy_mask)
-        # all_filters["classification"].set_mask(cls_entropy_mask)
-        # all_filters["box_size"].set_mask(box_size_mask)
-        # all_filters["objectness_and_classification"].set_mask(np.logical_and(obj_entropy_mask,cls_entropy_mask)) 
-        # all_filters["objectness_and_box_size"].set_mask(np.logical_and(obj_entropy_mask,box_size_mask)) 
-        # all_filters["box_size_and_classification"].set_mask(np.logical_and(box_size_mask,cls_entropy_mask)) 
-        # all_filters["no_filter"].set_mask(no_filter_mask) 
-        # all_filters["models_filter"].set_mask(models_masks[0]) 
-        # all_filters["models_voted_filter"].set_mask(models_mask) 
-        # all_filters["model_and_cls"].set_mask(np.logical_and(models_mask,all_filters["classification"].fvector))  
-        # all_filters["model_and_obj"].set_mask(np.logical_and(models_mask,all_filters["objectness"].fvector))  
-        # all_filters["model_and_objcls"].set_mask(np.logical_and(models_mask,all_filters["objectness_and_classification"].fvector))  
-        # cls_iou_masks,iou_masks = compute_iou_masks_with_classification(mc_samples,class_acc_dict)
-#         print("Accuracy masks computed")
-      
-        
-        # tf_logging_dict = {}
-        # tf_logging_rejection = {}
-        # for m in all_filters.keys():
-        #     all_filters[m].update(mc_samples[0],iou_masks,cls_iou_masks)
-        #     all_filters[m].log()
-        #     obj_acc,cls_acc = all_filters[m].get_last_accs()
-        #     tf_logging_dict[all_filters[m].name + "_obj_acc"] = obj_acc
-        #     tf_logging_dict[all_filters[m].name + "_cls_acc"] = cls_acc
-        #     tf_logging_rejection[all_filters[m].name + "_rejection"] = all_filters[m].num_rejected[-1]
-
-     
-
-
-
-        # tb.add_scalar("Box Size Variance",
-        #               (box_size_var).mean(), batch_idx)
-        # tb.add_scalar("Classification Entropy",
-        #               (cls_entropy).mean(), batch_idx)
-        # tb.add_scalar("Objectness Entropy",
-        #               (obj_entropy).mean(), batch_idx)
-        # tb.add_scalars("accs/", tf_logging_dict, batch_idx)
-        # tb.add_scalars("rejections/", tf_logging_rejection, batch_idx)
-
-        
- 
-        for ap_calculator in ap_calculator_list_original:
-            ap_calculator.step(org_batch_pred_map_cls, org_batch_gt_map_cls)
-
-        ep2["custom_mask"] = iou_masks[0]
-        batch_pred_map_cls = parse_predictions_with_custom_mask(ep2, CONFIG_DICT)
-        for ap_calculator in ap_calculator_list_custom:
-            ap_calculator.step(batch_pred_map_cls, org_batch_gt_map_cls)
-    
+    for idx,m in enumerate(methods):
+        print("|",m,"|","| ")
+        for ap_calculator in met_dict[m]:
+            print('|', 'iou_thresh | %f  ' % (ap_calculator.ap_iou_thresh), ' | ')
+            metrics_dict = ap_calculator.compute_metrics()
+            for key in metrics_dict:
+                # if key == "mAP" or key == "AR":
+                log_string(' | %s  | %f | ' % (key,metrics_dict[key]))
 
     
-#     mean_obj_accs = []
-#     mean_cls_accs = []
-#     names = []
-#     rejections = []
-#     for f in all_filters.keys():   
-#         mean_obj_accs.append(np.array(all_filters[f].obj_accs).mean())
-#         mean_cls_accs.append(np.array(all_filters[f].cls_accs).mean())
-#         names.append(f)
-#         rejections.append(np.array(all_filters[f].num_rejected).sum())
-
-#     fig, ax = plt.subplots()
-
-#     y_pos = np.arange(len(names))
-# ###############################
-
-#     ax.barh(y_pos, np.array(mean_obj_accs), align='center')
-#     ax.set_yticks(y_pos)
-#     ax.set_yticklabels(names)
-#     ax.invert_yaxis()  # labels read top-to-bottom
-#     # ax.set_xlabel('Performance')
-#     ax.set_title('"Mean Objectness Accuracies"')
-#     plt.tight_layout()
-#     tb.add_figure("Mean Objectness Accuracies",fig,0)
-
-# ###############################
-#     fig, ax = plt.subplots()
-
-#     ax.barh(y_pos, np.array(mean_cls_accs), align='center')
-#     ax.set_yticks(y_pos)
-#     ax.set_yticklabels(names)
-#     ax.invert_yaxis() 
-#     ax.set_title('"Mean Classification Accuracies"')
-#     plt.tight_layout()
-#     tb.add_figure("Mean Classification Accuracies",fig,0)
-# ###############################
-#     fig, ax = plt.subplots()
-
-#     ax.barh(y_pos, np.array(rejections), align='center')
-#     ax.set_yticks(y_pos)
-#     ax.set_yticklabels(names)
-#     ax.invert_yaxis()  # labels read top-to-bottom
-#     # ax.set_xlabel('Performance')
-#     ax.set_title('"Rejections"')
-#     plt.tight_layout()
-#     tb.add_figure("Rejections",fig,0)
-
-#     mean_obj_accs = []
-#     mean_cls_accs = []
-#     names = []
-#     rejections = []
-#     for f in all_filters.keys():   
-#         mean_obj_accs.append(np.array(all_filters[f].obj_accs).mean())
-#         mean_cls_accs.append(np.array(all_filters[f].cls_accs).mean())
-#         names.append(f)
-#         rejections.append(np.array(all_filters[f].num_rejected).sum())
-
-#     fig, ax = plt.subplots()
-
-#     y_pos = np.arange(len(names))
-# ###############################
-
-#     ax.barh(y_pos, np.array(mean_obj_accs), align='center')
-#     ax.set_yticks(y_pos)
-#     ax.set_yticklabels(names)
-#     ax.invert_yaxis()  # labels read top-to-bottom
-#     # ax.set_xlabel('Performance')
-#     ax.set_title('"Mean Objectness Accuracies"')
-#     plt.tight_layout()
-#     tb.add_figure("Mean Objectness Accuracies",fig,0)
-
-# ###############################
-#     fig, ax = plt.subplots()
-
-#     ax.barh(y_pos, np.array(mean_cls_accs), align='center')
-#     ax.set_yticks(y_pos)
-#     ax.set_yticklabels(names)
-#     ax.invert_yaxis() 
-#     ax.set_title('"Mean Classification Accuracies"')
-#     plt.tight_layout()
-#     tb.add_figure("Mean Classification Accuracies",fig,0)
-# ###############################
-#     fig, ax = plt.subplots()
-
-#     ax.barh(y_pos, np.array(rejections), align='center')
-#     ax.set_yticks(y_pos)
-#     ax.set_yticklabels(names)
-#     ax.invert_yaxis()  # labels read top-to-bottom
-#     # ax.set_xlabel('Performance')
-#     ax.set_title('"Rejections"')
-#     plt.tight_layout()
-#     tb.add_figure("Rejections",fig,0)
-
-#     total_accs = []
-#     mydict = {'cabinet':0, 'bed':1, 'chair':2, 'sofa':3, 'table':4, 'door':5,
-#             'window':6,'bookshelf':7,'picture':8, 'counter':9, 'desk':10, 'curtain':11,
-#             'refrigerator':12, 'showercurtrain':13, 'toilet':14, 'sink':15, 'bathtub':16, 'garbagebin':17, 'non-object':18} 
-#     revDict = {}
-#     for a in mydict.keys():
-#         revDict[mydict[a]] = a
-#     for f in all_filters.keys():
-#         filt = all_filters[f]
-#         accuracies = []
-#         for i in filt.classification_class_dict.keys():
-#             if np.sum(np.array(filt.classification_class_dict[i])) == 0:
-#                 acc = -1
-#             else:
-#                 acc = filt.classification_class_dict[i][0]/(filt.classification_class_dict[i][0] + filt.classification_class_dict[i][1])
-#             accuracies.append(acc)
-#         total_accs.append(accuracies)
-#     df = pd.DataFrame(total_accs,columns=list(mydict.keys()))
-#     df.index = ([all_filters[a].name for a in all_filters.keys() ])
-#     df.rename_axis("Filter")
-#     df.to_csv(FLAGS.logdir + "/class_based_accuracies.csv")
-#     tb.close()
-    print("******************************ORIGINAL****************************************")
-    for i, ap_calculator in enumerate(ap_calculator_list_original):
-        print('-' * 10, 'iou_thresh: %f' % (AP_IOU_THRESHOLDS[i]), '-' * 10)
-        metrics_dict = ap_calculator.compute_metrics()
-        for key in metrics_dict:
-            log_string('eval %s: %f' % (key, metrics_dict[key]))
-
-    print("******************************CUSTOM****************************************")
-    for i, ap_calculator in enumerate(ap_calculator_list_custom):
-        print('-' * 10, 'iou_thresh: %f' % (AP_IOU_THRESHOLDS[i]), '-' * 10)
-        metrics_dict = ap_calculator.compute_metrics()
-        for key in metrics_dict:
-            log_string('eval %s: %f' % (key, metrics_dict[key]))
 
 
-
-    print("*********************CLASS ACCURACIES IN PROPOSALS*******************")
-    mydict = {'cabinet':0, 'bed':1, 'chair':2, 'sofa':3, 'table':4, 'door':5,
-        'window':6,'bookshelf':7,'picture':8, 'counter':9, 'desk':10, 'curtain':11,
-        'refrigerator':12, 'showercurtrain':13, 'toilet':14, 'sink':15, 'bathtub':16, 'garbagebin':17} 
-    revDict = {}
-    for a in mydict.keys():
-        revDict[mydict[a]] = a
-    for c in revDict.keys():
-        corr = class_acc_dict[c][0]
-        wrong = class_acc_dict[c][1]
-        if(corr + wrong == 0):
-            acc = 0
-        else:
-            acc = corr/(corr + wrong )
-
-        print(revDict[c],"Correct Match: ",corr,"Wrong Match: ",wrong,"Acc ",acc)
-    return all_filters
 
 
 
@@ -470,4 +306,5 @@ def eval_uncertainties():
 
 
 # if __name__ == '__main__':
-all_filters = eval_uncertainties()
+for i in range(NUM_RUNS):
+    eval_uncertainties()

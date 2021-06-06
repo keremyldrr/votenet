@@ -189,6 +189,7 @@ class PointnetSAModuleVotes(nn.Module):
         self.mlp_module = None
         self.use_xyz = use_xyz
         self.sigma = sigma
+        self.drop = torch.nn.Dropout(0.5)
         if self.sigma is None:
             self.sigma = self.radius/2
         self.normalize_xyz = normalize_xyz
@@ -248,6 +249,10 @@ class PointnetSAModuleVotes(nn.Module):
                 xyz, new_xyz, features
             )  # (B, C, npoint, nsample), (B,3,npoint,nsample), (B,npoint)
 
+        # DONE: Add dropout here instead of backbone
+        # new_features = self.drop(grouped_features)
+
+        
         new_features = self.mlp_module(
             grouped_features
         )  # (B, mlp[-1], npoint, nsample)

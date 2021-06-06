@@ -12,10 +12,11 @@ import torch
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'utils'))
-from eval_det import eval_det_cls, eval_det_multiprocessing, eval_det
+from eval_det import eval_det_cls, eval_det_multiprocessing, eval_det,eval_det_iou
 from eval_det import get_iou_obb
 from nms import nms_2d_faster, nms_3d_faster, nms_3d_faster_samecls
 from box_util import get_3d_box
+from uncertainty_utils import accumulate_mc_samples
 
 sys.path.append(os.path.join(ROOT_DIR, 'sunrgbd'))
 from sunrgbd_utils import extract_pc_in_box3d
@@ -501,6 +502,8 @@ def parse_predictions_ensemble(mc_samples, config_dict,extension = None):
             where pred_list_i = [(pred_sem_cls, box_params, box_score)_j]
             where j = 0, ..., num of valid detections - 1 from sample input i
     """
+    
+    end_points = accumulate_mc_samples(mc_samples)
     pred_center = end_points['center']  # B,num_proposal,3
     pred_heading_class = torch.argmax(end_points['heading_scores'],
                                       -1)  # B,num_proposal
@@ -576,6 +579,18 @@ def parse_predictions_ensemble(mc_samples, config_dict,extension = None):
 
     obj_logits = end_points['objectness_scores'].detach().cpu().numpy()
     obj_prob = softmax(obj_logits)[:, :, 1]  # (B,K)
+    cls_entropy = end_points["semantic_cls_entropy"]
+    obj_entropy = end_points["objectness_entropy"]
+    extra = np.ones_like(obj_entropy)
+    if extension == "objectness":
+        extra = 1 - obj_entropy
+    elif extension == "classification":
+        extra = 1 - cls_entropy
+    elif extension == "obj_and_cls":
+        extra = (1 - obj_entropy )*(1 -  cls_entropy)
+
+    obj_prob =obj_prob *  extra
+    # box_size_entropy = end_points["box_size_entropy"]
     if not config_dict['use_3d_nms']:
         # ---------- NMS input: pred_with_prob in (B,K,7) -----------
         pred_mask = np.zeros((bsize, K))
@@ -659,20 +674,24 @@ def parse_predictions_ensemble(mc_samples, config_dict,extension = None):
 
     batch_pred_map_cls = []  # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
     # final_mask = np.zeros_like(pred_mask)
+ 
+    # print(extension)
     for i in range(bsize):
+
         if config_dict['per_class_proposal']:
             cur_list = []
             for ii in range(config_dict['dataset_config'].num_class):
                 cur_list += [(ii, pred_corners_3d_upright_camera[i,j], sem_cls_probs[i,j,ii]*obj_prob[i,j]) \
                     for j in range(pred_center.shape[1]) if pred_mask[i,j]==1 and obj_prob[i,j]>config_dict['conf_thresh']]
             batch_pred_map_cls.append(cur_list)
+            # print("Accepted" ,len(cur_list))
         else:
             batch_pred_map_cls.append([(pred_sem_cls[i,j].item(), pred_corners_3d_upright_camera[i,j], obj_prob[i,j]) \
                 for j in range(pred_center.shape[1]) if pred_mask[i,j]==1 and obj_prob[i,j]>config_dict['conf_thresh']])
             # for j in range(pred_center.shape[1]):
             #     if pred_mask[i,j]==1 and obj_prob[i,j]>config_dict['conf_thresh']:
             #         final_mask[i,j] = 1
-
+    # print("*******************")
     end_points['batch_pred_map_cls'] = batch_pred_map_cls
     # end_points["final_masks"] = final_mask
     return batch_pred_map_cls
@@ -780,7 +799,7 @@ class APCalculator(object):
         """ Use accumulated predictions and groundtruths to compute Average Precision.
         """
         # rec, prec, ap = eval_det_multiprocessing(self.pred_map_cls, self.gt_map_cls, ovthresh=self.ap_iou_thresh, get_iou_func=get_iou_obb)
-        rec, prec, ap = eval_det(self.pred_map_cls,
+        rec, prec, ap,ious = eval_det_iou(self.pred_map_cls,
                                  self.gt_map_cls,
                                  ovthresh=self.ap_iou_thresh,
                                  get_iou_func=get_iou_obb)
@@ -801,6 +820,11 @@ class APCalculator(object):
             except:
                 ret_dict['%s Recall' % (clsname)] = 0
                 rec_list.append(0)
+
+        for key in sorted(ious.keys()):
+            clsname = self.class2type_map[key] if self.class2type_map else str(
+                key)
+            ret_dict['%s Average IOU' % (clsname)] = np.array(ious[key]).mean()
         ret_dict['AR'] = np.mean(rec_list)
         return ret_dict
 

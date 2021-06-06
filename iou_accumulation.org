@@ -1,0 +1,4654 @@
+Namespace(DUMP_DIR='evals/eval_scannet_dropout_0_2_148', ap_iou_thresholds='0.25,0.5', batch_size=8, checkpoint_path='logs/log_scannet_dropout_0_1_200/checkpoint128.tar', cluster_sampling='seed_fps', conf_thresh=0.05, dataset='scannet', dump_dir='evals/eval_scannet_dropout_0_2_148', faster_eval=False, model='votenet', nms_iou=0.25, no_height=False, num_point=40000, num_runs=10, num_samples=20, num_target=256, per_class_proposal=True, shuffle_dataset=False, use_3d_nms=True, use_cls_nms=True, use_color=False, use_old_type_nms=False, use_sunrgbd_v2=False, vote_factor=1)
+kept 312 scans out of 312
+312
+Loaded checkpoint logs/log_scannet_dropout_0_1_200/checkpoint128.tar (epoch: 129)
+2021-06-04 15:59:58.507048
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.398518 | 
+ | bed Average Precision  | 0.867945 | 
+ | chair Average Precision  | 0.866331 | 
+ | sofa Average Precision  | 0.887441 | 
+ | table Average Precision  | 0.603415 | 
+ | door Average Precision  | 0.427138 | 
+ | window Average Precision  | 0.350661 | 
+ | bookshelf Average Precision  | 0.475200 | 
+ | picture Average Precision  | 0.056503 | 
+ | counter Average Precision  | 0.522904 | 
+ | desk Average Precision  | 0.637635 | 
+ | curtain Average Precision  | 0.426680 | 
+ | refrigerator Average Precision  | 0.492283 | 
+ | showercurtrain Average Precision  | 0.536635 | 
+ | toilet Average Precision  | 0.974475 | 
+ | sink Average Precision  | 0.476735 | 
+ | bathtub Average Precision  | 0.924610 | 
+ | garbagebin Average Precision  | 0.365782 | 
+ | mAP  | 0.571716 | 
+ | cabinet Recall  | 0.731183 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.916667 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.825714 | 
+ | door Recall  | 0.721627 | 
+ | window Recall  | 0.624113 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.220721 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.929134 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.664151 | 
+ | cabinet Average IOU  | 0.489072 | 
+ | bed Average IOU  | 0.669286 | 
+ | chair Average IOU  | 0.621771 | 
+ | sofa Average IOU  | 0.623762 | 
+ | table Average IOU  | 0.603426 | 
+ | door Average IOU  | 0.490830 | 
+ | window Average IOU  | 0.441318 | 
+ | bookshelf Average IOU  | 0.585112 | 
+ | picture Average IOU  | 0.381958 | 
+ | counter Average IOU  | 0.472737 | 
+ | desk Average IOU  | 0.564914 | 
+ | curtain Average IOU  | 0.436511 | 
+ | refrigerator Average IOU  | 0.550138 | 
+ | showercurtrain Average IOU  | 0.459312 | 
+ | toilet Average IOU  | 0.645959 | 
+ | sink Average IOU  | 0.493074 | 
+ | bathtub Average IOU  | 0.620177 | 
+ | garbagebin Average IOU  | 0.492949 | 
+ | AR  | 0.800593 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.074188 | 
+ | bed Average Precision  | 0.772977 | 
+ | chair Average Precision  | 0.642302 | 
+ | sofa Average Precision  | 0.700275 | 
+ | table Average Precision  | 0.434711 | 
+ | door Average Precision  | 0.124687 | 
+ | window Average Precision  | 0.092835 | 
+ | bookshelf Average Precision  | 0.339074 | 
+ | picture Average Precision  | 0.003385 | 
+ | counter Average Precision  | 0.174041 | 
+ | desk Average Precision  | 0.284976 | 
+ | curtain Average Precision  | 0.112201 | 
+ | refrigerator Average Precision  | 0.335036 | 
+ | showercurtrain Average Precision  | 0.100186 | 
+ | toilet Average Precision  | 0.881539 | 
+ | sink Average Precision  | 0.212629 | 
+ | bathtub Average Precision  | 0.812663 | 
+ | garbagebin Average Precision  | 0.128861 | 
+ | mAP  | 0.345920 | 
+ | cabinet Recall  | 0.338710 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.733918 | 
+ | sofa Recall  | 0.835052 | 
+ | table Recall  | 0.651429 | 
+ | door Recall  | 0.344754 | 
+ | window Recall  | 0.230496 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.653543 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.649123 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.838710 | 
+ | garbagebin Recall  | 0.350943 | 
+ | cabinet Average IOU  | 0.630103 | 
+ | bed Average IOU  | 0.707167 | 
+ | chair Average IOU  | 0.679878 | 
+ | sofa Average IOU  | 0.665126 | 
+ | table Average IOU  | 0.669805 | 
+ | door Average IOU  | 0.620266 | 
+ | window Average IOU  | 0.590960 | 
+ | bookshelf Average IOU  | 0.639807 | 
+ | picture Average IOU  | 0.583761 | 
+ | counter Average IOU  | 0.608884 | 
+ | desk Average IOU  | 0.649725 | 
+ | curtain Average IOU  | 0.575165 | 
+ | refrigerator Average IOU  | 0.645188 | 
+ | showercurtrain Average IOU  | 0.594095 | 
+ | toilet Average IOU  | 0.676605 | 
+ | sink Average IOU  | 0.631674 | 
+ | bathtub Average IOU  | 0.656209 | 
+ | garbagebin Average IOU  | 0.609903 | 
+ | AR  | 0.520719 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.401045 | 
+ | bed Average Precision  | 0.866553 | 
+ | chair Average Precision  | 0.869728 | 
+ | sofa Average Precision  | 0.884529 | 
+ | table Average Precision  | 0.605077 | 
+ | door Average Precision  | 0.426099 | 
+ | window Average Precision  | 0.356634 | 
+ | bookshelf Average Precision  | 0.480106 | 
+ | picture Average Precision  | 0.053745 | 
+ | counter Average Precision  | 0.526358 | 
+ | desk Average Precision  | 0.634497 | 
+ | curtain Average Precision  | 0.428192 | 
+ | refrigerator Average Precision  | 0.492885 | 
+ | showercurtrain Average Precision  | 0.592221 | 
+ | toilet Average Precision  | 0.974269 | 
+ | sink Average Precision  | 0.478381 | 
+ | bathtub Average Precision  | 0.924610 | 
+ | garbagebin Average Precision  | 0.371755 | 
+ | mAP  | 0.575927 | 
+ | cabinet Recall  | 0.733871 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.918860 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.828571 | 
+ | door Recall  | 0.721627 | 
+ | window Recall  | 0.624113 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.929134 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.664151 | 
+ | cabinet Average IOU  | 0.487955 | 
+ | bed Average IOU  | 0.674763 | 
+ | chair Average IOU  | 0.621739 | 
+ | sofa Average IOU  | 0.614898 | 
+ | table Average IOU  | 0.603194 | 
+ | door Average IOU  | 0.488089 | 
+ | window Average IOU  | 0.440789 | 
+ | bookshelf Average IOU  | 0.584271 | 
+ | picture Average IOU  | 0.382404 | 
+ | counter Average IOU  | 0.472305 | 
+ | desk Average IOU  | 0.565698 | 
+ | curtain Average IOU  | 0.438143 | 
+ | refrigerator Average IOU  | 0.549938 | 
+ | showercurtrain Average IOU  | 0.448886 | 
+ | toilet Average IOU  | 0.644089 | 
+ | sink Average IOU  | 0.504414 | 
+ | bathtub Average IOU  | 0.624112 | 
+ | garbagebin Average IOU  | 0.492259 | 
+ | AR  | 0.800772 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.076741 | 
+ | bed Average Precision  | 0.774575 | 
+ | chair Average Precision  | 0.639893 | 
+ | sofa Average Precision  | 0.689693 | 
+ | table Average Precision  | 0.434023 | 
+ | door Average Precision  | 0.119201 | 
+ | window Average Precision  | 0.094067 | 
+ | bookshelf Average Precision  | 0.343482 | 
+ | picture Average Precision  | 0.002304 | 
+ | counter Average Precision  | 0.172481 | 
+ | desk Average Precision  | 0.292918 | 
+ | curtain Average Precision  | 0.137939 | 
+ | refrigerator Average Precision  | 0.331376 | 
+ | showercurtrain Average Precision  | 0.075357 | 
+ | toilet Average Precision  | 0.905017 | 
+ | sink Average Precision  | 0.214300 | 
+ | bathtub Average Precision  | 0.812663 | 
+ | garbagebin Average Precision  | 0.131239 | 
+ | mAP  | 0.347071 | 
+ | cabinet Recall  | 0.330645 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.735380 | 
+ | sofa Recall  | 0.814433 | 
+ | table Recall  | 0.645714 | 
+ | door Recall  | 0.336188 | 
+ | window Recall  | 0.230496 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.653543 | 
+ | curtain Recall  | 0.298507 | 
+ | refrigerator Recall  | 0.649123 | 
+ | showercurtrain Recall  | 0.321429 | 
+ | toilet Recall  | 0.913793 | 
+ | sink Recall  | 0.326531 | 
+ | bathtub Recall  | 0.838710 | 
+ | garbagebin Recall  | 0.352830 | 
+ | cabinet Average IOU  | 0.626994 | 
+ | bed Average IOU  | 0.710469 | 
+ | chair Average IOU  | 0.680116 | 
+ | sofa Average IOU  | 0.658736 | 
+ | table Average IOU  | 0.671913 | 
+ | door Average IOU  | 0.622781 | 
+ | window Average IOU  | 0.587494 | 
+ | bookshelf Average IOU  | 0.638401 | 
+ | picture Average IOU  | 0.588256 | 
+ | counter Average IOU  | 0.601593 | 
+ | desk Average IOU  | 0.651922 | 
+ | curtain Average IOU  | 0.573189 | 
+ | refrigerator Average IOU  | 0.645530 | 
+ | showercurtrain Average IOU  | 0.591539 | 
+ | toilet Average IOU  | 0.670948 | 
+ | sink Average IOU  | 0.644976 | 
+ | bathtub Average IOU  | 0.660749 | 
+ | garbagebin Average IOU  | 0.609325 | 
+ | AR  | 0.518888 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.408480 | 
+ | bed Average Precision  | 0.873290 | 
+ | chair Average Precision  | 0.877967 | 
+ | sofa Average Precision  | 0.883638 | 
+ | table Average Precision  | 0.597930 | 
+ | door Average Precision  | 0.430519 | 
+ | window Average Precision  | 0.357072 | 
+ | bookshelf Average Precision  | 0.478406 | 
+ | picture Average Precision  | 0.058161 | 
+ | counter Average Precision  | 0.535790 | 
+ | desk Average Precision  | 0.680762 | 
+ | curtain Average Precision  | 0.430789 | 
+ | refrigerator Average Precision  | 0.481101 | 
+ | showercurtrain Average Precision  | 0.565769 | 
+ | toilet Average Precision  | 0.974132 | 
+ | sink Average Precision  | 0.475934 | 
+ | bathtub Average Precision  | 0.925573 | 
+ | garbagebin Average Precision  | 0.373167 | 
+ | mAP  | 0.578249 | 
+ | cabinet Recall  | 0.731183 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.921784 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.828571 | 
+ | door Recall  | 0.725910 | 
+ | window Recall  | 0.624113 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.220721 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.929134 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.664151 | 
+ | cabinet Average IOU  | 0.492742 | 
+ | bed Average IOU  | 0.669867 | 
+ | chair Average IOU  | 0.632729 | 
+ | sofa Average IOU  | 0.624833 | 
+ | table Average IOU  | 0.604297 | 
+ | door Average IOU  | 0.491051 | 
+ | window Average IOU  | 0.446138 | 
+ | bookshelf Average IOU  | 0.580411 | 
+ | picture Average IOU  | 0.381151 | 
+ | counter Average IOU  | 0.479370 | 
+ | desk Average IOU  | 0.584861 | 
+ | curtain Average IOU  | 0.427926 | 
+ | refrigerator Average IOU  | 0.557555 | 
+ | showercurtrain Average IOU  | 0.447620 | 
+ | toilet Average IOU  | 0.648914 | 
+ | sink Average IOU  | 0.514615 | 
+ | bathtub Average IOU  | 0.621097 | 
+ | garbagebin Average IOU  | 0.496015 | 
+ | AR  | 0.801716 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.072572 | 
+ | bed Average Precision  | 0.790226 | 
+ | chair Average Precision  | 0.675761 | 
+ | sofa Average Precision  | 0.708006 | 
+ | table Average Precision  | 0.434022 | 
+ | door Average Precision  | 0.145044 | 
+ | window Average Precision  | 0.106817 | 
+ | bookshelf Average Precision  | 0.332357 | 
+ | picture Average Precision  | 0.002741 | 
+ | counter Average Precision  | 0.188690 | 
+ | desk Average Precision  | 0.382606 | 
+ | curtain Average Precision  | 0.089828 | 
+ | refrigerator Average Precision  | 0.337319 | 
+ | showercurtrain Average Precision  | 0.068214 | 
+ | toilet Average Precision  | 0.880704 | 
+ | sink Average Precision  | 0.227855 | 
+ | bathtub Average Precision  | 0.817012 | 
+ | garbagebin Average Precision  | 0.140363 | 
+ | mAP  | 0.355563 | 
+ | cabinet Recall  | 0.327957 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.759503 | 
+ | sofa Recall  | 0.835052 | 
+ | table Recall  | 0.648571 | 
+ | door Recall  | 0.349036 | 
+ | window Recall  | 0.234043 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.716535 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.649123 | 
+ | showercurtrain Recall  | 0.285714 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.326531 | 
+ | bathtub Recall  | 0.838710 | 
+ | garbagebin Recall  | 0.364151 | 
+ | cabinet Average IOU  | 0.638996 | 
+ | bed Average IOU  | 0.706213 | 
+ | chair Average IOU  | 0.684457 | 
+ | sofa Average IOU  | 0.661377 | 
+ | table Average IOU  | 0.671986 | 
+ | door Average IOU  | 0.619491 | 
+ | window Average IOU  | 0.587604 | 
+ | bookshelf Average IOU  | 0.637485 | 
+ | picture Average IOU  | 0.580183 | 
+ | counter Average IOU  | 0.604941 | 
+ | desk Average IOU  | 0.657101 | 
+ | curtain Average IOU  | 0.579774 | 
+ | refrigerator Average IOU  | 0.655765 | 
+ | showercurtrain Average IOU  | 0.593611 | 
+ | toilet Average IOU  | 0.679787 | 
+ | sink Average IOU  | 0.655619 | 
+ | bathtub Average IOU  | 0.657271 | 
+ | garbagebin Average IOU  | 0.612172 | 
+ | AR  | 0.520021 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.419071 | 
+ | bed Average Precision  | 0.873062 | 
+ | chair Average Precision  | 0.878305 | 
+ | sofa Average Precision  | 0.883330 | 
+ | table Average Precision  | 0.601220 | 
+ | door Average Precision  | 0.430146 | 
+ | window Average Precision  | 0.356346 | 
+ | bookshelf Average Precision  | 0.480134 | 
+ | picture Average Precision  | 0.060367 | 
+ | counter Average Precision  | 0.560751 | 
+ | desk Average Precision  | 0.678220 | 
+ | curtain Average Precision  | 0.433663 | 
+ | refrigerator Average Precision  | 0.481832 | 
+ | showercurtrain Average Precision  | 0.606489 | 
+ | toilet Average Precision  | 0.973786 | 
+ | sink Average Precision  | 0.479572 | 
+ | bathtub Average Precision  | 0.924460 | 
+ | garbagebin Average Precision  | 0.374650 | 
+ | mAP  | 0.583078 | 
+ | cabinet Recall  | 0.741935 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.922515 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.828571 | 
+ | door Recall  | 0.725910 | 
+ | window Recall  | 0.624113 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.225225 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.929134 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.664151 | 
+ | cabinet Average IOU  | 0.488024 | 
+ | bed Average IOU  | 0.668326 | 
+ | chair Average IOU  | 0.631995 | 
+ | sofa Average IOU  | 0.623593 | 
+ | table Average IOU  | 0.605093 | 
+ | door Average IOU  | 0.489075 | 
+ | window Average IOU  | 0.444724 | 
+ | bookshelf Average IOU  | 0.582883 | 
+ | picture Average IOU  | 0.378742 | 
+ | counter Average IOU  | 0.490881 | 
+ | desk Average IOU  | 0.585323 | 
+ | curtain Average IOU  | 0.425945 | 
+ | refrigerator Average IOU  | 0.556092 | 
+ | showercurtrain Average IOU  | 0.444924 | 
+ | toilet Average IOU  | 0.657081 | 
+ | sink Average IOU  | 0.511789 | 
+ | bathtub Average IOU  | 0.620954 | 
+ | garbagebin Average IOU  | 0.494471 | 
+ | AR  | 0.802604 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.080016 | 
+ | bed Average Precision  | 0.791653 | 
+ | chair Average Precision  | 0.675986 | 
+ | sofa Average Precision  | 0.708067 | 
+ | table Average Precision  | 0.439225 | 
+ | door Average Precision  | 0.142491 | 
+ | window Average Precision  | 0.101828 | 
+ | bookshelf Average Precision  | 0.335550 | 
+ | picture Average Precision  | 0.002743 | 
+ | counter Average Precision  | 0.247767 | 
+ | desk Average Precision  | 0.379500 | 
+ | curtain Average Precision  | 0.118154 | 
+ | refrigerator Average Precision  | 0.334451 | 
+ | showercurtrain Average Precision  | 0.071026 | 
+ | toilet Average Precision  | 0.903361 | 
+ | sink Average Precision  | 0.228153 | 
+ | bathtub Average Precision  | 0.785258 | 
+ | garbagebin Average Precision  | 0.135090 | 
+ | mAP  | 0.360018 | 
+ | cabinet Recall  | 0.333333 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.758041 | 
+ | sofa Recall  | 0.824742 | 
+ | table Recall  | 0.648571 | 
+ | door Recall  | 0.344754 | 
+ | window Recall  | 0.226950 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.423077 | 
+ | desk Recall  | 0.716535 | 
+ | curtain Recall  | 0.268657 | 
+ | refrigerator Recall  | 0.649123 | 
+ | showercurtrain Recall  | 0.285714 | 
+ | toilet Recall  | 0.913793 | 
+ | sink Recall  | 0.326531 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.360377 | 
+ | cabinet Average IOU  | 0.632621 | 
+ | bed Average IOU  | 0.704464 | 
+ | chair Average IOU  | 0.684464 | 
+ | sofa Average IOU  | 0.661300 | 
+ | table Average IOU  | 0.674411 | 
+ | door Average IOU  | 0.619082 | 
+ | window Average IOU  | 0.587057 | 
+ | bookshelf Average IOU  | 0.639770 | 
+ | picture Average IOU  | 0.579753 | 
+ | counter Average IOU  | 0.601603 | 
+ | desk Average IOU  | 0.659175 | 
+ | curtain Average IOU  | 0.575963 | 
+ | refrigerator Average IOU  | 0.654070 | 
+ | showercurtrain Average IOU  | 0.588239 | 
+ | toilet Average IOU  | 0.685054 | 
+ | sink Average IOU  | 0.648849 | 
+ | bathtub Average IOU  | 0.665661 | 
+ | garbagebin Average IOU  | 0.611730 | 
+ | AR  | 0.520956 | 
+2021-06-04 16:16:01.598940
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.399559 | 
+ | bed Average Precision  | 0.874287 | 
+ | chair Average Precision  | 0.858715 | 
+ | sofa Average Precision  | 0.883060 | 
+ | table Average Precision  | 0.604706 | 
+ | door Average Precision  | 0.436710 | 
+ | window Average Precision  | 0.347697 | 
+ | bookshelf Average Precision  | 0.494528 | 
+ | picture Average Precision  | 0.047669 | 
+ | counter Average Precision  | 0.517560 | 
+ | desk Average Precision  | 0.631521 | 
+ | curtain Average Precision  | 0.419329 | 
+ | refrigerator Average Precision  | 0.490319 | 
+ | showercurtrain Average Precision  | 0.571683 | 
+ | toilet Average Precision  | 0.974977 | 
+ | sink Average Precision  | 0.485690 | 
+ | bathtub Average Precision  | 0.920859 | 
+ | garbagebin Average Precision  | 0.365126 | 
+ | mAP  | 0.573555 | 
+ | cabinet Recall  | 0.731183 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.910088 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.723769 | 
+ | window Recall  | 0.624113 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.207207 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.944882 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.650943 | 
+ | cabinet Average IOU  | 0.485818 | 
+ | bed Average IOU  | 0.667573 | 
+ | chair Average IOU  | 0.621749 | 
+ | sofa Average IOU  | 0.615887 | 
+ | table Average IOU  | 0.600708 | 
+ | door Average IOU  | 0.491150 | 
+ | window Average IOU  | 0.443060 | 
+ | bookshelf Average IOU  | 0.572705 | 
+ | picture Average IOU  | 0.388062 | 
+ | counter Average IOU  | 0.466662 | 
+ | desk Average IOU  | 0.561676 | 
+ | curtain Average IOU  | 0.445241 | 
+ | refrigerator Average IOU  | 0.542457 | 
+ | showercurtrain Average IOU  | 0.465526 | 
+ | toilet Average IOU  | 0.648890 | 
+ | sink Average IOU  | 0.490348 | 
+ | bathtub Average IOU  | 0.611784 | 
+ | garbagebin Average IOU  | 0.493486 | 
+ | AR  | 0.803987 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.091080 | 
+ | bed Average Precision  | 0.788925 | 
+ | chair Average Precision  | 0.632955 | 
+ | sofa Average Precision  | 0.693527 | 
+ | table Average Precision  | 0.447698 | 
+ | door Average Precision  | 0.121941 | 
+ | window Average Precision  | 0.099466 | 
+ | bookshelf Average Precision  | 0.311871 | 
+ | picture Average Precision  | 0.010516 | 
+ | counter Average Precision  | 0.166448 | 
+ | desk Average Precision  | 0.287892 | 
+ | curtain Average Precision  | 0.137542 | 
+ | refrigerator Average Precision  | 0.280552 | 
+ | showercurtrain Average Precision  | 0.090544 | 
+ | toilet Average Precision  | 0.857197 | 
+ | sink Average Precision  | 0.218758 | 
+ | bathtub Average Precision  | 0.715633 | 
+ | garbagebin Average Precision  | 0.129711 | 
+ | mAP  | 0.337903 | 
+ | cabinet Recall  | 0.357527 | 
+ | bed Recall  | 0.839506 | 
+ | chair Recall  | 0.728801 | 
+ | sofa Recall  | 0.824742 | 
+ | table Recall  | 0.648571 | 
+ | door Recall  | 0.342612 | 
+ | window Recall  | 0.226950 | 
+ | bookshelf Recall  | 0.597403 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.365385 | 
+ | desk Recall  | 0.653543 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.596491 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.879310 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.741935 | 
+ | garbagebin Recall  | 0.349057 | 
+ | cabinet Average IOU  | 0.624618 | 
+ | bed Average IOU  | 0.702050 | 
+ | chair Average IOU  | 0.679876 | 
+ | sofa Average IOU  | 0.655434 | 
+ | table Average IOU  | 0.667691 | 
+ | door Average IOU  | 0.617891 | 
+ | window Average IOU  | 0.597213 | 
+ | bookshelf Average IOU  | 0.648710 | 
+ | picture Average IOU  | 0.572263 | 
+ | counter Average IOU  | 0.600335 | 
+ | desk Average IOU  | 0.656099 | 
+ | curtain Average IOU  | 0.596874 | 
+ | refrigerator Average IOU  | 0.672053 | 
+ | showercurtrain Average IOU  | 0.598112 | 
+ | toilet Average IOU  | 0.684581 | 
+ | sink Average IOU  | 0.633698 | 
+ | bathtub Average IOU  | 0.672398 | 
+ | garbagebin Average IOU  | 0.613289 | 
+ | AR  | 0.507801 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.409736 | 
+ | bed Average Precision  | 0.877270 | 
+ | chair Average Precision  | 0.861798 | 
+ | sofa Average Precision  | 0.874634 | 
+ | table Average Precision  | 0.597368 | 
+ | door Average Precision  | 0.436965 | 
+ | window Average Precision  | 0.351520 | 
+ | bookshelf Average Precision  | 0.493998 | 
+ | picture Average Precision  | 0.046396 | 
+ | counter Average Precision  | 0.498217 | 
+ | desk Average Precision  | 0.642239 | 
+ | curtain Average Precision  | 0.424797 | 
+ | refrigerator Average Precision  | 0.485426 | 
+ | showercurtrain Average Precision  | 0.593923 | 
+ | toilet Average Precision  | 0.975588 | 
+ | sink Average Precision  | 0.465074 | 
+ | bathtub Average Precision  | 0.919826 | 
+ | garbagebin Average Precision  | 0.367216 | 
+ | mAP  | 0.573444 | 
+ | cabinet Recall  | 0.733871 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.913012 | 
+ | sofa Recall  | 0.969072 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.725910 | 
+ | window Recall  | 0.627660 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.211712 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.944882 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.649057 | 
+ | cabinet Average IOU  | 0.481020 | 
+ | bed Average IOU  | 0.661888 | 
+ | chair Average IOU  | 0.621418 | 
+ | sofa Average IOU  | 0.629324 | 
+ | table Average IOU  | 0.601431 | 
+ | door Average IOU  | 0.489546 | 
+ | window Average IOU  | 0.442413 | 
+ | bookshelf Average IOU  | 0.572872 | 
+ | picture Average IOU  | 0.385377 | 
+ | counter Average IOU  | 0.486663 | 
+ | desk Average IOU  | 0.564000 | 
+ | curtain Average IOU  | 0.439061 | 
+ | refrigerator Average IOU  | 0.545448 | 
+ | showercurtrain Average IOU  | 0.478159 | 
+ | toilet Average IOU  | 0.647875 | 
+ | sink Average IOU  | 0.486505 | 
+ | bathtub Average IOU  | 0.610492 | 
+ | garbagebin Average IOU  | 0.495182 | 
+ | AR  | 0.803462 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.083816 | 
+ | bed Average Precision  | 0.786471 | 
+ | chair Average Precision  | 0.639705 | 
+ | sofa Average Precision  | 0.748186 | 
+ | table Average Precision  | 0.452149 | 
+ | door Average Precision  | 0.118732 | 
+ | window Average Precision  | 0.102047 | 
+ | bookshelf Average Precision  | 0.314368 | 
+ | picture Average Precision  | 0.010967 | 
+ | counter Average Precision  | 0.207563 | 
+ | desk Average Precision  | 0.311647 | 
+ | curtain Average Precision  | 0.140641 | 
+ | refrigerator Average Precision  | 0.323273 | 
+ | showercurtrain Average Precision  | 0.117755 | 
+ | toilet Average Precision  | 0.831572 | 
+ | sink Average Precision  | 0.195819 | 
+ | bathtub Average Precision  | 0.714365 | 
+ | garbagebin Average Precision  | 0.121957 | 
+ | mAP  | 0.345613 | 
+ | cabinet Recall  | 0.349462 | 
+ | bed Recall  | 0.839506 | 
+ | chair Recall  | 0.733187 | 
+ | sofa Recall  | 0.855670 | 
+ | table Recall  | 0.651429 | 
+ | door Recall  | 0.344754 | 
+ | window Recall  | 0.223404 | 
+ | bookshelf Recall  | 0.597403 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.403846 | 
+ | desk Recall  | 0.677165 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.306122 | 
+ | bathtub Recall  | 0.741935 | 
+ | garbagebin Recall  | 0.343396 | 
+ | cabinet Average IOU  | 0.624124 | 
+ | bed Average IOU  | 0.698641 | 
+ | chair Average IOU  | 0.679000 | 
+ | sofa Average IOU  | 0.656097 | 
+ | table Average IOU  | 0.666722 | 
+ | door Average IOU  | 0.614944 | 
+ | window Average IOU  | 0.598418 | 
+ | bookshelf Average IOU  | 0.648939 | 
+ | picture Average IOU  | 0.572263 | 
+ | counter Average IOU  | 0.606724 | 
+ | desk Average IOU  | 0.653086 | 
+ | curtain Average IOU  | 0.582565 | 
+ | refrigerator Average IOU  | 0.667954 | 
+ | showercurtrain Average IOU  | 0.620305 | 
+ | toilet Average IOU  | 0.688416 | 
+ | sink Average IOU  | 0.638160 | 
+ | bathtub Average IOU  | 0.670713 | 
+ | garbagebin Average IOU  | 0.615991 | 
+ | AR  | 0.511980 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.405970 | 
+ | bed Average Precision  | 0.879824 | 
+ | chair Average Precision  | 0.875351 | 
+ | sofa Average Precision  | 0.887472 | 
+ | table Average Precision  | 0.601588 | 
+ | door Average Precision  | 0.437625 | 
+ | window Average Precision  | 0.352182 | 
+ | bookshelf Average Precision  | 0.485234 | 
+ | picture Average Precision  | 0.049754 | 
+ | counter Average Precision  | 0.554682 | 
+ | desk Average Precision  | 0.680257 | 
+ | curtain Average Precision  | 0.443361 | 
+ | refrigerator Average Precision  | 0.488605 | 
+ | showercurtrain Average Precision  | 0.609148 | 
+ | toilet Average Precision  | 0.974554 | 
+ | sink Average Precision  | 0.482500 | 
+ | bathtub Average Precision  | 0.921750 | 
+ | garbagebin Average Precision  | 0.368833 | 
+ | mAP  | 0.583261 | 
+ | cabinet Recall  | 0.728495 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.918860 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.723769 | 
+ | window Recall  | 0.624113 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.207207 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.663265 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.658491 | 
+ | cabinet Average IOU  | 0.491022 | 
+ | bed Average IOU  | 0.660385 | 
+ | chair Average IOU  | 0.633766 | 
+ | sofa Average IOU  | 0.627899 | 
+ | table Average IOU  | 0.600800 | 
+ | door Average IOU  | 0.492427 | 
+ | window Average IOU  | 0.444758 | 
+ | bookshelf Average IOU  | 0.577871 | 
+ | picture Average IOU  | 0.380122 | 
+ | counter Average IOU  | 0.488417 | 
+ | desk Average IOU  | 0.583072 | 
+ | curtain Average IOU  | 0.436415 | 
+ | refrigerator Average IOU  | 0.549756 | 
+ | showercurtrain Average IOU  | 0.467230 | 
+ | toilet Average IOU  | 0.651913 | 
+ | sink Average IOU  | 0.490462 | 
+ | bathtub Average IOU  | 0.621918 | 
+ | garbagebin Average IOU  | 0.495963 | 
+ | AR  | 0.803740 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.093868 | 
+ | bed Average Precision  | 0.758002 | 
+ | chair Average Precision  | 0.678811 | 
+ | sofa Average Precision  | 0.703566 | 
+ | table Average Precision  | 0.445232 | 
+ | door Average Precision  | 0.121076 | 
+ | window Average Precision  | 0.093911 | 
+ | bookshelf Average Precision  | 0.346960 | 
+ | picture Average Precision  | 0.009598 | 
+ | counter Average Precision  | 0.213450 | 
+ | desk Average Precision  | 0.377953 | 
+ | curtain Average Precision  | 0.114482 | 
+ | refrigerator Average Precision  | 0.279019 | 
+ | showercurtrain Average Precision  | 0.064567 | 
+ | toilet Average Precision  | 0.881757 | 
+ | sink Average Precision  | 0.217324 | 
+ | bathtub Average Precision  | 0.744444 | 
+ | garbagebin Average Precision  | 0.130330 | 
+ | mAP  | 0.348575 | 
+ | cabinet Recall  | 0.357527 | 
+ | bed Recall  | 0.814815 | 
+ | chair Recall  | 0.760234 | 
+ | sofa Recall  | 0.824742 | 
+ | table Recall  | 0.645714 | 
+ | door Recall  | 0.346895 | 
+ | window Recall  | 0.219858 | 
+ | bookshelf Recall  | 0.623377 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.423077 | 
+ | desk Recall  | 0.708661 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.321429 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.774194 | 
+ | garbagebin Recall  | 0.356604 | 
+ | cabinet Average IOU  | 0.630022 | 
+ | bed Average IOU  | 0.704609 | 
+ | chair Average IOU  | 0.683587 | 
+ | sofa Average IOU  | 0.664449 | 
+ | table Average IOU  | 0.671150 | 
+ | door Average IOU  | 0.616709 | 
+ | window Average IOU  | 0.597372 | 
+ | bookshelf Average IOU  | 0.643814 | 
+ | picture Average IOU  | 0.575627 | 
+ | counter Average IOU  | 0.591878 | 
+ | desk Average IOU  | 0.656720 | 
+ | curtain Average IOU  | 0.583946 | 
+ | refrigerator Average IOU  | 0.675824 | 
+ | showercurtrain Average IOU  | 0.613336 | 
+ | toilet Average IOU  | 0.684901 | 
+ | sink Average IOU  | 0.642695 | 
+ | bathtub Average IOU  | 0.672431 | 
+ | garbagebin Average IOU  | 0.610600 | 
+ | AR  | 0.515822 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.414164 | 
+ | bed Average Precision  | 0.880345 | 
+ | chair Average Precision  | 0.874943 | 
+ | sofa Average Precision  | 0.886109 | 
+ | table Average Precision  | 0.601497 | 
+ | door Average Precision  | 0.438764 | 
+ | window Average Precision  | 0.352657 | 
+ | bookshelf Average Precision  | 0.488125 | 
+ | picture Average Precision  | 0.047208 | 
+ | counter Average Precision  | 0.540117 | 
+ | desk Average Precision  | 0.687148 | 
+ | curtain Average Precision  | 0.442781 | 
+ | refrigerator Average Precision  | 0.490353 | 
+ | showercurtrain Average Precision  | 0.602245 | 
+ | toilet Average Precision  | 0.974819 | 
+ | sink Average Precision  | 0.480541 | 
+ | bathtub Average Precision  | 0.919326 | 
+ | garbagebin Average Precision  | 0.372643 | 
+ | mAP  | 0.582988 | 
+ | cabinet Recall  | 0.728495 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.918129 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.728051 | 
+ | window Recall  | 0.624113 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.207207 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.656604 | 
+ | cabinet Average IOU  | 0.487737 | 
+ | bed Average IOU  | 0.659705 | 
+ | chair Average IOU  | 0.633240 | 
+ | sofa Average IOU  | 0.626431 | 
+ | table Average IOU  | 0.598762 | 
+ | door Average IOU  | 0.490899 | 
+ | window Average IOU  | 0.442585 | 
+ | bookshelf Average IOU  | 0.577412 | 
+ | picture Average IOU  | 0.388795 | 
+ | counter Average IOU  | 0.486442 | 
+ | desk Average IOU  | 0.581128 | 
+ | curtain Average IOU  | 0.433690 | 
+ | refrigerator Average IOU  | 0.553704 | 
+ | showercurtrain Average IOU  | 0.469324 | 
+ | toilet Average IOU  | 0.651480 | 
+ | sink Average IOU  | 0.498165 | 
+ | bathtub Average IOU  | 0.620603 | 
+ | garbagebin Average IOU  | 0.496478 | 
+ | AR  | 0.803266 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.089903 | 
+ | bed Average Precision  | 0.756946 | 
+ | chair Average Precision  | 0.678653 | 
+ | sofa Average Precision  | 0.751639 | 
+ | table Average Precision  | 0.449008 | 
+ | door Average Precision  | 0.119471 | 
+ | window Average Precision  | 0.098113 | 
+ | bookshelf Average Precision  | 0.350376 | 
+ | picture Average Precision  | 0.009754 | 
+ | counter Average Precision  | 0.213240 | 
+ | desk Average Precision  | 0.383780 | 
+ | curtain Average Precision  | 0.098063 | 
+ | refrigerator Average Precision  | 0.316951 | 
+ | showercurtrain Average Precision  | 0.088518 | 
+ | toilet Average Precision  | 0.882192 | 
+ | sink Average Precision  | 0.226301 | 
+ | bathtub Average Precision  | 0.742408 | 
+ | garbagebin Average Precision  | 0.134521 | 
+ | mAP  | 0.354991 | 
+ | cabinet Recall  | 0.352151 | 
+ | bed Recall  | 0.814815 | 
+ | chair Recall  | 0.759503 | 
+ | sofa Recall  | 0.855670 | 
+ | table Recall  | 0.645714 | 
+ | door Recall  | 0.344754 | 
+ | window Recall  | 0.216312 | 
+ | bookshelf Recall  | 0.623377 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.403846 | 
+ | desk Recall  | 0.708661 | 
+ | curtain Recall  | 0.238806 | 
+ | refrigerator Recall  | 0.631579 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.326531 | 
+ | bathtub Recall  | 0.774194 | 
+ | garbagebin Recall  | 0.356604 | 
+ | cabinet Average IOU  | 0.629627 | 
+ | bed Average IOU  | 0.703827 | 
+ | chair Average IOU  | 0.683727 | 
+ | sofa Average IOU  | 0.655560 | 
+ | table Average IOU  | 0.668556 | 
+ | door Average IOU  | 0.615175 | 
+ | window Average IOU  | 0.595673 | 
+ | bookshelf Average IOU  | 0.643320 | 
+ | picture Average IOU  | 0.596774 | 
+ | counter Average IOU  | 0.597250 | 
+ | desk Average IOU  | 0.655214 | 
+ | curtain Average IOU  | 0.589090 | 
+ | refrigerator Average IOU  | 0.676020 | 
+ | showercurtrain Average IOU  | 0.609047 | 
+ | toilet Average IOU  | 0.683945 | 
+ | sink Average IOU  | 0.639405 | 
+ | bathtub Average IOU  | 0.671620 | 
+ | garbagebin Average IOU  | 0.609515 | 
+ | AR  | 0.518763 | 
+2021-06-04 16:32:04.795052
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.397586 | 
+ | bed Average Precision  | 0.880866 | 
+ | chair Average Precision  | 0.862580 | 
+ | sofa Average Precision  | 0.882965 | 
+ | table Average Precision  | 0.614653 | 
+ | door Average Precision  | 0.418167 | 
+ | window Average Precision  | 0.357616 | 
+ | bookshelf Average Precision  | 0.476314 | 
+ | picture Average Precision  | 0.045259 | 
+ | counter Average Precision  | 0.538167 | 
+ | desk Average Precision  | 0.613903 | 
+ | curtain Average Precision  | 0.407761 | 
+ | refrigerator Average Precision  | 0.490688 | 
+ | showercurtrain Average Precision  | 0.540545 | 
+ | toilet Average Precision  | 0.975440 | 
+ | sink Average Precision  | 0.473654 | 
+ | bathtub Average Precision  | 0.908835 | 
+ | garbagebin Average Precision  | 0.376290 | 
+ | mAP  | 0.570072 | 
+ | cabinet Recall  | 0.728495 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.911550 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.708779 | 
+ | window Recall  | 0.641844 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.207207 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.776119 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.935484 | 
+ | garbagebin Recall  | 0.666038 | 
+ | cabinet Average IOU  | 0.488328 | 
+ | bed Average IOU  | 0.661233 | 
+ | chair Average IOU  | 0.623114 | 
+ | sofa Average IOU  | 0.617264 | 
+ | table Average IOU  | 0.596729 | 
+ | door Average IOU  | 0.492426 | 
+ | window Average IOU  | 0.437650 | 
+ | bookshelf Average IOU  | 0.577546 | 
+ | picture Average IOU  | 0.385987 | 
+ | counter Average IOU  | 0.475468 | 
+ | desk Average IOU  | 0.563076 | 
+ | curtain Average IOU  | 0.441398 | 
+ | refrigerator Average IOU  | 0.537878 | 
+ | showercurtrain Average IOU  | 0.471479 | 
+ | toilet Average IOU  | 0.645968 | 
+ | sink Average IOU  | 0.500110 | 
+ | bathtub Average IOU  | 0.623897 | 
+ | garbagebin Average IOU  | 0.487699 | 
+ | AR  | 0.802509 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.081065 | 
+ | bed Average Precision  | 0.742872 | 
+ | chair Average Precision  | 0.648698 | 
+ | sofa Average Precision  | 0.732647 | 
+ | table Average Precision  | 0.448775 | 
+ | door Average Precision  | 0.136249 | 
+ | window Average Precision  | 0.082770 | 
+ | bookshelf Average Precision  | 0.364221 | 
+ | picture Average Precision  | 0.014284 | 
+ | counter Average Precision  | 0.200721 | 
+ | desk Average Precision  | 0.272246 | 
+ | curtain Average Precision  | 0.104271 | 
+ | refrigerator Average Precision  | 0.279586 | 
+ | showercurtrain Average Precision  | 0.085899 | 
+ | toilet Average Precision  | 0.883251 | 
+ | sink Average Precision  | 0.220214 | 
+ | bathtub Average Precision  | 0.832475 | 
+ | garbagebin Average Precision  | 0.115693 | 
+ | mAP  | 0.346996 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.814815 | 
+ | chair Recall  | 0.739766 | 
+ | sofa Recall  | 0.845361 | 
+ | table Recall  | 0.651429 | 
+ | door Recall  | 0.342612 | 
+ | window Recall  | 0.209220 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.036036 | 
+ | counter Recall  | 0.403846 | 
+ | desk Recall  | 0.645669 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.578947 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.326531 | 
+ | bathtub Recall  | 0.870968 | 
+ | garbagebin Recall  | 0.341509 | 
+ | cabinet Average IOU  | 0.625925 | 
+ | bed Average IOU  | 0.709631 | 
+ | chair Average IOU  | 0.679454 | 
+ | sofa Average IOU  | 0.652385 | 
+ | table Average IOU  | 0.667541 | 
+ | door Average IOU  | 0.618390 | 
+ | window Average IOU  | 0.600792 | 
+ | bookshelf Average IOU  | 0.632320 | 
+ | picture Average IOU  | 0.555836 | 
+ | counter Average IOU  | 0.598687 | 
+ | desk Average IOU  | 0.650802 | 
+ | curtain Average IOU  | 0.596356 | 
+ | refrigerator Average IOU  | 0.664248 | 
+ | showercurtrain Average IOU  | 0.613316 | 
+ | toilet Average IOU  | 0.686039 | 
+ | sink Average IOU  | 0.638719 | 
+ | bathtub Average IOU  | 0.643711 | 
+ | garbagebin Average IOU  | 0.612224 | 
+ | AR  | 0.517875 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.413165 | 
+ | bed Average Precision  | 0.881500 | 
+ | chair Average Precision  | 0.868554 | 
+ | sofa Average Precision  | 0.879854 | 
+ | table Average Precision  | 0.616360 | 
+ | door Average Precision  | 0.419721 | 
+ | window Average Precision  | 0.359735 | 
+ | bookshelf Average Precision  | 0.468512 | 
+ | picture Average Precision  | 0.050662 | 
+ | counter Average Precision  | 0.536137 | 
+ | desk Average Precision  | 0.612580 | 
+ | curtain Average Precision  | 0.411625 | 
+ | refrigerator Average Precision  | 0.490534 | 
+ | showercurtrain Average Precision  | 0.589595 | 
+ | toilet Average Precision  | 0.976354 | 
+ | sink Average Precision  | 0.455092 | 
+ | bathtub Average Precision  | 0.907616 | 
+ | garbagebin Average Precision  | 0.380611 | 
+ | mAP  | 0.573234 | 
+ | cabinet Recall  | 0.736559 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.916667 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.710921 | 
+ | window Recall  | 0.645390 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.211712 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.776119 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.935484 | 
+ | garbagebin Recall  | 0.666038 | 
+ | cabinet Average IOU  | 0.486425 | 
+ | bed Average IOU  | 0.661840 | 
+ | chair Average IOU  | 0.622086 | 
+ | sofa Average IOU  | 0.610518 | 
+ | table Average IOU  | 0.600903 | 
+ | door Average IOU  | 0.495247 | 
+ | window Average IOU  | 0.436489 | 
+ | bookshelf Average IOU  | 0.581049 | 
+ | picture Average IOU  | 0.383755 | 
+ | counter Average IOU  | 0.479585 | 
+ | desk Average IOU  | 0.567190 | 
+ | curtain Average IOU  | 0.432695 | 
+ | refrigerator Average IOU  | 0.538185 | 
+ | showercurtrain Average IOU  | 0.469222 | 
+ | toilet Average IOU  | 0.642750 | 
+ | sink Average IOU  | 0.494518 | 
+ | bathtub Average IOU  | 0.623855 | 
+ | garbagebin Average IOU  | 0.487815 | 
+ | AR  | 0.803807 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.085541 | 
+ | bed Average Precision  | 0.744229 | 
+ | chair Average Precision  | 0.657475 | 
+ | sofa Average Precision  | 0.695142 | 
+ | table Average Precision  | 0.463669 | 
+ | door Average Precision  | 0.129496 | 
+ | window Average Precision  | 0.086932 | 
+ | bookshelf Average Precision  | 0.356478 | 
+ | picture Average Precision  | 0.004343 | 
+ | counter Average Precision  | 0.253461 | 
+ | desk Average Precision  | 0.275543 | 
+ | curtain Average Precision  | 0.106089 | 
+ | refrigerator Average Precision  | 0.283679 | 
+ | showercurtrain Average Precision  | 0.098927 | 
+ | toilet Average Precision  | 0.820889 | 
+ | sink Average Precision  | 0.207831 | 
+ | bathtub Average Precision  | 0.830729 | 
+ | garbagebin Average Precision  | 0.114086 | 
+ | mAP  | 0.345252 | 
+ | cabinet Recall  | 0.346774 | 
+ | bed Recall  | 0.814815 | 
+ | chair Recall  | 0.745614 | 
+ | sofa Recall  | 0.824742 | 
+ | table Recall  | 0.662857 | 
+ | door Recall  | 0.340471 | 
+ | window Recall  | 0.212766 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.423077 | 
+ | desk Recall  | 0.653543 | 
+ | curtain Recall  | 0.268657 | 
+ | refrigerator Recall  | 0.578947 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.870968 | 
+ | garbagebin Recall  | 0.335849 | 
+ | cabinet Average IOU  | 0.622286 | 
+ | bed Average IOU  | 0.710399 | 
+ | chair Average IOU  | 0.677659 | 
+ | sofa Average IOU  | 0.654490 | 
+ | table Average IOU  | 0.667432 | 
+ | door Average IOU  | 0.623591 | 
+ | window Average IOU  | 0.595661 | 
+ | bookshelf Average IOU  | 0.637700 | 
+ | picture Average IOU  | 0.567608 | 
+ | counter Average IOU  | 0.595959 | 
+ | desk Average IOU  | 0.653090 | 
+ | curtain Average IOU  | 0.593582 | 
+ | refrigerator Average IOU  | 0.664318 | 
+ | showercurtrain Average IOU  | 0.614215 | 
+ | toilet Average IOU  | 0.690418 | 
+ | sink Average IOU  | 0.637806 | 
+ | bathtub Average IOU  | 0.643666 | 
+ | garbagebin Average IOU  | 0.613946 | 
+ | AR  | 0.515445 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.404613 | 
+ | bed Average Precision  | 0.881144 | 
+ | chair Average Precision  | 0.877488 | 
+ | sofa Average Precision  | 0.893097 | 
+ | table Average Precision  | 0.606657 | 
+ | door Average Precision  | 0.420438 | 
+ | window Average Precision  | 0.363215 | 
+ | bookshelf Average Precision  | 0.471280 | 
+ | picture Average Precision  | 0.055136 | 
+ | counter Average Precision  | 0.555646 | 
+ | desk Average Precision  | 0.689190 | 
+ | curtain Average Precision  | 0.428863 | 
+ | refrigerator Average Precision  | 0.491535 | 
+ | showercurtrain Average Precision  | 0.584624 | 
+ | toilet Average Precision  | 0.977411 | 
+ | sink Average Precision  | 0.505368 | 
+ | bathtub Average Precision  | 0.909529 | 
+ | garbagebin Average Precision  | 0.382175 | 
+ | mAP  | 0.583189 | 
+ | cabinet Recall  | 0.731183 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.920322 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.708779 | 
+ | window Recall  | 0.638298 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.211712 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.761194 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.673469 | 
+ | bathtub Recall  | 0.935484 | 
+ | garbagebin Recall  | 0.671698 | 
+ | cabinet Average IOU  | 0.487603 | 
+ | bed Average IOU  | 0.660542 | 
+ | chair Average IOU  | 0.632885 | 
+ | sofa Average IOU  | 0.613609 | 
+ | table Average IOU  | 0.599899 | 
+ | door Average IOU  | 0.496144 | 
+ | window Average IOU  | 0.440236 | 
+ | bookshelf Average IOU  | 0.579489 | 
+ | picture Average IOU  | 0.380730 | 
+ | counter Average IOU  | 0.488762 | 
+ | desk Average IOU  | 0.582135 | 
+ | curtain Average IOU  | 0.429352 | 
+ | refrigerator Average IOU  | 0.541313 | 
+ | showercurtrain Average IOU  | 0.455880 | 
+ | toilet Average IOU  | 0.643853 | 
+ | sink Average IOU  | 0.486954 | 
+ | bathtub Average IOU  | 0.629697 | 
+ | garbagebin Average IOU  | 0.494454 | 
+ | AR  | 0.803889 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.092197 | 
+ | bed Average Precision  | 0.760698 | 
+ | chair Average Precision  | 0.683321 | 
+ | sofa Average Precision  | 0.697480 | 
+ | table Average Precision  | 0.449346 | 
+ | door Average Precision  | 0.140869 | 
+ | window Average Precision  | 0.085156 | 
+ | bookshelf Average Precision  | 0.369586 | 
+ | picture Average Precision  | 0.013149 | 
+ | counter Average Precision  | 0.229790 | 
+ | desk Average Precision  | 0.351232 | 
+ | curtain Average Precision  | 0.085527 | 
+ | refrigerator Average Precision  | 0.331418 | 
+ | showercurtrain Average Precision  | 0.079897 | 
+ | toilet Average Precision  | 0.818216 | 
+ | sink Average Precision  | 0.207946 | 
+ | bathtub Average Precision  | 0.833399 | 
+ | garbagebin Average Precision  | 0.133148 | 
+ | mAP  | 0.353465 | 
+ | cabinet Recall  | 0.346774 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.767544 | 
+ | sofa Recall  | 0.824742 | 
+ | table Recall  | 0.654286 | 
+ | door Recall  | 0.349036 | 
+ | window Recall  | 0.216312 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.442308 | 
+ | desk Recall  | 0.692913 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.631579 | 
+ | showercurtrain Recall  | 0.321429 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.870968 | 
+ | garbagebin Recall  | 0.360377 | 
+ | cabinet Average IOU  | 0.626707 | 
+ | bed Average IOU  | 0.702904 | 
+ | chair Average IOU  | 0.681895 | 
+ | sofa Average IOU  | 0.652877 | 
+ | table Average IOU  | 0.670272 | 
+ | door Average IOU  | 0.618020 | 
+ | window Average IOU  | 0.598550 | 
+ | bookshelf Average IOU  | 0.630946 | 
+ | picture Average IOU  | 0.562787 | 
+ | counter Average IOU  | 0.596590 | 
+ | desk Average IOU  | 0.665972 | 
+ | curtain Average IOU  | 0.575308 | 
+ | refrigerator Average IOU  | 0.659492 | 
+ | showercurtrain Average IOU  | 0.606851 | 
+ | toilet Average IOU  | 0.689638 | 
+ | sink Average IOU  | 0.644003 | 
+ | bathtub Average IOU  | 0.649940 | 
+ | garbagebin Average IOU  | 0.616173 | 
+ | AR  | 0.523247 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.414683 | 
+ | bed Average Precision  | 0.884727 | 
+ | chair Average Precision  | 0.876685 | 
+ | sofa Average Precision  | 0.892365 | 
+ | table Average Precision  | 0.607778 | 
+ | door Average Precision  | 0.420431 | 
+ | window Average Precision  | 0.362530 | 
+ | bookshelf Average Precision  | 0.491341 | 
+ | picture Average Precision  | 0.055457 | 
+ | counter Average Precision  | 0.561342 | 
+ | desk Average Precision  | 0.695750 | 
+ | curtain Average Precision  | 0.433306 | 
+ | refrigerator Average Precision  | 0.489779 | 
+ | showercurtrain Average Precision  | 0.589159 | 
+ | toilet Average Precision  | 0.977729 | 
+ | sink Average Precision  | 0.507464 | 
+ | bathtub Average Precision  | 0.908417 | 
+ | garbagebin Average Precision  | 0.383252 | 
+ | mAP  | 0.586233 | 
+ | cabinet Recall  | 0.733871 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.918860 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.708779 | 
+ | window Recall  | 0.638298 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.211712 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.776119 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.673469 | 
+ | bathtub Recall  | 0.935484 | 
+ | garbagebin Recall  | 0.671698 | 
+ | cabinet Average IOU  | 0.488178 | 
+ | bed Average IOU  | 0.656890 | 
+ | chair Average IOU  | 0.631905 | 
+ | sofa Average IOU  | 0.617142 | 
+ | table Average IOU  | 0.597149 | 
+ | door Average IOU  | 0.496775 | 
+ | window Average IOU  | 0.441207 | 
+ | bookshelf Average IOU  | 0.575528 | 
+ | picture Average IOU  | 0.384562 | 
+ | counter Average IOU  | 0.483777 | 
+ | desk Average IOU  | 0.579858 | 
+ | curtain Average IOU  | 0.423412 | 
+ | refrigerator Average IOU  | 0.545564 | 
+ | showercurtrain Average IOU  | 0.467715 | 
+ | toilet Average IOU  | 0.644461 | 
+ | sink Average IOU  | 0.483073 | 
+ | bathtub Average IOU  | 0.628635 | 
+ | garbagebin Average IOU  | 0.493612 | 
+ | AR  | 0.806576 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.088329 | 
+ | bed Average Precision  | 0.759729 | 
+ | chair Average Precision  | 0.683923 | 
+ | sofa Average Precision  | 0.731758 | 
+ | table Average Precision  | 0.445140 | 
+ | door Average Precision  | 0.123290 | 
+ | window Average Precision  | 0.091629 | 
+ | bookshelf Average Precision  | 0.377821 | 
+ | picture Average Precision  | 0.011993 | 
+ | counter Average Precision  | 0.257963 | 
+ | desk Average Precision  | 0.353808 | 
+ | curtain Average Precision  | 0.091910 | 
+ | refrigerator Average Precision  | 0.330081 | 
+ | showercurtrain Average Precision  | 0.078775 | 
+ | toilet Average Precision  | 0.816240 | 
+ | sink Average Precision  | 0.218548 | 
+ | bathtub Average Precision  | 0.831710 | 
+ | garbagebin Average Precision  | 0.133685 | 
+ | mAP  | 0.357019 | 
+ | cabinet Recall  | 0.344086 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.766082 | 
+ | sofa Recall  | 0.855670 | 
+ | table Recall  | 0.651429 | 
+ | door Recall  | 0.340471 | 
+ | window Recall  | 0.223404 | 
+ | bookshelf Recall  | 0.662338 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.423077 | 
+ | desk Recall  | 0.685039 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.631579 | 
+ | showercurtrain Recall  | 0.321429 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.326531 | 
+ | bathtub Recall  | 0.870968 | 
+ | garbagebin Recall  | 0.358491 | 
+ | cabinet Average IOU  | 0.628074 | 
+ | bed Average IOU  | 0.702205 | 
+ | chair Average IOU  | 0.681381 | 
+ | sofa Average IOU  | 0.651343 | 
+ | table Average IOU  | 0.669846 | 
+ | door Average IOU  | 0.622438 | 
+ | window Average IOU  | 0.594483 | 
+ | bookshelf Average IOU  | 0.630677 | 
+ | picture Average IOU  | 0.562787 | 
+ | counter Average IOU  | 0.582930 | 
+ | desk Average IOU  | 0.664336 | 
+ | curtain Average IOU  | 0.571463 | 
+ | refrigerator Average IOU  | 0.659809 | 
+ | showercurtrain Average IOU  | 0.602863 | 
+ | toilet Average IOU  | 0.690344 | 
+ | sink Average IOU  | 0.634188 | 
+ | bathtub Average IOU  | 0.648800 | 
+ | garbagebin Average IOU  | 0.615806 | 
+ | AR  | 0.524171 | 
+2021-06-04 16:48:08.288889
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.415360 | 
+ | bed Average Precision  | 0.881209 | 
+ | chair Average Precision  | 0.858952 | 
+ | sofa Average Precision  | 0.881536 | 
+ | table Average Precision  | 0.611251 | 
+ | door Average Precision  | 0.437560 | 
+ | window Average Precision  | 0.364812 | 
+ | bookshelf Average Precision  | 0.488263 | 
+ | picture Average Precision  | 0.050467 | 
+ | counter Average Precision  | 0.522523 | 
+ | desk Average Precision  | 0.660472 | 
+ | curtain Average Precision  | 0.405907 | 
+ | refrigerator Average Precision  | 0.492497 | 
+ | showercurtrain Average Precision  | 0.586894 | 
+ | toilet Average Precision  | 0.974039 | 
+ | sink Average Precision  | 0.450756 | 
+ | bathtub Average Precision  | 0.922610 | 
+ | garbagebin Average Precision  | 0.364437 | 
+ | mAP  | 0.576086 | 
+ | cabinet Recall  | 0.739247 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.908626 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.732334 | 
+ | window Recall  | 0.648936 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.929134 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.660377 | 
+ | cabinet Average IOU  | 0.484771 | 
+ | bed Average IOU  | 0.668867 | 
+ | chair Average IOU  | 0.620726 | 
+ | sofa Average IOU  | 0.610963 | 
+ | table Average IOU  | 0.602742 | 
+ | door Average IOU  | 0.485043 | 
+ | window Average IOU  | 0.440684 | 
+ | bookshelf Average IOU  | 0.575165 | 
+ | picture Average IOU  | 0.373092 | 
+ | counter Average IOU  | 0.467541 | 
+ | desk Average IOU  | 0.574309 | 
+ | curtain Average IOU  | 0.441479 | 
+ | refrigerator Average IOU  | 0.544840 | 
+ | showercurtrain Average IOU  | 0.460398 | 
+ | toilet Average IOU  | 0.642903 | 
+ | sink Average IOU  | 0.492659 | 
+ | bathtub Average IOU  | 0.613152 | 
+ | garbagebin Average IOU  | 0.493361 | 
+ | AR  | 0.804788 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.082170 | 
+ | bed Average Precision  | 0.779141 | 
+ | chair Average Precision  | 0.625996 | 
+ | sofa Average Precision  | 0.707355 | 
+ | table Average Precision  | 0.447475 | 
+ | door Average Precision  | 0.115756 | 
+ | window Average Precision  | 0.084765 | 
+ | bookshelf Average Precision  | 0.374389 | 
+ | picture Average Precision  | 0.001827 | 
+ | counter Average Precision  | 0.121573 | 
+ | desk Average Precision  | 0.278723 | 
+ | curtain Average Precision  | 0.108920 | 
+ | refrigerator Average Precision  | 0.334149 | 
+ | showercurtrain Average Precision  | 0.132004 | 
+ | toilet Average Precision  | 0.810732 | 
+ | sink Average Precision  | 0.187477 | 
+ | bathtub Average Precision  | 0.743283 | 
+ | garbagebin Average Precision  | 0.132016 | 
+ | mAP  | 0.337097 | 
+ | cabinet Recall  | 0.346774 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.721491 | 
+ | sofa Recall  | 0.814433 | 
+ | table Recall  | 0.657143 | 
+ | door Recall  | 0.334047 | 
+ | window Recall  | 0.226950 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.022523 | 
+ | counter Recall  | 0.346154 | 
+ | desk Recall  | 0.645669 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.596491 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.306122 | 
+ | bathtub Recall  | 0.774194 | 
+ | garbagebin Recall  | 0.358491 | 
+ | cabinet Average IOU  | 0.625721 | 
+ | bed Average IOU  | 0.709650 | 
+ | chair Average IOU  | 0.680803 | 
+ | sofa Average IOU  | 0.654181 | 
+ | table Average IOU  | 0.667274 | 
+ | door Average IOU  | 0.618025 | 
+ | window Average IOU  | 0.597062 | 
+ | bookshelf Average IOU  | 0.631089 | 
+ | picture Average IOU  | 0.574328 | 
+ | counter Average IOU  | 0.635105 | 
+ | desk Average IOU  | 0.651207 | 
+ | curtain Average IOU  | 0.584155 | 
+ | refrigerator Average IOU  | 0.665383 | 
+ | showercurtrain Average IOU  | 0.596407 | 
+ | toilet Average IOU  | 0.683052 | 
+ | sink Average IOU  | 0.641543 | 
+ | bathtub Average IOU  | 0.660887 | 
+ | garbagebin Average IOU  | 0.610331 | 
+ | AR  | 0.507210 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.405866 | 
+ | bed Average Precision  | 0.880427 | 
+ | chair Average Precision  | 0.857534 | 
+ | sofa Average Precision  | 0.881797 | 
+ | table Average Precision  | 0.611676 | 
+ | door Average Precision  | 0.439531 | 
+ | window Average Precision  | 0.367346 | 
+ | bookshelf Average Precision  | 0.484470 | 
+ | picture Average Precision  | 0.056720 | 
+ | counter Average Precision  | 0.534635 | 
+ | desk Average Precision  | 0.656437 | 
+ | curtain Average Precision  | 0.407317 | 
+ | refrigerator Average Precision  | 0.492271 | 
+ | showercurtrain Average Precision  | 0.584239 | 
+ | toilet Average Precision  | 0.974871 | 
+ | sink Average Precision  | 0.460267 | 
+ | bathtub Average Precision  | 0.922610 | 
+ | garbagebin Average Precision  | 0.366785 | 
+ | mAP  | 0.576933 | 
+ | cabinet Recall  | 0.736559 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.906433 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.732334 | 
+ | window Recall  | 0.648936 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.220721 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.921260 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.658491 | 
+ | cabinet Average IOU  | 0.486410 | 
+ | bed Average IOU  | 0.664719 | 
+ | chair Average IOU  | 0.622952 | 
+ | sofa Average IOU  | 0.614970 | 
+ | table Average IOU  | 0.600619 | 
+ | door Average IOU  | 0.485436 | 
+ | window Average IOU  | 0.437397 | 
+ | bookshelf Average IOU  | 0.579184 | 
+ | picture Average IOU  | 0.379292 | 
+ | counter Average IOU  | 0.472633 | 
+ | desk Average IOU  | 0.571981 | 
+ | curtain Average IOU  | 0.435616 | 
+ | refrigerator Average IOU  | 0.543024 | 
+ | showercurtrain Average IOU  | 0.462563 | 
+ | toilet Average IOU  | 0.638095 | 
+ | sink Average IOU  | 0.488042 | 
+ | bathtub Average IOU  | 0.614582 | 
+ | garbagebin Average IOU  | 0.494112 | 
+ | AR  | 0.804384 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.084902 | 
+ | bed Average Precision  | 0.779364 | 
+ | chair Average Precision  | 0.634635 | 
+ | sofa Average Precision  | 0.715705 | 
+ | table Average Precision  | 0.431662 | 
+ | door Average Precision  | 0.122603 | 
+ | window Average Precision  | 0.085228 | 
+ | bookshelf Average Precision  | 0.371380 | 
+ | picture Average Precision  | 0.007662 | 
+ | counter Average Precision  | 0.180717 | 
+ | desk Average Precision  | 0.294161 | 
+ | curtain Average Precision  | 0.118260 | 
+ | refrigerator Average Precision  | 0.334920 | 
+ | showercurtrain Average Precision  | 0.136522 | 
+ | toilet Average Precision  | 0.822246 | 
+ | sink Average Precision  | 0.188196 | 
+ | bathtub Average Precision  | 0.743283 | 
+ | garbagebin Average Precision  | 0.130152 | 
+ | mAP  | 0.343422 | 
+ | cabinet Recall  | 0.352151 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.726608 | 
+ | sofa Recall  | 0.814433 | 
+ | table Recall  | 0.645714 | 
+ | door Recall  | 0.338330 | 
+ | window Recall  | 0.230496 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.653543 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.392857 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.295918 | 
+ | bathtub Recall  | 0.774194 | 
+ | garbagebin Recall  | 0.358491 | 
+ | cabinet Average IOU  | 0.624826 | 
+ | bed Average IOU  | 0.704945 | 
+ | chair Average IOU  | 0.680582 | 
+ | sofa Average IOU  | 0.656903 | 
+ | table Average IOU  | 0.669221 | 
+ | door Average IOU  | 0.616136 | 
+ | window Average IOU  | 0.592302 | 
+ | bookshelf Average IOU  | 0.637800 | 
+ | picture Average IOU  | 0.563458 | 
+ | counter Average IOU  | 0.620721 | 
+ | desk Average IOU  | 0.650088 | 
+ | curtain Average IOU  | 0.575530 | 
+ | refrigerator Average IOU  | 0.657714 | 
+ | showercurtrain Average IOU  | 0.584322 | 
+ | toilet Average IOU  | 0.678253 | 
+ | sink Average IOU  | 0.638735 | 
+ | bathtub Average IOU  | 0.662674 | 
+ | garbagebin Average IOU  | 0.609884 | 
+ | AR  | 0.512088 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.424556 | 
+ | bed Average Precision  | 0.882874 | 
+ | chair Average Precision  | 0.876048 | 
+ | sofa Average Precision  | 0.886648 | 
+ | table Average Precision  | 0.608909 | 
+ | door Average Precision  | 0.436794 | 
+ | window Average Precision  | 0.365267 | 
+ | bookshelf Average Precision  | 0.484711 | 
+ | picture Average Precision  | 0.056681 | 
+ | counter Average Precision  | 0.544837 | 
+ | desk Average Precision  | 0.705347 | 
+ | curtain Average Precision  | 0.428887 | 
+ | refrigerator Average Precision  | 0.478715 | 
+ | showercurtrain Average Precision  | 0.572211 | 
+ | toilet Average Precision  | 0.974948 | 
+ | sink Average Precision  | 0.469005 | 
+ | bathtub Average Precision  | 0.923812 | 
+ | garbagebin Average Precision  | 0.376127 | 
+ | mAP  | 0.583132 | 
+ | cabinet Recall  | 0.741935 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.919591 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.728051 | 
+ | window Recall  | 0.645390 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.225225 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.663265 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.664151 | 
+ | cabinet Average IOU  | 0.485440 | 
+ | bed Average IOU  | 0.668839 | 
+ | chair Average IOU  | 0.635016 | 
+ | sofa Average IOU  | 0.619858 | 
+ | table Average IOU  | 0.603135 | 
+ | door Average IOU  | 0.485476 | 
+ | window Average IOU  | 0.439499 | 
+ | bookshelf Average IOU  | 0.573008 | 
+ | picture Average IOU  | 0.372225 | 
+ | counter Average IOU  | 0.494367 | 
+ | desk Average IOU  | 0.586968 | 
+ | curtain Average IOU  | 0.429006 | 
+ | refrigerator Average IOU  | 0.548698 | 
+ | showercurtrain Average IOU  | 0.456609 | 
+ | toilet Average IOU  | 0.645685 | 
+ | sink Average IOU  | 0.490002 | 
+ | bathtub Average IOU  | 0.619513 | 
+ | garbagebin Average IOU  | 0.492505 | 
+ | AR  | 0.806674 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.090805 | 
+ | bed Average Precision  | 0.777284 | 
+ | chair Average Precision  | 0.666359 | 
+ | sofa Average Precision  | 0.725412 | 
+ | table Average Precision  | 0.447019 | 
+ | door Average Precision  | 0.127331 | 
+ | window Average Precision  | 0.081461 | 
+ | bookshelf Average Precision  | 0.360748 | 
+ | picture Average Precision  | 0.003885 | 
+ | counter Average Precision  | 0.184435 | 
+ | desk Average Precision  | 0.386996 | 
+ | curtain Average Precision  | 0.114882 | 
+ | refrigerator Average Precision  | 0.322708 | 
+ | showercurtrain Average Precision  | 0.121213 | 
+ | toilet Average Precision  | 0.845292 | 
+ | sink Average Precision  | 0.184140 | 
+ | bathtub Average Precision  | 0.836320 | 
+ | garbagebin Average Precision  | 0.146352 | 
+ | mAP  | 0.356813 | 
+ | cabinet Recall  | 0.352151 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.752924 | 
+ | sofa Recall  | 0.835052 | 
+ | table Recall  | 0.657143 | 
+ | door Recall  | 0.344754 | 
+ | window Recall  | 0.223404 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.403846 | 
+ | desk Recall  | 0.692913 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.596491 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.879310 | 
+ | sink Recall  | 0.285714 | 
+ | bathtub Recall  | 0.838710 | 
+ | garbagebin Recall  | 0.366038 | 
+ | cabinet Average IOU  | 0.623151 | 
+ | bed Average IOU  | 0.711586 | 
+ | chair Average IOU  | 0.686659 | 
+ | sofa Average IOU  | 0.659232 | 
+ | table Average IOU  | 0.671461 | 
+ | door Average IOU  | 0.611406 | 
+ | window Average IOU  | 0.597695 | 
+ | bookshelf Average IOU  | 0.628897 | 
+ | picture Average IOU  | 0.553111 | 
+ | counter Average IOU  | 0.622524 | 
+ | desk Average IOU  | 0.655392 | 
+ | curtain Average IOU  | 0.575383 | 
+ | refrigerator Average IOU  | 0.673967 | 
+ | showercurtrain Average IOU  | 0.585931 | 
+ | toilet Average IOU  | 0.682397 | 
+ | sink Average IOU  | 0.647044 | 
+ | bathtub Average IOU  | 0.653340 | 
+ | garbagebin Average IOU  | 0.609676 | 
+ | AR  | 0.519985 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.418141 | 
+ | bed Average Precision  | 0.882884 | 
+ | chair Average Precision  | 0.872518 | 
+ | sofa Average Precision  | 0.886837 | 
+ | table Average Precision  | 0.608752 | 
+ | door Average Precision  | 0.440409 | 
+ | window Average Precision  | 0.365964 | 
+ | bookshelf Average Precision  | 0.479818 | 
+ | picture Average Precision  | 0.056342 | 
+ | counter Average Precision  | 0.538162 | 
+ | desk Average Precision  | 0.711078 | 
+ | curtain Average Precision  | 0.433383 | 
+ | refrigerator Average Precision  | 0.471548 | 
+ | showercurtrain Average Precision  | 0.582470 | 
+ | toilet Average Precision  | 0.974948 | 
+ | sink Average Precision  | 0.469203 | 
+ | bathtub Average Precision  | 0.924407 | 
+ | garbagebin Average Precision  | 0.379792 | 
+ | mAP  | 0.583148 | 
+ | cabinet Recall  | 0.739247 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.916667 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.730193 | 
+ | window Recall  | 0.641844 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.225225 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.663265 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.669811 | 
+ | cabinet Average IOU  | 0.484092 | 
+ | bed Average IOU  | 0.667486 | 
+ | chair Average IOU  | 0.635991 | 
+ | sofa Average IOU  | 0.619102 | 
+ | table Average IOU  | 0.603641 | 
+ | door Average IOU  | 0.485186 | 
+ | window Average IOU  | 0.440347 | 
+ | bookshelf Average IOU  | 0.574728 | 
+ | picture Average IOU  | 0.372290 | 
+ | counter Average IOU  | 0.489401 | 
+ | desk Average IOU  | 0.584138 | 
+ | curtain Average IOU  | 0.425008 | 
+ | refrigerator Average IOU  | 0.546734 | 
+ | showercurtrain Average IOU  | 0.456911 | 
+ | toilet Average IOU  | 0.647521 | 
+ | sink Average IOU  | 0.484638 | 
+ | bathtub Average IOU  | 0.619987 | 
+ | garbagebin Average IOU  | 0.492617 | 
+ | AR  | 0.805624 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.086309 | 
+ | bed Average Precision  | 0.778244 | 
+ | chair Average Precision  | 0.674108 | 
+ | sofa Average Precision  | 0.722045 | 
+ | table Average Precision  | 0.447785 | 
+ | door Average Precision  | 0.123603 | 
+ | window Average Precision  | 0.098517 | 
+ | bookshelf Average Precision  | 0.377952 | 
+ | picture Average Precision  | 0.001576 | 
+ | counter Average Precision  | 0.206728 | 
+ | desk Average Precision  | 0.396159 | 
+ | curtain Average Precision  | 0.128296 | 
+ | refrigerator Average Precision  | 0.321336 | 
+ | showercurtrain Average Precision  | 0.118108 | 
+ | toilet Average Precision  | 0.878901 | 
+ | sink Average Precision  | 0.171529 | 
+ | bathtub Average Precision  | 0.797640 | 
+ | garbagebin Average Precision  | 0.146761 | 
+ | mAP  | 0.359755 | 
+ | cabinet Recall  | 0.346774 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.757310 | 
+ | sofa Recall  | 0.835052 | 
+ | table Recall  | 0.651429 | 
+ | door Recall  | 0.340471 | 
+ | window Recall  | 0.230496 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.022523 | 
+ | counter Recall  | 0.423077 | 
+ | desk Recall  | 0.700787 | 
+ | curtain Recall  | 0.298507 | 
+ | refrigerator Recall  | 0.596491 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.275510 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.366038 | 
+ | cabinet Average IOU  | 0.624250 | 
+ | bed Average IOU  | 0.710054 | 
+ | chair Average IOU  | 0.685891 | 
+ | sofa Average IOU  | 0.656854 | 
+ | table Average IOU  | 0.672160 | 
+ | door Average IOU  | 0.613904 | 
+ | window Average IOU  | 0.594814 | 
+ | bookshelf Average IOU  | 0.628523 | 
+ | picture Average IOU  | 0.558626 | 
+ | counter Average IOU  | 0.610168 | 
+ | desk Average IOU  | 0.652301 | 
+ | curtain Average IOU  | 0.569793 | 
+ | refrigerator Average IOU  | 0.667726 | 
+ | showercurtrain Average IOU  | 0.580316 | 
+ | toilet Average IOU  | 0.680352 | 
+ | sink Average IOU  | 0.643716 | 
+ | bathtub Average IOU  | 0.660085 | 
+ | garbagebin Average IOU  | 0.609906 | 
+ | AR  | 0.521173 | 
+2021-06-04 17:04:11.289448
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.398491 | 
+ | bed Average Precision  | 0.873839 | 
+ | chair Average Precision  | 0.862497 | 
+ | sofa Average Precision  | 0.891928 | 
+ | table Average Precision  | 0.614639 | 
+ | door Average Precision  | 0.436686 | 
+ | window Average Precision  | 0.360744 | 
+ | bookshelf Average Precision  | 0.468291 | 
+ | picture Average Precision  | 0.056909 | 
+ | counter Average Precision  | 0.483745 | 
+ | desk Average Precision  | 0.627035 | 
+ | curtain Average Precision  | 0.400846 | 
+ | refrigerator Average Precision  | 0.484117 | 
+ | showercurtrain Average Precision  | 0.544264 | 
+ | toilet Average Precision  | 0.969235 | 
+ | sink Average Precision  | 0.445356 | 
+ | bathtub Average Precision  | 0.907511 | 
+ | garbagebin Average Precision  | 0.373115 | 
+ | mAP  | 0.566625 | 
+ | cabinet Recall  | 0.731183 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.910819 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.723769 | 
+ | window Recall  | 0.631206 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.935484 | 
+ | garbagebin Recall  | 0.667925 | 
+ | cabinet Average IOU  | 0.485734 | 
+ | bed Average IOU  | 0.672793 | 
+ | chair Average IOU  | 0.622317 | 
+ | sofa Average IOU  | 0.622059 | 
+ | table Average IOU  | 0.601760 | 
+ | door Average IOU  | 0.486871 | 
+ | window Average IOU  | 0.441196 | 
+ | bookshelf Average IOU  | 0.582220 | 
+ | picture Average IOU  | 0.376093 | 
+ | counter Average IOU  | 0.484322 | 
+ | desk Average IOU  | 0.569980 | 
+ | curtain Average IOU  | 0.442530 | 
+ | refrigerator Average IOU  | 0.550897 | 
+ | showercurtrain Average IOU  | 0.483282 | 
+ | toilet Average IOU  | 0.640928 | 
+ | sink Average IOU  | 0.495241 | 
+ | bathtub Average IOU  | 0.636021 | 
+ | garbagebin Average IOU  | 0.494164 | 
+ | AR  | 0.796242 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.067830 | 
+ | bed Average Precision  | 0.776965 | 
+ | chair Average Precision  | 0.632237 | 
+ | sofa Average Precision  | 0.704802 | 
+ | table Average Precision  | 0.463991 | 
+ | door Average Precision  | 0.116789 | 
+ | window Average Precision  | 0.088546 | 
+ | bookshelf Average Precision  | 0.345975 | 
+ | picture Average Precision  | 0.001079 | 
+ | counter Average Precision  | 0.243703 | 
+ | desk Average Precision  | 0.309692 | 
+ | curtain Average Precision  | 0.110591 | 
+ | refrigerator Average Precision  | 0.277457 | 
+ | showercurtrain Average Precision  | 0.088579 | 
+ | toilet Average Precision  | 0.880519 | 
+ | sink Average Precision  | 0.184568 | 
+ | bathtub Average Precision  | 0.785258 | 
+ | garbagebin Average Precision  | 0.134639 | 
+ | mAP  | 0.345179 | 
+ | cabinet Recall  | 0.336022 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.725877 | 
+ | sofa Recall  | 0.814433 | 
+ | table Recall  | 0.668571 | 
+ | door Recall  | 0.329764 | 
+ | window Recall  | 0.223404 | 
+ | bookshelf Recall  | 0.623377 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.423077 | 
+ | desk Recall  | 0.669291 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.285714 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.349057 | 
+ | cabinet Average IOU  | 0.627617 | 
+ | bed Average IOU  | 0.708647 | 
+ | chair Average IOU  | 0.682733 | 
+ | sofa Average IOU  | 0.663248 | 
+ | table Average IOU  | 0.665251 | 
+ | door Average IOU  | 0.618715 | 
+ | window Average IOU  | 0.594328 | 
+ | bookshelf Average IOU  | 0.642649 | 
+ | picture Average IOU  | 0.555275 | 
+ | counter Average IOU  | 0.594817 | 
+ | desk Average IOU  | 0.650800 | 
+ | curtain Average IOU  | 0.583478 | 
+ | refrigerator Average IOU  | 0.659359 | 
+ | showercurtrain Average IOU  | 0.607084 | 
+ | toilet Average IOU  | 0.678296 | 
+ | sink Average IOU  | 0.652309 | 
+ | bathtub Average IOU  | 0.667954 | 
+ | garbagebin Average IOU  | 0.616198 | 
+ | AR  | 0.514725 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.392681 | 
+ | bed Average Precision  | 0.874964 | 
+ | chair Average Precision  | 0.865493 | 
+ | sofa Average Precision  | 0.890893 | 
+ | table Average Precision  | 0.613701 | 
+ | door Average Precision  | 0.436649 | 
+ | window Average Precision  | 0.362972 | 
+ | bookshelf Average Precision  | 0.461544 | 
+ | picture Average Precision  | 0.056604 | 
+ | counter Average Precision  | 0.521745 | 
+ | desk Average Precision  | 0.643238 | 
+ | curtain Average Precision  | 0.403413 | 
+ | refrigerator Average Precision  | 0.483766 | 
+ | showercurtrain Average Precision  | 0.584829 | 
+ | toilet Average Precision  | 0.970973 | 
+ | sink Average Precision  | 0.449955 | 
+ | bathtub Average Precision  | 0.908728 | 
+ | garbagebin Average Precision  | 0.374933 | 
+ | mAP  | 0.572060 | 
+ | cabinet Recall  | 0.728495 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.912281 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.725910 | 
+ | window Recall  | 0.631206 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.935484 | 
+ | garbagebin Recall  | 0.671698 | 
+ | cabinet Average IOU  | 0.487115 | 
+ | bed Average IOU  | 0.679607 | 
+ | chair Average IOU  | 0.622126 | 
+ | sofa Average IOU  | 0.619483 | 
+ | table Average IOU  | 0.601531 | 
+ | door Average IOU  | 0.489322 | 
+ | window Average IOU  | 0.440002 | 
+ | bookshelf Average IOU  | 0.576469 | 
+ | picture Average IOU  | 0.386550 | 
+ | counter Average IOU  | 0.472765 | 
+ | desk Average IOU  | 0.568853 | 
+ | curtain Average IOU  | 0.448188 | 
+ | refrigerator Average IOU  | 0.552528 | 
+ | showercurtrain Average IOU  | 0.485121 | 
+ | toilet Average IOU  | 0.644274 | 
+ | sink Average IOU  | 0.492861 | 
+ | bathtub Average IOU  | 0.628504 | 
+ | garbagebin Average IOU  | 0.491771 | 
+ | AR  | 0.797571 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.073203 | 
+ | bed Average Precision  | 0.776931 | 
+ | chair Average Precision  | 0.631829 | 
+ | sofa Average Precision  | 0.684293 | 
+ | table Average Precision  | 0.443836 | 
+ | door Average Precision  | 0.116500 | 
+ | window Average Precision  | 0.097919 | 
+ | bookshelf Average Precision  | 0.339319 | 
+ | picture Average Precision  | 0.000616 | 
+ | counter Average Precision  | 0.181725 | 
+ | desk Average Precision  | 0.302432 | 
+ | curtain Average Precision  | 0.145575 | 
+ | refrigerator Average Precision  | 0.309839 | 
+ | showercurtrain Average Precision  | 0.091056 | 
+ | toilet Average Precision  | 0.848043 | 
+ | sink Average Precision  | 0.180627 | 
+ | bathtub Average Precision  | 0.784200 | 
+ | garbagebin Average Precision  | 0.130785 | 
+ | mAP  | 0.341041 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.725877 | 
+ | sofa Recall  | 0.814433 | 
+ | table Recall  | 0.657143 | 
+ | door Recall  | 0.331906 | 
+ | window Recall  | 0.226950 | 
+ | bookshelf Recall  | 0.623377 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.653543 | 
+ | curtain Recall  | 0.298507 | 
+ | refrigerator Recall  | 0.631579 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.879310 | 
+ | sink Recall  | 0.285714 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.347170 | 
+ | cabinet Average IOU  | 0.624259 | 
+ | bed Average IOU  | 0.714836 | 
+ | chair Average IOU  | 0.682793 | 
+ | sofa Average IOU  | 0.660551 | 
+ | table Average IOU  | 0.668504 | 
+ | door Average IOU  | 0.621424 | 
+ | window Average IOU  | 0.593572 | 
+ | bookshelf Average IOU  | 0.635793 | 
+ | picture Average IOU  | 0.561398 | 
+ | counter Average IOU  | 0.596909 | 
+ | desk Average IOU  | 0.654717 | 
+ | curtain Average IOU  | 0.587159 | 
+ | refrigerator Average IOU  | 0.656949 | 
+ | showercurtrain Average IOU  | 0.610164 | 
+ | toilet Average IOU  | 0.685407 | 
+ | sink Average IOU  | 0.643147 | 
+ | bathtub Average IOU  | 0.659234 | 
+ | garbagebin Average IOU  | 0.614352 | 
+ | AR  | 0.512184 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.411794 | 
+ | bed Average Precision  | 0.877184 | 
+ | chair Average Precision  | 0.879203 | 
+ | sofa Average Precision  | 0.889055 | 
+ | table Average Precision  | 0.601822 | 
+ | door Average Precision  | 0.435897 | 
+ | window Average Precision  | 0.362249 | 
+ | bookshelf Average Precision  | 0.460850 | 
+ | picture Average Precision  | 0.060250 | 
+ | counter Average Precision  | 0.534750 | 
+ | desk Average Precision  | 0.673072 | 
+ | curtain Average Precision  | 0.423785 | 
+ | refrigerator Average Precision  | 0.489633 | 
+ | showercurtrain Average Precision  | 0.559870 | 
+ | toilet Average Precision  | 0.972558 | 
+ | sink Average Precision  | 0.458042 | 
+ | bathtub Average Precision  | 0.909287 | 
+ | garbagebin Average Precision  | 0.375603 | 
+ | mAP  | 0.576384 | 
+ | cabinet Recall  | 0.733871 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.921053 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.828571 | 
+ | door Recall  | 0.723769 | 
+ | window Recall  | 0.620567 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.776119 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.935484 | 
+ | garbagebin Recall  | 0.673585 | 
+ | cabinet Average IOU  | 0.487546 | 
+ | bed Average IOU  | 0.671215 | 
+ | chair Average IOU  | 0.631463 | 
+ | sofa Average IOU  | 0.625351 | 
+ | table Average IOU  | 0.601117 | 
+ | door Average IOU  | 0.490767 | 
+ | window Average IOU  | 0.442172 | 
+ | bookshelf Average IOU  | 0.579114 | 
+ | picture Average IOU  | 0.377059 | 
+ | counter Average IOU  | 0.484924 | 
+ | desk Average IOU  | 0.591548 | 
+ | curtain Average IOU  | 0.439678 | 
+ | refrigerator Average IOU  | 0.557008 | 
+ | showercurtrain Average IOU  | 0.505019 | 
+ | toilet Average IOU  | 0.640185 | 
+ | sink Average IOU  | 0.500742 | 
+ | bathtub Average IOU  | 0.638136 | 
+ | garbagebin Average IOU  | 0.496764 | 
+ | AR  | 0.798025 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.072498 | 
+ | bed Average Precision  | 0.775266 | 
+ | chair Average Precision  | 0.674139 | 
+ | sofa Average Precision  | 0.685720 | 
+ | table Average Precision  | 0.433852 | 
+ | door Average Precision  | 0.118040 | 
+ | window Average Precision  | 0.096087 | 
+ | bookshelf Average Precision  | 0.348920 | 
+ | picture Average Precision  | 0.002348 | 
+ | counter Average Precision  | 0.235887 | 
+ | desk Average Precision  | 0.378236 | 
+ | curtain Average Precision  | 0.138864 | 
+ | refrigerator Average Precision  | 0.323377 | 
+ | showercurtrain Average Precision  | 0.127435 | 
+ | toilet Average Precision  | 0.828306 | 
+ | sink Average Precision  | 0.190438 | 
+ | bathtub Average Precision  | 0.836320 | 
+ | garbagebin Average Precision  | 0.129931 | 
+ | mAP  | 0.355315 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.754386 | 
+ | sofa Recall  | 0.804124 | 
+ | table Recall  | 0.645714 | 
+ | door Recall  | 0.331906 | 
+ | window Recall  | 0.226950 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.423077 | 
+ | desk Recall  | 0.716535 | 
+ | curtain Recall  | 0.313433 | 
+ | refrigerator Recall  | 0.649123 | 
+ | showercurtrain Recall  | 0.428571 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.285714 | 
+ | bathtub Recall  | 0.838710 | 
+ | garbagebin Recall  | 0.349057 | 
+ | cabinet Average IOU  | 0.627165 | 
+ | bed Average IOU  | 0.709482 | 
+ | chair Average IOU  | 0.684502 | 
+ | sofa Average IOU  | 0.665626 | 
+ | table Average IOU  | 0.671912 | 
+ | door Average IOU  | 0.620264 | 
+ | window Average IOU  | 0.593679 | 
+ | bookshelf Average IOU  | 0.635068 | 
+ | picture Average IOU  | 0.543358 | 
+ | counter Average IOU  | 0.595081 | 
+ | desk Average IOU  | 0.661177 | 
+ | curtain Average IOU  | 0.571292 | 
+ | refrigerator Average IOU  | 0.662447 | 
+ | showercurtrain Average IOU  | 0.596055 | 
+ | toilet Average IOU  | 0.685488 | 
+ | sink Average IOU  | 0.655325 | 
+ | bathtub Average IOU  | 0.662477 | 
+ | garbagebin Average IOU  | 0.617030 | 
+ | AR  | 0.525879 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.403617 | 
+ | bed Average Precision  | 0.877321 | 
+ | chair Average Precision  | 0.878720 | 
+ | sofa Average Precision  | 0.889041 | 
+ | table Average Precision  | 0.606754 | 
+ | door Average Precision  | 0.435604 | 
+ | window Average Precision  | 0.365857 | 
+ | bookshelf Average Precision  | 0.462089 | 
+ | picture Average Precision  | 0.058113 | 
+ | counter Average Precision  | 0.528785 | 
+ | desk Average Precision  | 0.677608 | 
+ | curtain Average Precision  | 0.411074 | 
+ | refrigerator Average Precision  | 0.490664 | 
+ | showercurtrain Average Precision  | 0.567389 | 
+ | toilet Average Precision  | 0.972501 | 
+ | sink Average Precision  | 0.464391 | 
+ | bathtub Average Precision  | 0.909407 | 
+ | garbagebin Average Precision  | 0.381227 | 
+ | mAP  | 0.576676 | 
+ | cabinet Recall  | 0.725806 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.920322 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.828571 | 
+ | door Recall  | 0.725910 | 
+ | window Recall  | 0.620567 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.776119 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.935484 | 
+ | garbagebin Recall  | 0.675472 | 
+ | cabinet Average IOU  | 0.487529 | 
+ | bed Average IOU  | 0.671315 | 
+ | chair Average IOU  | 0.631085 | 
+ | sofa Average IOU  | 0.626056 | 
+ | table Average IOU  | 0.601334 | 
+ | door Average IOU  | 0.490151 | 
+ | window Average IOU  | 0.441127 | 
+ | bookshelf Average IOU  | 0.575316 | 
+ | picture Average IOU  | 0.391720 | 
+ | counter Average IOU  | 0.483078 | 
+ | desk Average IOU  | 0.591362 | 
+ | curtain Average IOU  | 0.438110 | 
+ | refrigerator Average IOU  | 0.557008 | 
+ | showercurtrain Average IOU  | 0.502182 | 
+ | toilet Average IOU  | 0.639492 | 
+ | sink Average IOU  | 0.500375 | 
+ | bathtub Average IOU  | 0.627969 | 
+ | garbagebin Average IOU  | 0.496410 | 
+ | AR  | 0.797760 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.075397 | 
+ | bed Average Precision  | 0.775440 | 
+ | chair Average Precision  | 0.672157 | 
+ | sofa Average Precision  | 0.676178 | 
+ | table Average Precision  | 0.428403 | 
+ | door Average Precision  | 0.119406 | 
+ | window Average Precision  | 0.090515 | 
+ | bookshelf Average Precision  | 0.350505 | 
+ | picture Average Precision  | 0.008138 | 
+ | counter Average Precision  | 0.213996 | 
+ | desk Average Precision  | 0.385593 | 
+ | curtain Average Precision  | 0.135760 | 
+ | refrigerator Average Precision  | 0.323267 | 
+ | showercurtrain Average Precision  | 0.099633 | 
+ | toilet Average Precision  | 0.828715 | 
+ | sink Average Precision  | 0.195807 | 
+ | bathtub Average Precision  | 0.789576 | 
+ | garbagebin Average Precision  | 0.132945 | 
+ | mAP  | 0.350079 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.753655 | 
+ | sofa Recall  | 0.814433 | 
+ | table Recall  | 0.637143 | 
+ | door Recall  | 0.340471 | 
+ | window Recall  | 0.219858 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.040541 | 
+ | counter Recall  | 0.403846 | 
+ | desk Recall  | 0.716535 | 
+ | curtain Recall  | 0.298507 | 
+ | refrigerator Recall  | 0.649123 | 
+ | showercurtrain Recall  | 0.392857 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.295918 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.350943 | 
+ | cabinet Average IOU  | 0.623294 | 
+ | bed Average IOU  | 0.708279 | 
+ | chair Average IOU  | 0.684490 | 
+ | sofa Average IOU  | 0.664113 | 
+ | table Average IOU  | 0.675232 | 
+ | door Average IOU  | 0.616594 | 
+ | window Average IOU  | 0.593039 | 
+ | bookshelf Average IOU  | 0.629928 | 
+ | picture Average IOU  | 0.540566 | 
+ | counter Average IOU  | 0.596984 | 
+ | desk Average IOU  | 0.660916 | 
+ | curtain Average IOU  | 0.578197 | 
+ | refrigerator Average IOU  | 0.662447 | 
+ | showercurtrain Average IOU  | 0.608941 | 
+ | toilet Average IOU  | 0.685097 | 
+ | sink Average IOU  | 0.651061 | 
+ | bathtub Average IOU  | 0.659792 | 
+ | garbagebin Average IOU  | 0.616843 | 
+ | AR  | 0.521515 | 
+2021-06-04 17:20:15.428633
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.371240 | 
+ | bed Average Precision  | 0.880263 | 
+ | chair Average Precision  | 0.860057 | 
+ | sofa Average Precision  | 0.888546 | 
+ | table Average Precision  | 0.617634 | 
+ | door Average Precision  | 0.434556 | 
+ | window Average Precision  | 0.353128 | 
+ | bookshelf Average Precision  | 0.494937 | 
+ | picture Average Precision  | 0.052853 | 
+ | counter Average Precision  | 0.508247 | 
+ | desk Average Precision  | 0.631184 | 
+ | curtain Average Precision  | 0.400174 | 
+ | refrigerator Average Precision  | 0.484287 | 
+ | showercurtrain Average Precision  | 0.535886 | 
+ | toilet Average Precision  | 0.971919 | 
+ | sink Average Precision  | 0.458777 | 
+ | bathtub Average Precision  | 0.918729 | 
+ | garbagebin Average Precision  | 0.367103 | 
+ | mAP  | 0.568307 | 
+ | cabinet Recall  | 0.712366 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.910819 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.728051 | 
+ | window Recall  | 0.638298 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.220721 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.666038 | 
+ | cabinet Average IOU  | 0.488620 | 
+ | bed Average IOU  | 0.663680 | 
+ | chair Average IOU  | 0.620419 | 
+ | sofa Average IOU  | 0.615373 | 
+ | table Average IOU  | 0.599047 | 
+ | door Average IOU  | 0.490637 | 
+ | window Average IOU  | 0.440210 | 
+ | bookshelf Average IOU  | 0.583664 | 
+ | picture Average IOU  | 0.385392 | 
+ | counter Average IOU  | 0.464392 | 
+ | desk Average IOU  | 0.565507 | 
+ | curtain Average IOU  | 0.430273 | 
+ | refrigerator Average IOU  | 0.547495 | 
+ | showercurtrain Average IOU  | 0.477167 | 
+ | toilet Average IOU  | 0.647656 | 
+ | sink Average IOU  | 0.496329 | 
+ | bathtub Average IOU  | 0.622196 | 
+ | garbagebin Average IOU  | 0.492763 | 
+ | AR  | 0.800129 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.078799 | 
+ | bed Average Precision  | 0.784409 | 
+ | chair Average Precision  | 0.636154 | 
+ | sofa Average Precision  | 0.702592 | 
+ | table Average Precision  | 0.433907 | 
+ | door Average Precision  | 0.121620 | 
+ | window Average Precision  | 0.092156 | 
+ | bookshelf Average Precision  | 0.341869 | 
+ | picture Average Precision  | 0.003922 | 
+ | counter Average Precision  | 0.123119 | 
+ | desk Average Precision  | 0.288712 | 
+ | curtain Average Precision  | 0.146619 | 
+ | refrigerator Average Precision  | 0.327579 | 
+ | showercurtrain Average Precision  | 0.095092 | 
+ | toilet Average Precision  | 0.877316 | 
+ | sink Average Precision  | 0.206094 | 
+ | bathtub Average Precision  | 0.784007 | 
+ | garbagebin Average Precision  | 0.118296 | 
+ | mAP  | 0.342348 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.728801 | 
+ | sofa Recall  | 0.824742 | 
+ | table Recall  | 0.654286 | 
+ | door Recall  | 0.336188 | 
+ | window Recall  | 0.223404 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.346154 | 
+ | desk Recall  | 0.661417 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.631579 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.335849 | 
+ | cabinet Average IOU  | 0.624766 | 
+ | bed Average IOU  | 0.704521 | 
+ | chair Average IOU  | 0.679059 | 
+ | sofa Average IOU  | 0.659077 | 
+ | table Average IOU  | 0.667697 | 
+ | door Average IOU  | 0.620330 | 
+ | window Average IOU  | 0.589131 | 
+ | bookshelf Average IOU  | 0.642959 | 
+ | picture Average IOU  | 0.558029 | 
+ | counter Average IOU  | 0.605011 | 
+ | desk Average IOU  | 0.650754 | 
+ | curtain Average IOU  | 0.570408 | 
+ | refrigerator Average IOU  | 0.658028 | 
+ | showercurtrain Average IOU  | 0.602074 | 
+ | toilet Average IOU  | 0.681140 | 
+ | sink Average IOU  | 0.638288 | 
+ | bathtub Average IOU  | 0.661454 | 
+ | garbagebin Average IOU  | 0.618400 | 
+ | AR  | 0.513995 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.381444 | 
+ | bed Average Precision  | 0.879885 | 
+ | chair Average Precision  | 0.862685 | 
+ | sofa Average Precision  | 0.893092 | 
+ | table Average Precision  | 0.622864 | 
+ | door Average Precision  | 0.436496 | 
+ | window Average Precision  | 0.356643 | 
+ | bookshelf Average Precision  | 0.473819 | 
+ | picture Average Precision  | 0.056830 | 
+ | counter Average Precision  | 0.514889 | 
+ | desk Average Precision  | 0.637600 | 
+ | curtain Average Precision  | 0.404033 | 
+ | refrigerator Average Precision  | 0.484558 | 
+ | showercurtrain Average Precision  | 0.560549 | 
+ | toilet Average Precision  | 0.971653 | 
+ | sink Average Precision  | 0.477241 | 
+ | bathtub Average Precision  | 0.918750 | 
+ | garbagebin Average Precision  | 0.364305 | 
+ | mAP  | 0.572074 | 
+ | cabinet Recall  | 0.717742 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.912281 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.730193 | 
+ | window Recall  | 0.638298 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.220721 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.667925 | 
+ | cabinet Average IOU  | 0.490188 | 
+ | bed Average IOU  | 0.664452 | 
+ | chair Average IOU  | 0.621963 | 
+ | sofa Average IOU  | 0.612707 | 
+ | table Average IOU  | 0.601636 | 
+ | door Average IOU  | 0.486791 | 
+ | window Average IOU  | 0.440133 | 
+ | bookshelf Average IOU  | 0.580950 | 
+ | picture Average IOU  | 0.382222 | 
+ | counter Average IOU  | 0.476800 | 
+ | desk Average IOU  | 0.564703 | 
+ | curtain Average IOU  | 0.422797 | 
+ | refrigerator Average IOU  | 0.554106 | 
+ | showercurtrain Average IOU  | 0.479431 | 
+ | toilet Average IOU  | 0.636506 | 
+ | sink Average IOU  | 0.498785 | 
+ | bathtub Average IOU  | 0.610596 | 
+ | garbagebin Average IOU  | 0.488681 | 
+ | AR  | 0.800578 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.081245 | 
+ | bed Average Precision  | 0.771160 | 
+ | chair Average Precision  | 0.639428 | 
+ | sofa Average Precision  | 0.684334 | 
+ | table Average Precision  | 0.456811 | 
+ | door Average Precision  | 0.124820 | 
+ | window Average Precision  | 0.093899 | 
+ | bookshelf Average Precision  | 0.333911 | 
+ | picture Average Precision  | 0.002770 | 
+ | counter Average Precision  | 0.167264 | 
+ | desk Average Precision  | 0.292957 | 
+ | curtain Average Precision  | 0.137177 | 
+ | refrigerator Average Precision  | 0.330133 | 
+ | showercurtrain Average Precision  | 0.118523 | 
+ | toilet Average Precision  | 0.825182 | 
+ | sink Average Precision  | 0.209704 | 
+ | bathtub Average Precision  | 0.753803 | 
+ | garbagebin Average Precision  | 0.111418 | 
+ | mAP  | 0.340808 | 
+ | cabinet Recall  | 0.352151 | 
+ | bed Recall  | 0.814815 | 
+ | chair Recall  | 0.730263 | 
+ | sofa Recall  | 0.814433 | 
+ | table Recall  | 0.665714 | 
+ | door Recall  | 0.340471 | 
+ | window Recall  | 0.219858 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.661417 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.649123 | 
+ | showercurtrain Recall  | 0.392857 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.774194 | 
+ | garbagebin Recall  | 0.328302 | 
+ | cabinet Average IOU  | 0.621526 | 
+ | bed Average IOU  | 0.708549 | 
+ | chair Average IOU  | 0.680383 | 
+ | sofa Average IOU  | 0.659646 | 
+ | table Average IOU  | 0.668399 | 
+ | door Average IOU  | 0.613512 | 
+ | window Average IOU  | 0.589020 | 
+ | bookshelf Average IOU  | 0.633512 | 
+ | picture Average IOU  | 0.567150 | 
+ | counter Average IOU  | 0.611872 | 
+ | desk Average IOU  | 0.648543 | 
+ | curtain Average IOU  | 0.571681 | 
+ | refrigerator Average IOU  | 0.659911 | 
+ | showercurtrain Average IOU  | 0.595718 | 
+ | toilet Average IOU  | 0.677077 | 
+ | sink Average IOU  | 0.643135 | 
+ | bathtub Average IOU  | 0.658683 | 
+ | garbagebin Average IOU  | 0.618861 | 
+ | AR  | 0.512429 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.387010 | 
+ | bed Average Precision  | 0.879717 | 
+ | chair Average Precision  | 0.874039 | 
+ | sofa Average Precision  | 0.896473 | 
+ | table Average Precision  | 0.604351 | 
+ | door Average Precision  | 0.435651 | 
+ | window Average Precision  | 0.365973 | 
+ | bookshelf Average Precision  | 0.486196 | 
+ | picture Average Precision  | 0.054808 | 
+ | counter Average Precision  | 0.530713 | 
+ | desk Average Precision  | 0.698817 | 
+ | curtain Average Precision  | 0.389504 | 
+ | refrigerator Average Precision  | 0.487185 | 
+ | showercurtrain Average Precision  | 0.551261 | 
+ | toilet Average Precision  | 0.972285 | 
+ | sink Average Precision  | 0.485498 | 
+ | bathtub Average Precision  | 0.921078 | 
+ | garbagebin Average Precision  | 0.378769 | 
+ | mAP  | 0.577741 | 
+ | cabinet Recall  | 0.715054 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.916667 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.723769 | 
+ | window Recall  | 0.645390 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.225225 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.944882 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.663265 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.673585 | 
+ | cabinet Average IOU  | 0.491170 | 
+ | bed Average IOU  | 0.668324 | 
+ | chair Average IOU  | 0.633498 | 
+ | sofa Average IOU  | 0.616945 | 
+ | table Average IOU  | 0.604931 | 
+ | door Average IOU  | 0.490913 | 
+ | window Average IOU  | 0.440765 | 
+ | bookshelf Average IOU  | 0.581913 | 
+ | picture Average IOU  | 0.375722 | 
+ | counter Average IOU  | 0.474021 | 
+ | desk Average IOU  | 0.585985 | 
+ | curtain Average IOU  | 0.436096 | 
+ | refrigerator Average IOU  | 0.552799 | 
+ | showercurtrain Average IOU  | 0.472232 | 
+ | toilet Average IOU  | 0.648411 | 
+ | sink Average IOU  | 0.503033 | 
+ | bathtub Average IOU  | 0.621880 | 
+ | garbagebin Average IOU  | 0.491809 | 
+ | AR  | 0.802025 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.090415 | 
+ | bed Average Precision  | 0.773991 | 
+ | chair Average Precision  | 0.672725 | 
+ | sofa Average Precision  | 0.666868 | 
+ | table Average Precision  | 0.437123 | 
+ | door Average Precision  | 0.126708 | 
+ | window Average Precision  | 0.094061 | 
+ | bookshelf Average Precision  | 0.373345 | 
+ | picture Average Precision  | 0.000314 | 
+ | counter Average Precision  | 0.178723 | 
+ | desk Average Precision  | 0.401922 | 
+ | curtain Average Precision  | 0.136799 | 
+ | refrigerator Average Precision  | 0.340873 | 
+ | showercurtrain Average Precision  | 0.082493 | 
+ | toilet Average Precision  | 0.880635 | 
+ | sink Average Precision  | 0.213057 | 
+ | bathtub Average Precision  | 0.786888 | 
+ | garbagebin Average Precision  | 0.133194 | 
+ | mAP  | 0.355007 | 
+ | cabinet Recall  | 0.352151 | 
+ | bed Recall  | 0.814815 | 
+ | chair Recall  | 0.755117 | 
+ | sofa Recall  | 0.804124 | 
+ | table Recall  | 0.657143 | 
+ | door Recall  | 0.340471 | 
+ | window Recall  | 0.223404 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.022523 | 
+ | counter Recall  | 0.365385 | 
+ | desk Recall  | 0.724409 | 
+ | curtain Recall  | 0.268657 | 
+ | refrigerator Recall  | 0.666667 | 
+ | showercurtrain Recall  | 0.321429 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.350943 | 
+ | cabinet Average IOU  | 0.623724 | 
+ | bed Average IOU  | 0.708967 | 
+ | chair Average IOU  | 0.684348 | 
+ | sofa Average IOU  | 0.661836 | 
+ | table Average IOU  | 0.672192 | 
+ | door Average IOU  | 0.617168 | 
+ | window Average IOU  | 0.588012 | 
+ | bookshelf Average IOU  | 0.637170 | 
+ | picture Average IOU  | 0.564085 | 
+ | counter Average IOU  | 0.610337 | 
+ | desk Average IOU  | 0.655074 | 
+ | curtain Average IOU  | 0.584801 | 
+ | refrigerator Average IOU  | 0.655749 | 
+ | showercurtrain Average IOU  | 0.581716 | 
+ | toilet Average IOU  | 0.680939 | 
+ | sink Average IOU  | 0.657515 | 
+ | bathtub Average IOU  | 0.661075 | 
+ | garbagebin Average IOU  | 0.616769 | 
+ | AR  | 0.518662 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.394047 | 
+ | bed Average Precision  | 0.879621 | 
+ | chair Average Precision  | 0.874409 | 
+ | sofa Average Precision  | 0.897548 | 
+ | table Average Precision  | 0.601008 | 
+ | door Average Precision  | 0.427364 | 
+ | window Average Precision  | 0.361017 | 
+ | bookshelf Average Precision  | 0.465229 | 
+ | picture Average Precision  | 0.052812 | 
+ | counter Average Precision  | 0.525590 | 
+ | desk Average Precision  | 0.696546 | 
+ | curtain Average Precision  | 0.387210 | 
+ | refrigerator Average Precision  | 0.490651 | 
+ | showercurtrain Average Precision  | 0.558286 | 
+ | toilet Average Precision  | 0.971734 | 
+ | sink Average Precision  | 0.487819 | 
+ | bathtub Average Precision  | 0.921343 | 
+ | garbagebin Average Precision  | 0.374989 | 
+ | mAP  | 0.575957 | 
+ | cabinet Recall  | 0.720430 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.916667 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.723769 | 
+ | window Recall  | 0.645390 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.220721 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.944882 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.663265 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.671698 | 
+ | cabinet Average IOU  | 0.490302 | 
+ | bed Average IOU  | 0.667487 | 
+ | chair Average IOU  | 0.633433 | 
+ | sofa Average IOU  | 0.617309 | 
+ | table Average IOU  | 0.606829 | 
+ | door Average IOU  | 0.488116 | 
+ | window Average IOU  | 0.440644 | 
+ | bookshelf Average IOU  | 0.582427 | 
+ | picture Average IOU  | 0.380325 | 
+ | counter Average IOU  | 0.485810 | 
+ | desk Average IOU  | 0.585637 | 
+ | curtain Average IOU  | 0.437221 | 
+ | refrigerator Average IOU  | 0.549674 | 
+ | showercurtrain Average IOU  | 0.477737 | 
+ | toilet Average IOU  | 0.643999 | 
+ | sink Average IOU  | 0.503124 | 
+ | bathtub Average IOU  | 0.618033 | 
+ | garbagebin Average IOU  | 0.492379 | 
+ | AR  | 0.802064 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.082137 | 
+ | bed Average Precision  | 0.756231 | 
+ | chair Average Precision  | 0.671636 | 
+ | sofa Average Precision  | 0.660612 | 
+ | table Average Precision  | 0.443114 | 
+ | door Average Precision  | 0.129337 | 
+ | window Average Precision  | 0.100283 | 
+ | bookshelf Average Precision  | 0.336233 | 
+ | picture Average Precision  | 0.000991 | 
+ | counter Average Precision  | 0.192265 | 
+ | desk Average Precision  | 0.387031 | 
+ | curtain Average Precision  | 0.135257 | 
+ | refrigerator Average Precision  | 0.338252 | 
+ | showercurtrain Average Precision  | 0.109677 | 
+ | toilet Average Precision  | 0.844228 | 
+ | sink Average Precision  | 0.212573 | 
+ | bathtub Average Precision  | 0.785544 | 
+ | garbagebin Average Precision  | 0.115550 | 
+ | mAP  | 0.350053 | 
+ | cabinet Recall  | 0.346774 | 
+ | bed Recall  | 0.802469 | 
+ | chair Recall  | 0.754386 | 
+ | sofa Recall  | 0.793814 | 
+ | table Recall  | 0.662857 | 
+ | door Recall  | 0.342612 | 
+ | window Recall  | 0.226950 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.365385 | 
+ | desk Recall  | 0.716535 | 
+ | curtain Recall  | 0.268657 | 
+ | refrigerator Recall  | 0.666667 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.879310 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.337736 | 
+ | cabinet Average IOU  | 0.623239 | 
+ | bed Average IOU  | 0.710896 | 
+ | chair Average IOU  | 0.684862 | 
+ | sofa Average IOU  | 0.665339 | 
+ | table Average IOU  | 0.672545 | 
+ | door Average IOU  | 0.610885 | 
+ | window Average IOU  | 0.584277 | 
+ | bookshelf Average IOU  | 0.635141 | 
+ | picture Average IOU  | 0.567150 | 
+ | counter Average IOU  | 0.623571 | 
+ | desk Average IOU  | 0.655874 | 
+ | curtain Average IOU  | 0.586712 | 
+ | refrigerator Average IOU  | 0.650072 | 
+ | showercurtrain Average IOU  | 0.588204 | 
+ | toilet Average IOU  | 0.679833 | 
+ | sink Average IOU  | 0.657704 | 
+ | bathtub Average IOU  | 0.656458 | 
+ | garbagebin Average IOU  | 0.621043 | 
+ | AR  | 0.517081 | 
+2021-06-04 17:36:21.175118
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.389657 | 
+ | bed Average Precision  | 0.879422 | 
+ | chair Average Precision  | 0.861382 | 
+ | sofa Average Precision  | 0.888427 | 
+ | table Average Precision  | 0.610920 | 
+ | door Average Precision  | 0.436449 | 
+ | window Average Precision  | 0.355623 | 
+ | bookshelf Average Precision  | 0.475945 | 
+ | picture Average Precision  | 0.052307 | 
+ | counter Average Precision  | 0.516564 | 
+ | desk Average Precision  | 0.638825 | 
+ | curtain Average Precision  | 0.393199 | 
+ | refrigerator Average Precision  | 0.494779 | 
+ | showercurtrain Average Precision  | 0.575198 | 
+ | toilet Average Precision  | 0.972849 | 
+ | sink Average Precision  | 0.461389 | 
+ | bathtub Average Precision  | 0.915868 | 
+ | garbagebin Average Precision  | 0.371134 | 
+ | mAP  | 0.571663 | 
+ | cabinet Recall  | 0.731183 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.910088 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.725910 | 
+ | window Recall  | 0.627660 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.632653 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.654717 | 
+ | cabinet Average IOU  | 0.485603 | 
+ | bed Average IOU  | 0.663775 | 
+ | chair Average IOU  | 0.622411 | 
+ | sofa Average IOU  | 0.613220 | 
+ | table Average IOU  | 0.602320 | 
+ | door Average IOU  | 0.490839 | 
+ | window Average IOU  | 0.445165 | 
+ | bookshelf Average IOU  | 0.586274 | 
+ | picture Average IOU  | 0.381829 | 
+ | counter Average IOU  | 0.469479 | 
+ | desk Average IOU  | 0.560146 | 
+ | curtain Average IOU  | 0.444393 | 
+ | refrigerator Average IOU  | 0.544518 | 
+ | showercurtrain Average IOU  | 0.469000 | 
+ | toilet Average IOU  | 0.640451 | 
+ | sink Average IOU  | 0.501223 | 
+ | bathtub Average IOU  | 0.614673 | 
+ | garbagebin Average IOU  | 0.495715 | 
+ | AR  | 0.801995 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.083181 | 
+ | bed Average Precision  | 0.775038 | 
+ | chair Average Precision  | 0.630259 | 
+ | sofa Average Precision  | 0.647257 | 
+ | table Average Precision  | 0.443557 | 
+ | door Average Precision  | 0.108133 | 
+ | window Average Precision  | 0.083439 | 
+ | bookshelf Average Precision  | 0.369385 | 
+ | picture Average Precision  | 0.001421 | 
+ | counter Average Precision  | 0.223091 | 
+ | desk Average Precision  | 0.289771 | 
+ | curtain Average Precision  | 0.153754 | 
+ | refrigerator Average Precision  | 0.282718 | 
+ | showercurtrain Average Precision  | 0.140125 | 
+ | toilet Average Precision  | 0.823586 | 
+ | sink Average Precision  | 0.205573 | 
+ | bathtub Average Precision  | 0.815030 | 
+ | garbagebin Average Precision  | 0.143055 | 
+ | mAP  | 0.345465 | 
+ | cabinet Recall  | 0.344086 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.725877 | 
+ | sofa Recall  | 0.804124 | 
+ | table Recall  | 0.648571 | 
+ | door Recall  | 0.336188 | 
+ | window Recall  | 0.202128 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.403846 | 
+ | desk Recall  | 0.645669 | 
+ | curtain Recall  | 0.298507 | 
+ | refrigerator Recall  | 0.578947 | 
+ | showercurtrain Recall  | 0.428571 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.295918 | 
+ | bathtub Recall  | 0.838710 | 
+ | garbagebin Recall  | 0.360377 | 
+ | cabinet Average IOU  | 0.628834 | 
+ | bed Average IOU  | 0.705317 | 
+ | chair Average IOU  | 0.681209 | 
+ | sofa Average IOU  | 0.660320 | 
+ | table Average IOU  | 0.671478 | 
+ | door Average IOU  | 0.621457 | 
+ | window Average IOU  | 0.600891 | 
+ | bookshelf Average IOU  | 0.636432 | 
+ | picture Average IOU  | 0.561497 | 
+ | counter Average IOU  | 0.619570 | 
+ | desk Average IOU  | 0.648358 | 
+ | curtain Average IOU  | 0.586351 | 
+ | refrigerator Average IOU  | 0.653462 | 
+ | showercurtrain Average IOU  | 0.583493 | 
+ | toilet Average IOU  | 0.679536 | 
+ | sink Average IOU  | 0.642951 | 
+ | bathtub Average IOU  | 0.648013 | 
+ | garbagebin Average IOU  | 0.612082 | 
+ | AR  | 0.515396 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.393170 | 
+ | bed Average Precision  | 0.879686 | 
+ | chair Average Precision  | 0.866903 | 
+ | sofa Average Precision  | 0.887125 | 
+ | table Average Precision  | 0.613819 | 
+ | door Average Precision  | 0.438795 | 
+ | window Average Precision  | 0.358548 | 
+ | bookshelf Average Precision  | 0.468194 | 
+ | picture Average Precision  | 0.052146 | 
+ | counter Average Precision  | 0.539719 | 
+ | desk Average Precision  | 0.644634 | 
+ | curtain Average Precision  | 0.400566 | 
+ | refrigerator Average Precision  | 0.497883 | 
+ | showercurtrain Average Precision  | 0.598210 | 
+ | toilet Average Precision  | 0.973860 | 
+ | sink Average Precision  | 0.460640 | 
+ | bathtub Average Precision  | 0.919133 | 
+ | garbagebin Average Precision  | 0.370046 | 
+ | mAP  | 0.575727 | 
+ | cabinet Recall  | 0.733871 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.913743 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.728051 | 
+ | window Recall  | 0.624113 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.632653 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.654717 | 
+ | cabinet Average IOU  | 0.483638 | 
+ | bed Average IOU  | 0.671312 | 
+ | chair Average IOU  | 0.622550 | 
+ | sofa Average IOU  | 0.616159 | 
+ | table Average IOU  | 0.600345 | 
+ | door Average IOU  | 0.490874 | 
+ | window Average IOU  | 0.443768 | 
+ | bookshelf Average IOU  | 0.584663 | 
+ | picture Average IOU  | 0.386896 | 
+ | counter Average IOU  | 0.488556 | 
+ | desk Average IOU  | 0.562234 | 
+ | curtain Average IOU  | 0.448614 | 
+ | refrigerator Average IOU  | 0.548020 | 
+ | showercurtrain Average IOU  | 0.474416 | 
+ | toilet Average IOU  | 0.639212 | 
+ | sink Average IOU  | 0.494742 | 
+ | bathtub Average IOU  | 0.615264 | 
+ | garbagebin Average IOU  | 0.495693 | 
+ | AR  | 0.799599 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.077345 | 
+ | bed Average Precision  | 0.775837 | 
+ | chair Average Precision  | 0.633713 | 
+ | sofa Average Precision  | 0.628702 | 
+ | table Average Precision  | 0.445002 | 
+ | door Average Precision  | 0.114624 | 
+ | window Average Precision  | 0.087889 | 
+ | bookshelf Average Precision  | 0.359816 | 
+ | picture Average Precision  | 0.007847 | 
+ | counter Average Precision  | 0.270742 | 
+ | desk Average Precision  | 0.295872 | 
+ | curtain Average Precision  | 0.140043 | 
+ | refrigerator Average Precision  | 0.318514 | 
+ | showercurtrain Average Precision  | 0.119639 | 
+ | toilet Average Precision  | 0.827449 | 
+ | sink Average Precision  | 0.209344 | 
+ | bathtub Average Precision  | 0.815581 | 
+ | garbagebin Average Precision  | 0.146523 | 
+ | mAP  | 0.348582 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.726608 | 
+ | sofa Recall  | 0.793814 | 
+ | table Recall  | 0.648571 | 
+ | door Recall  | 0.336188 | 
+ | window Recall  | 0.205674 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.036036 | 
+ | counter Recall  | 0.442308 | 
+ | desk Recall  | 0.645669 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.596491 | 
+ | showercurtrain Recall  | 0.392857 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.295918 | 
+ | bathtub Recall  | 0.838710 | 
+ | garbagebin Recall  | 0.360377 | 
+ | cabinet Average IOU  | 0.626899 | 
+ | bed Average IOU  | 0.707806 | 
+ | chair Average IOU  | 0.682277 | 
+ | sofa Average IOU  | 0.663216 | 
+ | table Average IOU  | 0.669689 | 
+ | door Average IOU  | 0.623456 | 
+ | window Average IOU  | 0.599686 | 
+ | bookshelf Average IOU  | 0.636770 | 
+ | picture Average IOU  | 0.569919 | 
+ | counter Average IOU  | 0.612191 | 
+ | desk Average IOU  | 0.651336 | 
+ | curtain Average IOU  | 0.594506 | 
+ | refrigerator Average IOU  | 0.655618 | 
+ | showercurtrain Average IOU  | 0.584552 | 
+ | toilet Average IOU  | 0.678087 | 
+ | sink Average IOU  | 0.635858 | 
+ | bathtub Average IOU  | 0.647765 | 
+ | garbagebin Average IOU  | 0.611146 | 
+ | AR  | 0.514989 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.395152 | 
+ | bed Average Precision  | 0.879956 | 
+ | chair Average Precision  | 0.873803 | 
+ | sofa Average Precision  | 0.889420 | 
+ | table Average Precision  | 0.608733 | 
+ | door Average Precision  | 0.432533 | 
+ | window Average Precision  | 0.358160 | 
+ | bookshelf Average Precision  | 0.463156 | 
+ | picture Average Precision  | 0.046450 | 
+ | counter Average Precision  | 0.566228 | 
+ | desk Average Precision  | 0.689101 | 
+ | curtain Average Precision  | 0.422646 | 
+ | refrigerator Average Precision  | 0.490083 | 
+ | showercurtrain Average Precision  | 0.583461 | 
+ | toilet Average Precision  | 0.972978 | 
+ | sink Average Precision  | 0.466234 | 
+ | bathtub Average Precision  | 0.921074 | 
+ | garbagebin Average Precision  | 0.386572 | 
+ | mAP  | 0.580319 | 
+ | cabinet Recall  | 0.725806 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.915205 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.725910 | 
+ | window Recall  | 0.627660 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.211712 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.929134 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.671698 | 
+ | cabinet Average IOU  | 0.492840 | 
+ | bed Average IOU  | 0.668901 | 
+ | chair Average IOU  | 0.634019 | 
+ | sofa Average IOU  | 0.616419 | 
+ | table Average IOU  | 0.603128 | 
+ | door Average IOU  | 0.488547 | 
+ | window Average IOU  | 0.441345 | 
+ | bookshelf Average IOU  | 0.582559 | 
+ | picture Average IOU  | 0.377410 | 
+ | counter Average IOU  | 0.484951 | 
+ | desk Average IOU  | 0.585728 | 
+ | curtain Average IOU  | 0.424254 | 
+ | refrigerator Average IOU  | 0.553038 | 
+ | showercurtrain Average IOU  | 0.456714 | 
+ | toilet Average IOU  | 0.645418 | 
+ | sink Average IOU  | 0.506044 | 
+ | bathtub Average IOU  | 0.619064 | 
+ | garbagebin Average IOU  | 0.494716 | 
+ | AR  | 0.802117 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.082616 | 
+ | bed Average Precision  | 0.778097 | 
+ | chair Average Precision  | 0.670232 | 
+ | sofa Average Precision  | 0.640406 | 
+ | table Average Precision  | 0.441821 | 
+ | door Average Precision  | 0.111268 | 
+ | window Average Precision  | 0.065454 | 
+ | bookshelf Average Precision  | 0.359809 | 
+ | picture Average Precision  | 0.001577 | 
+ | counter Average Precision  | 0.179077 | 
+ | desk Average Precision  | 0.387831 | 
+ | curtain Average Precision  | 0.123366 | 
+ | refrigerator Average Precision  | 0.323825 | 
+ | showercurtrain Average Precision  | 0.113853 | 
+ | toilet Average Precision  | 0.880486 | 
+ | sink Average Precision  | 0.204336 | 
+ | bathtub Average Precision  | 0.792264 | 
+ | garbagebin Average Precision  | 0.137973 | 
+ | mAP  | 0.349683 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.754386 | 
+ | sofa Recall  | 0.793814 | 
+ | table Recall  | 0.651429 | 
+ | door Recall  | 0.329764 | 
+ | window Recall  | 0.195035 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.716535 | 
+ | curtain Recall  | 0.268657 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.306122 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.362264 | 
+ | cabinet Average IOU  | 0.639374 | 
+ | bed Average IOU  | 0.704757 | 
+ | chair Average IOU  | 0.685497 | 
+ | sofa Average IOU  | 0.662436 | 
+ | table Average IOU  | 0.672434 | 
+ | door Average IOU  | 0.619012 | 
+ | window Average IOU  | 0.594339 | 
+ | bookshelf Average IOU  | 0.638651 | 
+ | picture Average IOU  | 0.553575 | 
+ | counter Average IOU  | 0.607184 | 
+ | desk Average IOU  | 0.653231 | 
+ | curtain Average IOU  | 0.581613 | 
+ | refrigerator Average IOU  | 0.669296 | 
+ | showercurtrain Average IOU  | 0.575067 | 
+ | toilet Average IOU  | 0.676298 | 
+ | sink Average IOU  | 0.652563 | 
+ | bathtub Average IOU  | 0.659592 | 
+ | garbagebin Average IOU  | 0.615529 | 
+ | AR  | 0.514931 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.399872 | 
+ | bed Average Precision  | 0.880035 | 
+ | chair Average Precision  | 0.875703 | 
+ | sofa Average Precision  | 0.889303 | 
+ | table Average Precision  | 0.608888 | 
+ | door Average Precision  | 0.438897 | 
+ | window Average Precision  | 0.362234 | 
+ | bookshelf Average Precision  | 0.464151 | 
+ | picture Average Precision  | 0.048094 | 
+ | counter Average Precision  | 0.558030 | 
+ | desk Average Precision  | 0.695396 | 
+ | curtain Average Precision  | 0.426526 | 
+ | refrigerator Average Precision  | 0.488539 | 
+ | showercurtrain Average Precision  | 0.598640 | 
+ | toilet Average Precision  | 0.973909 | 
+ | sink Average Precision  | 0.465572 | 
+ | bathtub Average Precision  | 0.921997 | 
+ | garbagebin Average Precision  | 0.389392 | 
+ | mAP  | 0.582510 | 
+ | cabinet Recall  | 0.728495 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.916667 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.732334 | 
+ | window Recall  | 0.627660 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.929134 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.671698 | 
+ | cabinet Average IOU  | 0.489848 | 
+ | bed Average IOU  | 0.669509 | 
+ | chair Average IOU  | 0.633396 | 
+ | sofa Average IOU  | 0.613988 | 
+ | table Average IOU  | 0.605684 | 
+ | door Average IOU  | 0.491306 | 
+ | window Average IOU  | 0.444916 | 
+ | bookshelf Average IOU  | 0.583175 | 
+ | picture Average IOU  | 0.384364 | 
+ | counter Average IOU  | 0.494290 | 
+ | desk Average IOU  | 0.588853 | 
+ | curtain Average IOU  | 0.427272 | 
+ | refrigerator Average IOU  | 0.549261 | 
+ | showercurtrain Average IOU  | 0.463803 | 
+ | toilet Average IOU  | 0.651870 | 
+ | sink Average IOU  | 0.500760 | 
+ | bathtub Average IOU  | 0.623230 | 
+ | garbagebin Average IOU  | 0.493224 | 
+ | AR  | 0.802955 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.080692 | 
+ | bed Average Precision  | 0.777265 | 
+ | chair Average Precision  | 0.671523 | 
+ | sofa Average Precision  | 0.624822 | 
+ | table Average Precision  | 0.446157 | 
+ | door Average Precision  | 0.115508 | 
+ | window Average Precision  | 0.079938 | 
+ | bookshelf Average Precision  | 0.361922 | 
+ | picture Average Precision  | 0.003876 | 
+ | counter Average Precision  | 0.232969 | 
+ | desk Average Precision  | 0.385576 | 
+ | curtain Average Precision  | 0.116940 | 
+ | refrigerator Average Precision  | 0.323181 | 
+ | showercurtrain Average Precision  | 0.109360 | 
+ | toilet Average Precision  | 0.881380 | 
+ | sink Average Precision  | 0.205442 | 
+ | bathtub Average Precision  | 0.789576 | 
+ | garbagebin Average Precision  | 0.142627 | 
+ | mAP  | 0.352709 | 
+ | cabinet Recall  | 0.333333 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.752924 | 
+ | sofa Recall  | 0.783505 | 
+ | table Recall  | 0.654286 | 
+ | door Recall  | 0.338330 | 
+ | window Recall  | 0.205674 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.031532 | 
+ | counter Recall  | 0.403846 | 
+ | desk Recall  | 0.708661 | 
+ | curtain Recall  | 0.268657 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.306122 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.362264 | 
+ | cabinet Average IOU  | 0.639234 | 
+ | bed Average IOU  | 0.705447 | 
+ | chair Average IOU  | 0.685509 | 
+ | sofa Average IOU  | 0.663027 | 
+ | table Average IOU  | 0.673548 | 
+ | door Average IOU  | 0.622134 | 
+ | window Average IOU  | 0.597273 | 
+ | bookshelf Average IOU  | 0.639430 | 
+ | picture Average IOU  | 0.560935 | 
+ | counter Average IOU  | 0.623865 | 
+ | desk Average IOU  | 0.659713 | 
+ | curtain Average IOU  | 0.583628 | 
+ | refrigerator Average IOU  | 0.663361 | 
+ | showercurtrain Average IOU  | 0.591985 | 
+ | toilet Average IOU  | 0.683493 | 
+ | sink Average IOU  | 0.641467 | 
+ | bathtub Average IOU  | 0.663378 | 
+ | garbagebin Average IOU  | 0.612661 | 
+ | AR  | 0.515936 | 
+2021-06-04 17:52:21.793348
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.395651 | 
+ | bed Average Precision  | 0.874160 | 
+ | chair Average Precision  | 0.864549 | 
+ | sofa Average Precision  | 0.888409 | 
+ | table Average Precision  | 0.611024 | 
+ | door Average Precision  | 0.432053 | 
+ | window Average Precision  | 0.358059 | 
+ | bookshelf Average Precision  | 0.495990 | 
+ | picture Average Precision  | 0.057587 | 
+ | counter Average Precision  | 0.470134 | 
+ | desk Average Precision  | 0.645553 | 
+ | curtain Average Precision  | 0.414736 | 
+ | refrigerator Average Precision  | 0.511669 | 
+ | showercurtrain Average Precision  | 0.577761 | 
+ | toilet Average Precision  | 0.977224 | 
+ | sink Average Precision  | 0.467049 | 
+ | bathtub Average Precision  | 0.919665 | 
+ | garbagebin Average Precision  | 0.365723 | 
+ | mAP  | 0.573722 | 
+ | cabinet Recall  | 0.723118 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.913012 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.725910 | 
+ | window Recall  | 0.634752 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.234234 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.761194 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.656604 | 
+ | cabinet Average IOU  | 0.487656 | 
+ | bed Average IOU  | 0.664065 | 
+ | chair Average IOU  | 0.622085 | 
+ | sofa Average IOU  | 0.611533 | 
+ | table Average IOU  | 0.597601 | 
+ | door Average IOU  | 0.493189 | 
+ | window Average IOU  | 0.441770 | 
+ | bookshelf Average IOU  | 0.574303 | 
+ | picture Average IOU  | 0.373734 | 
+ | counter Average IOU  | 0.476492 | 
+ | desk Average IOU  | 0.569652 | 
+ | curtain Average IOU  | 0.436106 | 
+ | refrigerator Average IOU  | 0.554968 | 
+ | showercurtrain Average IOU  | 0.474360 | 
+ | toilet Average IOU  | 0.646624 | 
+ | sink Average IOU  | 0.497581 | 
+ | bathtub Average IOU  | 0.616922 | 
+ | garbagebin Average IOU  | 0.495189 | 
+ | AR  | 0.802115 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.079841 | 
+ | bed Average Precision  | 0.792481 | 
+ | chair Average Precision  | 0.633945 | 
+ | sofa Average Precision  | 0.700086 | 
+ | table Average Precision  | 0.450161 | 
+ | door Average Precision  | 0.128565 | 
+ | window Average Precision  | 0.092909 | 
+ | bookshelf Average Precision  | 0.357567 | 
+ | picture Average Precision  | 0.011808 | 
+ | counter Average Precision  | 0.201895 | 
+ | desk Average Precision  | 0.296643 | 
+ | curtain Average Precision  | 0.130475 | 
+ | refrigerator Average Precision  | 0.300589 | 
+ | showercurtrain Average Precision  | 0.147074 | 
+ | toilet Average Precision  | 0.885484 | 
+ | sink Average Precision  | 0.219603 | 
+ | bathtub Average Precision  | 0.817012 | 
+ | garbagebin Average Precision  | 0.122220 | 
+ | mAP  | 0.353798 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.839506 | 
+ | chair Recall  | 0.727339 | 
+ | sofa Recall  | 0.845361 | 
+ | table Recall  | 0.648571 | 
+ | door Recall  | 0.349036 | 
+ | window Recall  | 0.230496 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.036036 | 
+ | counter Recall  | 0.442308 | 
+ | desk Recall  | 0.677165 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.596491 | 
+ | showercurtrain Recall  | 0.428571 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.326531 | 
+ | bathtub Recall  | 0.838710 | 
+ | garbagebin Recall  | 0.343396 | 
+ | cabinet Average IOU  | 0.623788 | 
+ | bed Average IOU  | 0.701649 | 
+ | chair Average IOU  | 0.681722 | 
+ | sofa Average IOU  | 0.656078 | 
+ | table Average IOU  | 0.666730 | 
+ | door Average IOU  | 0.616255 | 
+ | window Average IOU  | 0.597153 | 
+ | bookshelf Average IOU  | 0.635831 | 
+ | picture Average IOU  | 0.560232 | 
+ | counter Average IOU  | 0.602947 | 
+ | desk Average IOU  | 0.649082 | 
+ | curtain Average IOU  | 0.580461 | 
+ | refrigerator Average IOU  | 0.670776 | 
+ | showercurtrain Average IOU  | 0.578627 | 
+ | toilet Average IOU  | 0.679708 | 
+ | sink Average IOU  | 0.625086 | 
+ | bathtub Average IOU  | 0.650141 | 
+ | garbagebin Average IOU  | 0.612653 | 
+ | AR  | 0.525420 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.406129 | 
+ | bed Average Precision  | 0.876321 | 
+ | chair Average Precision  | 0.870427 | 
+ | sofa Average Precision  | 0.890618 | 
+ | table Average Precision  | 0.618254 | 
+ | door Average Precision  | 0.429509 | 
+ | window Average Precision  | 0.362042 | 
+ | bookshelf Average Precision  | 0.487272 | 
+ | picture Average Precision  | 0.053279 | 
+ | counter Average Precision  | 0.494766 | 
+ | desk Average Precision  | 0.649322 | 
+ | curtain Average Precision  | 0.416681 | 
+ | refrigerator Average Precision  | 0.510648 | 
+ | showercurtrain Average Precision  | 0.560740 | 
+ | toilet Average Precision  | 0.978013 | 
+ | sink Average Precision  | 0.477083 | 
+ | bathtub Average Precision  | 0.919533 | 
+ | garbagebin Average Precision  | 0.368239 | 
+ | mAP  | 0.576049 | 
+ | cabinet Recall  | 0.725806 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.917398 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.721627 | 
+ | window Recall  | 0.634752 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.229730 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.761194 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.656604 | 
+ | cabinet Average IOU  | 0.484976 | 
+ | bed Average IOU  | 0.660024 | 
+ | chair Average IOU  | 0.623155 | 
+ | sofa Average IOU  | 0.615291 | 
+ | table Average IOU  | 0.601813 | 
+ | door Average IOU  | 0.493925 | 
+ | window Average IOU  | 0.441010 | 
+ | bookshelf Average IOU  | 0.576519 | 
+ | picture Average IOU  | 0.380436 | 
+ | counter Average IOU  | 0.483224 | 
+ | desk Average IOU  | 0.567233 | 
+ | curtain Average IOU  | 0.433844 | 
+ | refrigerator Average IOU  | 0.553121 | 
+ | showercurtrain Average IOU  | 0.469351 | 
+ | toilet Average IOU  | 0.654232 | 
+ | sink Average IOU  | 0.503749 | 
+ | bathtub Average IOU  | 0.614380 | 
+ | garbagebin Average IOU  | 0.494851 | 
+ | AR  | 0.803655 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.083300 | 
+ | bed Average Precision  | 0.792438 | 
+ | chair Average Precision  | 0.648791 | 
+ | sofa Average Precision  | 0.727921 | 
+ | table Average Precision  | 0.458080 | 
+ | door Average Precision  | 0.127694 | 
+ | window Average Precision  | 0.098062 | 
+ | bookshelf Average Precision  | 0.351948 | 
+ | picture Average Precision  | 0.010174 | 
+ | counter Average Precision  | 0.242337 | 
+ | desk Average Precision  | 0.306120 | 
+ | curtain Average Precision  | 0.132636 | 
+ | refrigerator Average Precision  | 0.304338 | 
+ | showercurtrain Average Precision  | 0.119070 | 
+ | toilet Average Precision  | 0.886665 | 
+ | sink Average Precision  | 0.236352 | 
+ | bathtub Average Precision  | 0.783855 | 
+ | garbagebin Average Precision  | 0.127630 | 
+ | mAP  | 0.357634 | 
+ | cabinet Recall  | 0.338710 | 
+ | bed Recall  | 0.839506 | 
+ | chair Recall  | 0.739035 | 
+ | sofa Recall  | 0.855670 | 
+ | table Recall  | 0.648571 | 
+ | door Recall  | 0.346895 | 
+ | window Recall  | 0.230496 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.040541 | 
+ | counter Recall  | 0.461538 | 
+ | desk Recall  | 0.677165 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.392857 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.336735 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.349057 | 
+ | cabinet Average IOU  | 0.624109 | 
+ | bed Average IOU  | 0.697968 | 
+ | chair Average IOU  | 0.679636 | 
+ | sofa Average IOU  | 0.656293 | 
+ | table Average IOU  | 0.671508 | 
+ | door Average IOU  | 0.617045 | 
+ | window Average IOU  | 0.595731 | 
+ | bookshelf Average IOU  | 0.639422 | 
+ | picture Average IOU  | 0.557127 | 
+ | counter Average IOU  | 0.608178 | 
+ | desk Average IOU  | 0.645450 | 
+ | curtain Average IOU  | 0.580093 | 
+ | refrigerator Average IOU  | 0.664037 | 
+ | showercurtrain Average IOU  | 0.575300 | 
+ | toilet Average IOU  | 0.688194 | 
+ | sink Average IOU  | 0.637654 | 
+ | bathtub Average IOU  | 0.654833 | 
+ | garbagebin Average IOU  | 0.610147 | 
+ | AR  | 0.525773 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.414103 | 
+ | bed Average Precision  | 0.880519 | 
+ | chair Average Precision  | 0.876529 | 
+ | sofa Average Precision  | 0.887873 | 
+ | table Average Precision  | 0.610098 | 
+ | door Average Precision  | 0.435745 | 
+ | window Average Precision  | 0.356484 | 
+ | bookshelf Average Precision  | 0.485861 | 
+ | picture Average Precision  | 0.058914 | 
+ | counter Average Precision  | 0.513990 | 
+ | desk Average Precision  | 0.690471 | 
+ | curtain Average Precision  | 0.431439 | 
+ | refrigerator Average Precision  | 0.489054 | 
+ | showercurtrain Average Precision  | 0.597872 | 
+ | toilet Average Precision  | 0.977889 | 
+ | sink Average Precision  | 0.484891 | 
+ | bathtub Average Precision  | 0.920648 | 
+ | garbagebin Average Precision  | 0.367616 | 
+ | mAP  | 0.582222 | 
+ | cabinet Recall  | 0.723118 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.918129 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.730193 | 
+ | window Recall  | 0.631206 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.234234 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.944882 | 
+ | curtain Recall  | 0.761194 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.663265 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.664151 | 
+ | cabinet Average IOU  | 0.490912 | 
+ | bed Average IOU  | 0.670021 | 
+ | chair Average IOU  | 0.632364 | 
+ | sofa Average IOU  | 0.619532 | 
+ | table Average IOU  | 0.603488 | 
+ | door Average IOU  | 0.489913 | 
+ | window Average IOU  | 0.446520 | 
+ | bookshelf Average IOU  | 0.574429 | 
+ | picture Average IOU  | 0.376023 | 
+ | counter Average IOU  | 0.482467 | 
+ | desk Average IOU  | 0.586203 | 
+ | curtain Average IOU  | 0.427887 | 
+ | refrigerator Average IOU  | 0.555703 | 
+ | showercurtrain Average IOU  | 0.466147 | 
+ | toilet Average IOU  | 0.656782 | 
+ | sink Average IOU  | 0.509853 | 
+ | bathtub Average IOU  | 0.618505 | 
+ | garbagebin Average IOU  | 0.500609 | 
+ | AR  | 0.803745 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.089173 | 
+ | bed Average Precision  | 0.790542 | 
+ | chair Average Precision  | 0.673264 | 
+ | sofa Average Precision  | 0.731290 | 
+ | table Average Precision  | 0.439088 | 
+ | door Average Precision  | 0.130436 | 
+ | window Average Precision  | 0.090781 | 
+ | bookshelf Average Precision  | 0.352791 | 
+ | picture Average Precision  | 0.015295 | 
+ | counter Average Precision  | 0.176633 | 
+ | desk Average Precision  | 0.381528 | 
+ | curtain Average Precision  | 0.129044 | 
+ | refrigerator Average Precision  | 0.326352 | 
+ | showercurtrain Average Precision  | 0.099191 | 
+ | toilet Average Precision  | 0.878495 | 
+ | sink Average Precision  | 0.231246 | 
+ | bathtub Average Precision  | 0.786888 | 
+ | garbagebin Average Precision  | 0.137071 | 
+ | mAP  | 0.358839 | 
+ | cabinet Recall  | 0.346774 | 
+ | bed Recall  | 0.839506 | 
+ | chair Recall  | 0.758041 | 
+ | sofa Recall  | 0.845361 | 
+ | table Recall  | 0.645714 | 
+ | door Recall  | 0.353319 | 
+ | window Recall  | 0.226950 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.040541 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.716535 | 
+ | curtain Recall  | 0.298507 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.346939 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.360377 | 
+ | cabinet Average IOU  | 0.626336 | 
+ | bed Average IOU  | 0.708396 | 
+ | chair Average IOU  | 0.683686 | 
+ | sofa Average IOU  | 0.657783 | 
+ | table Average IOU  | 0.674661 | 
+ | door Average IOU  | 0.609341 | 
+ | window Average IOU  | 0.600004 | 
+ | bookshelf Average IOU  | 0.639958 | 
+ | picture Average IOU  | 0.554849 | 
+ | counter Average IOU  | 0.613157 | 
+ | desk Average IOU  | 0.656983 | 
+ | curtain Average IOU  | 0.574003 | 
+ | refrigerator Average IOU  | 0.671734 | 
+ | showercurtrain Average IOU  | 0.565690 | 
+ | toilet Average IOU  | 0.690066 | 
+ | sink Average IOU  | 0.647892 | 
+ | bathtub Average IOU  | 0.659777 | 
+ | garbagebin Average IOU  | 0.612448 | 
+ | AR  | 0.526318 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.426325 | 
+ | bed Average Precision  | 0.880425 | 
+ | chair Average Precision  | 0.876918 | 
+ | sofa Average Precision  | 0.887253 | 
+ | table Average Precision  | 0.613695 | 
+ | door Average Precision  | 0.431967 | 
+ | window Average Precision  | 0.359699 | 
+ | bookshelf Average Precision  | 0.487534 | 
+ | picture Average Precision  | 0.055524 | 
+ | counter Average Precision  | 0.510138 | 
+ | desk Average Precision  | 0.688083 | 
+ | curtain Average Precision  | 0.436158 | 
+ | refrigerator Average Precision  | 0.493275 | 
+ | showercurtrain Average Precision  | 0.568618 | 
+ | toilet Average Precision  | 0.979339 | 
+ | sink Average Precision  | 0.477046 | 
+ | bathtub Average Precision  | 0.919535 | 
+ | garbagebin Average Precision  | 0.370256 | 
+ | mAP  | 0.581210 | 
+ | cabinet Recall  | 0.725806 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.918129 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.723769 | 
+ | window Recall  | 0.631206 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.229730 | 
+ | counter Recall  | 0.884615 | 
+ | desk Recall  | 0.944882 | 
+ | curtain Recall  | 0.761194 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.664151 | 
+ | cabinet Average IOU  | 0.490007 | 
+ | bed Average IOU  | 0.668038 | 
+ | chair Average IOU  | 0.631389 | 
+ | sofa Average IOU  | 0.619489 | 
+ | table Average IOU  | 0.601945 | 
+ | door Average IOU  | 0.490811 | 
+ | window Average IOU  | 0.444442 | 
+ | bookshelf Average IOU  | 0.574050 | 
+ | picture Average IOU  | 0.384814 | 
+ | counter Average IOU  | 0.480475 | 
+ | desk Average IOU  | 0.587356 | 
+ | curtain Average IOU  | 0.427057 | 
+ | refrigerator Average IOU  | 0.554911 | 
+ | showercurtrain Average IOU  | 0.468337 | 
+ | toilet Average IOU  | 0.658176 | 
+ | sink Average IOU  | 0.512844 | 
+ | bathtub Average IOU  | 0.619088 | 
+ | garbagebin Average IOU  | 0.498737 | 
+ | AR  | 0.803789 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.082171 | 
+ | bed Average Precision  | 0.790460 | 
+ | chair Average Precision  | 0.670725 | 
+ | sofa Average Precision  | 0.753609 | 
+ | table Average Precision  | 0.447715 | 
+ | door Average Precision  | 0.128701 | 
+ | window Average Precision  | 0.087957 | 
+ | bookshelf Average Precision  | 0.354344 | 
+ | picture Average Precision  | 0.014222 | 
+ | counter Average Precision  | 0.200546 | 
+ | desk Average Precision  | 0.393074 | 
+ | curtain Average Precision  | 0.113001 | 
+ | refrigerator Average Precision  | 0.327452 | 
+ | showercurtrain Average Precision  | 0.115823 | 
+ | toilet Average Precision  | 0.904463 | 
+ | sink Average Precision  | 0.223036 | 
+ | bathtub Average Precision  | 0.785258 | 
+ | garbagebin Average Precision  | 0.130750 | 
+ | mAP  | 0.362406 | 
+ | cabinet Recall  | 0.336022 | 
+ | bed Recall  | 0.839506 | 
+ | chair Recall  | 0.756579 | 
+ | sofa Recall  | 0.855670 | 
+ | table Recall  | 0.642857 | 
+ | door Recall  | 0.346895 | 
+ | window Recall  | 0.223404 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.045045 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.716535 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.392857 | 
+ | toilet Recall  | 0.913793 | 
+ | sink Recall  | 0.336735 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.356604 | 
+ | cabinet Average IOU  | 0.628563 | 
+ | bed Average IOU  | 0.706180 | 
+ | chair Average IOU  | 0.683033 | 
+ | sofa Average IOU  | 0.654885 | 
+ | table Average IOU  | 0.674124 | 
+ | door Average IOU  | 0.616436 | 
+ | window Average IOU  | 0.599696 | 
+ | bookshelf Average IOU  | 0.639791 | 
+ | picture Average IOU  | 0.552593 | 
+ | counter Average IOU  | 0.626697 | 
+ | desk Average IOU  | 0.656917 | 
+ | curtain Average IOU  | 0.575736 | 
+ | refrigerator Average IOU  | 0.670828 | 
+ | showercurtrain Average IOU  | 0.566004 | 
+ | toilet Average IOU  | 0.687593 | 
+ | sink Average IOU  | 0.643543 | 
+ | bathtub Average IOU  | 0.660476 | 
+ | garbagebin Average IOU  | 0.611687 | 
+ | AR  | 0.527086 | 
+2021-06-04 18:08:24.149348
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.390656 | 
+ | bed Average Precision  | 0.879400 | 
+ | chair Average Precision  | 0.862515 | 
+ | sofa Average Precision  | 0.874216 | 
+ | table Average Precision  | 0.605021 | 
+ | door Average Precision  | 0.448510 | 
+ | window Average Precision  | 0.360182 | 
+ | bookshelf Average Precision  | 0.468750 | 
+ | picture Average Precision  | 0.047042 | 
+ | counter Average Precision  | 0.489254 | 
+ | desk Average Precision  | 0.653674 | 
+ | curtain Average Precision  | 0.394689 | 
+ | refrigerator Average Precision  | 0.492998 | 
+ | showercurtrain Average Precision  | 0.563111 | 
+ | toilet Average Precision  | 0.973041 | 
+ | sink Average Precision  | 0.485163 | 
+ | bathtub Average Precision  | 0.921818 | 
+ | garbagebin Average Precision  | 0.364238 | 
+ | mAP  | 0.570793 | 
+ | cabinet Recall  | 0.725806 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.910819 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.828571 | 
+ | door Recall  | 0.736617 | 
+ | window Recall  | 0.638298 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.202703 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.746269 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.663265 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.656604 | 
+ | cabinet Average IOU  | 0.491300 | 
+ | bed Average IOU  | 0.660366 | 
+ | chair Average IOU  | 0.620687 | 
+ | sofa Average IOU  | 0.616470 | 
+ | table Average IOU  | 0.602863 | 
+ | door Average IOU  | 0.488246 | 
+ | window Average IOU  | 0.434464 | 
+ | bookshelf Average IOU  | 0.576465 | 
+ | picture Average IOU  | 0.379889 | 
+ | counter Average IOU  | 0.473890 | 
+ | desk Average IOU  | 0.567416 | 
+ | curtain Average IOU  | 0.441047 | 
+ | refrigerator Average IOU  | 0.544799 | 
+ | showercurtrain Average IOU  | 0.474276 | 
+ | toilet Average IOU  | 0.646003 | 
+ | sink Average IOU  | 0.486643 | 
+ | bathtub Average IOU  | 0.617590 | 
+ | garbagebin Average IOU  | 0.491032 | 
+ | AR  | 0.799976 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.081848 | 
+ | bed Average Precision  | 0.773040 | 
+ | chair Average Precision  | 0.637905 | 
+ | sofa Average Precision  | 0.704688 | 
+ | table Average Precision  | 0.459108 | 
+ | door Average Precision  | 0.131411 | 
+ | window Average Precision  | 0.110817 | 
+ | bookshelf Average Precision  | 0.372733 | 
+ | picture Average Precision  | 0.005380 | 
+ | counter Average Precision  | 0.204997 | 
+ | desk Average Precision  | 0.308112 | 
+ | curtain Average Precision  | 0.139321 | 
+ | refrigerator Average Precision  | 0.302076 | 
+ | showercurtrain Average Precision  | 0.100963 | 
+ | toilet Average Precision  | 0.841467 | 
+ | sink Average Precision  | 0.217981 | 
+ | bathtub Average Precision  | 0.783041 | 
+ | garbagebin Average Precision  | 0.127906 | 
+ | mAP  | 0.350155 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.814815 | 
+ | chair Recall  | 0.733918 | 
+ | sofa Recall  | 0.835052 | 
+ | table Recall  | 0.668571 | 
+ | door Recall  | 0.342612 | 
+ | window Recall  | 0.237589 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.442308 | 
+ | desk Recall  | 0.661417 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.596491 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.347170 | 
+ | cabinet Average IOU  | 0.630690 | 
+ | bed Average IOU  | 0.705040 | 
+ | chair Average IOU  | 0.678109 | 
+ | sofa Average IOU  | 0.655433 | 
+ | table Average IOU  | 0.665824 | 
+ | door Average IOU  | 0.620070 | 
+ | window Average IOU  | 0.579410 | 
+ | bookshelf Average IOU  | 0.632397 | 
+ | picture Average IOU  | 0.546718 | 
+ | counter Average IOU  | 0.587125 | 
+ | desk Average IOU  | 0.654133 | 
+ | curtain Average IOU  | 0.585508 | 
+ | refrigerator Average IOU  | 0.663029 | 
+ | showercurtrain Average IOU  | 0.604891 | 
+ | toilet Average IOU  | 0.685364 | 
+ | sink Average IOU  | 0.627754 | 
+ | bathtub Average IOU  | 0.659274 | 
+ | garbagebin Average IOU  | 0.613028 | 
+ | AR  | 0.517239 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.391616 | 
+ | bed Average Precision  | 0.878547 | 
+ | chair Average Precision  | 0.863017 | 
+ | sofa Average Precision  | 0.886837 | 
+ | table Average Precision  | 0.606564 | 
+ | door Average Precision  | 0.451243 | 
+ | window Average Precision  | 0.352629 | 
+ | bookshelf Average Precision  | 0.468364 | 
+ | picture Average Precision  | 0.051868 | 
+ | counter Average Precision  | 0.512010 | 
+ | desk Average Precision  | 0.666792 | 
+ | curtain Average Precision  | 0.394939 | 
+ | refrigerator Average Precision  | 0.491352 | 
+ | showercurtrain Average Precision  | 0.582074 | 
+ | toilet Average Precision  | 0.976476 | 
+ | sink Average Precision  | 0.460318 | 
+ | bathtub Average Precision  | 0.921282 | 
+ | garbagebin Average Precision  | 0.369112 | 
+ | mAP  | 0.573613 | 
+ | cabinet Recall  | 0.728495 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.910088 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.738758 | 
+ | window Recall  | 0.638298 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.207207 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.944882 | 
+ | curtain Recall  | 0.731343 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.892857 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.658491 | 
+ | cabinet Average IOU  | 0.491497 | 
+ | bed Average IOU  | 0.664025 | 
+ | chair Average IOU  | 0.621089 | 
+ | sofa Average IOU  | 0.616818 | 
+ | table Average IOU  | 0.601708 | 
+ | door Average IOU  | 0.489311 | 
+ | window Average IOU  | 0.432161 | 
+ | bookshelf Average IOU  | 0.576010 | 
+ | picture Average IOU  | 0.376384 | 
+ | counter Average IOU  | 0.474156 | 
+ | desk Average IOU  | 0.564730 | 
+ | curtain Average IOU  | 0.446838 | 
+ | refrigerator Average IOU  | 0.556178 | 
+ | showercurtrain Average IOU  | 0.472782 | 
+ | toilet Average IOU  | 0.650640 | 
+ | sink Average IOU  | 0.486291 | 
+ | bathtub Average IOU  | 0.625882 | 
+ | garbagebin Average IOU  | 0.492399 | 
+ | AR  | 0.801629 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.077854 | 
+ | bed Average Precision  | 0.772797 | 
+ | chair Average Precision  | 0.634533 | 
+ | sofa Average Precision  | 0.712013 | 
+ | table Average Precision  | 0.447439 | 
+ | door Average Precision  | 0.137862 | 
+ | window Average Precision  | 0.102375 | 
+ | bookshelf Average Precision  | 0.392358 | 
+ | picture Average Precision  | 0.005336 | 
+ | counter Average Precision  | 0.149578 | 
+ | desk Average Precision  | 0.332538 | 
+ | curtain Average Precision  | 0.141059 | 
+ | refrigerator Average Precision  | 0.291641 | 
+ | showercurtrain Average Precision  | 0.098231 | 
+ | toilet Average Precision  | 0.824615 | 
+ | sink Average Precision  | 0.211764 | 
+ | bathtub Average Precision  | 0.866354 | 
+ | garbagebin Average Precision  | 0.131565 | 
+ | mAP  | 0.351662 | 
+ | cabinet Recall  | 0.336022 | 
+ | bed Recall  | 0.814815 | 
+ | chair Recall  | 0.729532 | 
+ | sofa Recall  | 0.845361 | 
+ | table Recall  | 0.662857 | 
+ | door Recall  | 0.346895 | 
+ | window Recall  | 0.230496 | 
+ | bookshelf Recall  | 0.662338 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.685039 | 
+ | curtain Recall  | 0.283582 | 
+ | refrigerator Recall  | 0.596491 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.862069 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.870968 | 
+ | garbagebin Recall  | 0.352830 | 
+ | cabinet Average IOU  | 0.634856 | 
+ | bed Average IOU  | 0.704294 | 
+ | chair Average IOU  | 0.680095 | 
+ | sofa Average IOU  | 0.659874 | 
+ | table Average IOU  | 0.667976 | 
+ | door Average IOU  | 0.618844 | 
+ | window Average IOU  | 0.581454 | 
+ | bookshelf Average IOU  | 0.627191 | 
+ | picture Average IOU  | 0.546718 | 
+ | counter Average IOU  | 0.601379 | 
+ | desk Average IOU  | 0.649007 | 
+ | curtain Average IOU  | 0.592032 | 
+ | refrigerator Average IOU  | 0.672642 | 
+ | showercurtrain Average IOU  | 0.606182 | 
+ | toilet Average IOU  | 0.688907 | 
+ | sink Average IOU  | 0.622324 | 
+ | bathtub Average IOU  | 0.653616 | 
+ | garbagebin Average IOU  | 0.613492 | 
+ | AR  | 0.520245 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.398151 | 
+ | bed Average Precision  | 0.882848 | 
+ | chair Average Precision  | 0.879964 | 
+ | sofa Average Precision  | 0.894936 | 
+ | table Average Precision  | 0.607067 | 
+ | door Average Precision  | 0.441038 | 
+ | window Average Precision  | 0.363639 | 
+ | bookshelf Average Precision  | 0.456431 | 
+ | picture Average Precision  | 0.044577 | 
+ | counter Average Precision  | 0.538173 | 
+ | desk Average Precision  | 0.690192 | 
+ | curtain Average Precision  | 0.392318 | 
+ | refrigerator Average Precision  | 0.474655 | 
+ | showercurtrain Average Precision  | 0.553117 | 
+ | toilet Average Precision  | 0.974605 | 
+ | sink Average Precision  | 0.490424 | 
+ | bathtub Average Precision  | 0.922380 | 
+ | garbagebin Average Precision  | 0.373101 | 
+ | mAP  | 0.576534 | 
+ | cabinet Recall  | 0.720430 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.921053 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.730193 | 
+ | window Recall  | 0.641844 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.198198 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.944882 | 
+ | curtain Recall  | 0.731343 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.663265 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.662264 | 
+ | cabinet Average IOU  | 0.495851 | 
+ | bed Average IOU  | 0.668906 | 
+ | chair Average IOU  | 0.632693 | 
+ | sofa Average IOU  | 0.615699 | 
+ | table Average IOU  | 0.608149 | 
+ | door Average IOU  | 0.490541 | 
+ | window Average IOU  | 0.433842 | 
+ | bookshelf Average IOU  | 0.572202 | 
+ | picture Average IOU  | 0.387508 | 
+ | counter Average IOU  | 0.480553 | 
+ | desk Average IOU  | 0.583465 | 
+ | curtain Average IOU  | 0.435253 | 
+ | refrigerator Average IOU  | 0.551737 | 
+ | showercurtrain Average IOU  | 0.477900 | 
+ | toilet Average IOU  | 0.654199 | 
+ | sink Average IOU  | 0.496041 | 
+ | bathtub Average IOU  | 0.624573 | 
+ | garbagebin Average IOU  | 0.493553 | 
+ | AR  | 0.799804 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.084357 | 
+ | bed Average Precision  | 0.783882 | 
+ | chair Average Precision  | 0.672330 | 
+ | sofa Average Precision  | 0.700546 | 
+ | table Average Precision  | 0.459315 | 
+ | door Average Precision  | 0.133489 | 
+ | window Average Precision  | 0.109718 | 
+ | bookshelf Average Precision  | 0.366083 | 
+ | picture Average Precision  | 0.002364 | 
+ | counter Average Precision  | 0.155819 | 
+ | desk Average Precision  | 0.384347 | 
+ | curtain Average Precision  | 0.093131 | 
+ | refrigerator Average Precision  | 0.330718 | 
+ | showercurtrain Average Precision  | 0.132152 | 
+ | toilet Average Precision  | 0.905534 | 
+ | sink Average Precision  | 0.240395 | 
+ | bathtub Average Precision  | 0.784200 | 
+ | garbagebin Average Precision  | 0.135019 | 
+ | mAP  | 0.359633 | 
+ | cabinet Recall  | 0.338710 | 
+ | bed Recall  | 0.839506 | 
+ | chair Recall  | 0.760965 | 
+ | sofa Recall  | 0.835052 | 
+ | table Recall  | 0.662857 | 
+ | door Recall  | 0.344754 | 
+ | window Recall  | 0.237589 | 
+ | bookshelf Recall  | 0.636364 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.346154 | 
+ | desk Recall  | 0.716535 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.392857 | 
+ | toilet Recall  | 0.913793 | 
+ | sink Recall  | 0.346939 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.358491 | 
+ | cabinet Average IOU  | 0.636695 | 
+ | bed Average IOU  | 0.706207 | 
+ | chair Average IOU  | 0.683730 | 
+ | sofa Average IOU  | 0.654763 | 
+ | table Average IOU  | 0.673220 | 
+ | door Average IOU  | 0.615349 | 
+ | window Average IOU  | 0.573708 | 
+ | bookshelf Average IOU  | 0.627396 | 
+ | picture Average IOU  | 0.553850 | 
+ | counter Average IOU  | 0.609410 | 
+ | desk Average IOU  | 0.656439 | 
+ | curtain Average IOU  | 0.573863 | 
+ | refrigerator Average IOU  | 0.661344 | 
+ | showercurtrain Average IOU  | 0.586694 | 
+ | toilet Average IOU  | 0.681919 | 
+ | sink Average IOU  | 0.632215 | 
+ | bathtub Average IOU  | 0.668529 | 
+ | garbagebin Average IOU  | 0.614984 | 
+ | AR  | 0.523989 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.394333 | 
+ | bed Average Precision  | 0.881998 | 
+ | chair Average Precision  | 0.878395 | 
+ | sofa Average Precision  | 0.892426 | 
+ | table Average Precision  | 0.600306 | 
+ | door Average Precision  | 0.444883 | 
+ | window Average Precision  | 0.354784 | 
+ | bookshelf Average Precision  | 0.478854 | 
+ | picture Average Precision  | 0.045230 | 
+ | counter Average Precision  | 0.529116 | 
+ | desk Average Precision  | 0.703168 | 
+ | curtain Average Precision  | 0.393211 | 
+ | refrigerator Average Precision  | 0.473903 | 
+ | showercurtrain Average Precision  | 0.580298 | 
+ | toilet Average Precision  | 0.974605 | 
+ | sink Average Precision  | 0.491938 | 
+ | bathtub Average Precision  | 0.922380 | 
+ | garbagebin Average Precision  | 0.377591 | 
+ | mAP  | 0.578746 | 
+ | cabinet Recall  | 0.720430 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.918860 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.828571 | 
+ | door Recall  | 0.732334 | 
+ | window Recall  | 0.634752 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.198198 | 
+ | counter Recall  | 0.846154 | 
+ | desk Recall  | 0.944882 | 
+ | curtain Recall  | 0.731343 | 
+ | refrigerator Recall  | 0.947368 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.663265 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.664151 | 
+ | cabinet Average IOU  | 0.493314 | 
+ | bed Average IOU  | 0.666261 | 
+ | chair Average IOU  | 0.632089 | 
+ | sofa Average IOU  | 0.619143 | 
+ | table Average IOU  | 0.609370 | 
+ | door Average IOU  | 0.489676 | 
+ | window Average IOU  | 0.430194 | 
+ | bookshelf Average IOU  | 0.570506 | 
+ | picture Average IOU  | 0.394324 | 
+ | counter Average IOU  | 0.481301 | 
+ | desk Average IOU  | 0.580940 | 
+ | curtain Average IOU  | 0.434598 | 
+ | refrigerator Average IOU  | 0.554702 | 
+ | showercurtrain Average IOU  | 0.477901 | 
+ | toilet Average IOU  | 0.653054 | 
+ | sink Average IOU  | 0.497380 | 
+ | bathtub Average IOU  | 0.630900 | 
+ | garbagebin Average IOU  | 0.494909 | 
+ | AR  | 0.800074 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.087253 | 
+ | bed Average Precision  | 0.781624 | 
+ | chair Average Precision  | 0.670720 | 
+ | sofa Average Precision  | 0.728521 | 
+ | table Average Precision  | 0.459616 | 
+ | door Average Precision  | 0.131536 | 
+ | window Average Precision  | 0.086871 | 
+ | bookshelf Average Precision  | 0.380114 | 
+ | picture Average Precision  | 0.004992 | 
+ | counter Average Precision  | 0.172216 | 
+ | desk Average Precision  | 0.379641 | 
+ | curtain Average Precision  | 0.089581 | 
+ | refrigerator Average Precision  | 0.331393 | 
+ | showercurtrain Average Precision  | 0.134758 | 
+ | toilet Average Precision  | 0.875284 | 
+ | sink Average Precision  | 0.242062 | 
+ | bathtub Average Precision  | 0.836320 | 
+ | garbagebin Average Precision  | 0.139993 | 
+ | mAP  | 0.362916 | 
+ | cabinet Recall  | 0.341398 | 
+ | bed Recall  | 0.827160 | 
+ | chair Recall  | 0.758772 | 
+ | sofa Recall  | 0.855670 | 
+ | table Recall  | 0.660000 | 
+ | door Recall  | 0.340471 | 
+ | window Recall  | 0.219858 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.036036 | 
+ | counter Recall  | 0.365385 | 
+ | desk Recall  | 0.708661 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.631579 | 
+ | showercurtrain Recall  | 0.392857 | 
+ | toilet Recall  | 0.896552 | 
+ | sink Recall  | 0.346939 | 
+ | bathtub Recall  | 0.838710 | 
+ | garbagebin Recall  | 0.358491 | 
+ | cabinet Average IOU  | 0.635448 | 
+ | bed Average IOU  | 0.706367 | 
+ | chair Average IOU  | 0.683163 | 
+ | sofa Average IOU  | 0.654184 | 
+ | table Average IOU  | 0.674531 | 
+ | door Average IOU  | 0.616507 | 
+ | window Average IOU  | 0.573072 | 
+ | bookshelf Average IOU  | 0.629671 | 
+ | picture Average IOU  | 0.561494 | 
+ | counter Average IOU  | 0.603483 | 
+ | desk Average IOU  | 0.655027 | 
+ | curtain Average IOU  | 0.573835 | 
+ | refrigerator Average IOU  | 0.660568 | 
+ | showercurtrain Average IOU  | 0.589648 | 
+ | toilet Average IOU  | 0.684263 | 
+ | sink Average IOU  | 0.634776 | 
+ | bathtub Average IOU  | 0.666449 | 
+ | garbagebin Average IOU  | 0.616398 | 
+ | AR  | 0.526757 | 
+2021-06-04 18:24:27.494846
+Eval batch: 0
+Eval batch: 10
+Eval batch: 20
+Eval batch: 30
+| Native | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.395909 | 
+ | bed Average Precision  | 0.874770 | 
+ | chair Average Precision  | 0.861956 | 
+ | sofa Average Precision  | 0.887119 | 
+ | table Average Precision  | 0.615669 | 
+ | door Average Precision  | 0.436460 | 
+ | window Average Precision  | 0.348086 | 
+ | bookshelf Average Precision  | 0.458786 | 
+ | picture Average Precision  | 0.043988 | 
+ | counter Average Precision  | 0.476611 | 
+ | desk Average Precision  | 0.647326 | 
+ | curtain Average Precision  | 0.419902 | 
+ | refrigerator Average Precision  | 0.491569 | 
+ | showercurtrain Average Precision  | 0.576298 | 
+ | toilet Average Precision  | 0.973894 | 
+ | sink Average Precision  | 0.478564 | 
+ | bathtub Average Precision  | 0.921783 | 
+ | garbagebin Average Precision  | 0.361926 | 
+ | mAP  | 0.570590 | 
+ | cabinet Recall  | 0.723118 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.912281 | 
+ | sofa Recall  | 0.979381 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.725910 | 
+ | window Recall  | 0.617021 | 
+ | bookshelf Recall  | 0.805195 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.761194 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.653061 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.660377 | 
+ | cabinet Average IOU  | 0.489612 | 
+ | bed Average IOU  | 0.675314 | 
+ | chair Average IOU  | 0.621916 | 
+ | sofa Average IOU  | 0.611009 | 
+ | table Average IOU  | 0.600505 | 
+ | door Average IOU  | 0.492937 | 
+ | window Average IOU  | 0.441002 | 
+ | bookshelf Average IOU  | 0.590782 | 
+ | picture Average IOU  | 0.383416 | 
+ | counter Average IOU  | 0.476153 | 
+ | desk Average IOU  | 0.569280 | 
+ | curtain Average IOU  | 0.423493 | 
+ | refrigerator Average IOU  | 0.545280 | 
+ | showercurtrain Average IOU  | 0.469316 | 
+ | toilet Average IOU  | 0.638540 | 
+ | sink Average IOU  | 0.494966 | 
+ | bathtub Average IOU  | 0.620357 | 
+ | garbagebin Average IOU  | 0.489838 | 
+ | AR  | 0.799044 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.085112 | 
+ | bed Average Precision  | 0.799106 | 
+ | chair Average Precision  | 0.638936 | 
+ | sofa Average Precision  | 0.611626 | 
+ | table Average Precision  | 0.445950 | 
+ | door Average Precision  | 0.122994 | 
+ | window Average Precision  | 0.087909 | 
+ | bookshelf Average Precision  | 0.362291 | 
+ | picture Average Precision  | 0.007870 | 
+ | counter Average Precision  | 0.180150 | 
+ | desk Average Precision  | 0.321531 | 
+ | curtain Average Precision  | 0.116477 | 
+ | refrigerator Average Precision  | 0.330359 | 
+ | showercurtrain Average Precision  | 0.104869 | 
+ | toilet Average Precision  | 0.798522 | 
+ | sink Average Precision  | 0.204656 | 
+ | bathtub Average Precision  | 0.786888 | 
+ | garbagebin Average Precision  | 0.114289 | 
+ | mAP  | 0.339974 | 
+ | cabinet Recall  | 0.362903 | 
+ | bed Recall  | 0.851852 | 
+ | chair Recall  | 0.736111 | 
+ | sofa Recall  | 0.762887 | 
+ | table Recall  | 0.654286 | 
+ | door Recall  | 0.342612 | 
+ | window Recall  | 0.209220 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.036036 | 
+ | counter Recall  | 0.384615 | 
+ | desk Recall  | 0.685039 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.614035 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.844828 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.339623 | 
+ | cabinet Average IOU  | 0.621036 | 
+ | bed Average IOU  | 0.702350 | 
+ | chair Average IOU  | 0.679563 | 
+ | sofa Average IOU  | 0.670586 | 
+ | table Average IOU  | 0.666640 | 
+ | door Average IOU  | 0.622778 | 
+ | window Average IOU  | 0.597224 | 
+ | bookshelf Average IOU  | 0.647227 | 
+ | picture Average IOU  | 0.551687 | 
+ | counter Average IOU  | 0.601529 | 
+ | desk Average IOU  | 0.644273 | 
+ | curtain Average IOU  | 0.591893 | 
+ | refrigerator Average IOU  | 0.668195 | 
+ | showercurtrain Average IOU  | 0.585199 | 
+ | toilet Average IOU  | 0.682762 | 
+ | sink Average IOU  | 0.644090 | 
+ | bathtub Average IOU  | 0.662296 | 
+ | garbagebin Average IOU  | 0.614303 | 
+ | AR  | 0.511503 | 
+| objectness | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.400375 | 
+ | bed Average Precision  | 0.876299 | 
+ | chair Average Precision  | 0.866326 | 
+ | sofa Average Precision  | 0.878156 | 
+ | table Average Precision  | 0.614683 | 
+ | door Average Precision  | 0.441939 | 
+ | window Average Precision  | 0.348642 | 
+ | bookshelf Average Precision  | 0.481048 | 
+ | picture Average Precision  | 0.043507 | 
+ | counter Average Precision  | 0.478843 | 
+ | desk Average Precision  | 0.648308 | 
+ | curtain Average Precision  | 0.420594 | 
+ | refrigerator Average Precision  | 0.492254 | 
+ | showercurtrain Average Precision  | 0.581970 | 
+ | toilet Average Precision  | 0.975957 | 
+ | sink Average Precision  | 0.473373 | 
+ | bathtub Average Precision  | 0.921829 | 
+ | garbagebin Average Precision  | 0.365800 | 
+ | mAP  | 0.572772 | 
+ | cabinet Recall  | 0.723118 | 
+ | bed Recall  | 0.938272 | 
+ | chair Recall  | 0.914474 | 
+ | sofa Recall  | 0.969072 | 
+ | table Recall  | 0.834286 | 
+ | door Recall  | 0.728051 | 
+ | window Recall  | 0.620567 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.211712 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.937008 | 
+ | curtain Recall  | 0.761194 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.857143 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.662264 | 
+ | cabinet Average IOU  | 0.487197 | 
+ | bed Average IOU  | 0.670190 | 
+ | chair Average IOU  | 0.623157 | 
+ | sofa Average IOU  | 0.619392 | 
+ | table Average IOU  | 0.601723 | 
+ | door Average IOU  | 0.493434 | 
+ | window Average IOU  | 0.442137 | 
+ | bookshelf Average IOU  | 0.590934 | 
+ | picture Average IOU  | 0.386004 | 
+ | counter Average IOU  | 0.475360 | 
+ | desk Average IOU  | 0.567745 | 
+ | curtain Average IOU  | 0.426923 | 
+ | refrigerator Average IOU  | 0.539861 | 
+ | showercurtrain Average IOU  | 0.465355 | 
+ | toilet Average IOU  | 0.655026 | 
+ | sink Average IOU  | 0.496134 | 
+ | bathtub Average IOU  | 0.624038 | 
+ | garbagebin Average IOU  | 0.487195 | 
+ | AR  | 0.800902 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.079891 | 
+ | bed Average Precision  | 0.802592 | 
+ | chair Average Precision  | 0.642909 | 
+ | sofa Average Precision  | 0.670872 | 
+ | table Average Precision  | 0.446597 | 
+ | door Average Precision  | 0.123424 | 
+ | window Average Precision  | 0.093348 | 
+ | bookshelf Average Precision  | 0.362487 | 
+ | picture Average Precision  | 0.005338 | 
+ | counter Average Precision  | 0.153864 | 
+ | desk Average Precision  | 0.329061 | 
+ | curtain Average Precision  | 0.116888 | 
+ | refrigerator Average Precision  | 0.334086 | 
+ | showercurtrain Average Precision  | 0.101386 | 
+ | toilet Average Precision  | 0.849232 | 
+ | sink Average Precision  | 0.204330 | 
+ | bathtub Average Precision  | 0.786888 | 
+ | garbagebin Average Precision  | 0.116071 | 
+ | mAP  | 0.345515 | 
+ | cabinet Recall  | 0.349462 | 
+ | bed Recall  | 0.851852 | 
+ | chair Recall  | 0.735380 | 
+ | sofa Recall  | 0.793814 | 
+ | table Recall  | 0.657143 | 
+ | door Recall  | 0.342612 | 
+ | window Recall  | 0.212766 | 
+ | bookshelf Recall  | 0.649351 | 
+ | picture Recall  | 0.027027 | 
+ | counter Recall  | 0.346154 | 
+ | desk Recall  | 0.685039 | 
+ | curtain Recall  | 0.253731 | 
+ | refrigerator Recall  | 0.596491 | 
+ | showercurtrain Recall  | 0.357143 | 
+ | toilet Recall  | 0.879310 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.341509 | 
+ | cabinet Average IOU  | 0.623700 | 
+ | bed Average IOU  | 0.698752 | 
+ | chair Average IOU  | 0.681367 | 
+ | sofa Average IOU  | 0.664035 | 
+ | table Average IOU  | 0.667793 | 
+ | door Average IOU  | 0.620926 | 
+ | window Average IOU  | 0.597021 | 
+ | bookshelf Average IOU  | 0.654585 | 
+ | picture Average IOU  | 0.589739 | 
+ | counter Average IOU  | 0.613812 | 
+ | desk Average IOU  | 0.644135 | 
+ | curtain Average IOU  | 0.595667 | 
+ | refrigerator Average IOU  | 0.669587 | 
+ | showercurtrain Average IOU  | 0.588893 | 
+ | toilet Average IOU  | 0.691384 | 
+ | sink Average IOU  | 0.635791 | 
+ | bathtub Average IOU  | 0.668952 | 
+ | garbagebin Average IOU  | 0.611041 | 
+ | AR  | 0.511198 | 
+| classification | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.405925 | 
+ | bed Average Precision  | 0.878771 | 
+ | chair Average Precision  | 0.878612 | 
+ | sofa Average Precision  | 0.889127 | 
+ | table Average Precision  | 0.605534 | 
+ | door Average Precision  | 0.439421 | 
+ | window Average Precision  | 0.357418 | 
+ | bookshelf Average Precision  | 0.482333 | 
+ | picture Average Precision  | 0.045998 | 
+ | counter Average Precision  | 0.546813 | 
+ | desk Average Precision  | 0.711057 | 
+ | curtain Average Precision  | 0.438805 | 
+ | refrigerator Average Precision  | 0.486828 | 
+ | showercurtrain Average Precision  | 0.594161 | 
+ | toilet Average Precision  | 0.975628 | 
+ | sink Average Precision  | 0.460889 | 
+ | bathtub Average Precision  | 0.922256 | 
+ | garbagebin Average Precision  | 0.382194 | 
+ | mAP  | 0.583432 | 
+ | cabinet Recall  | 0.720430 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.921784 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.728051 | 
+ | window Recall  | 0.631206 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.216216 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.952756 | 
+ | curtain Recall  | 0.761194 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.673585 | 
+ | cabinet Average IOU  | 0.490458 | 
+ | bed Average IOU  | 0.662254 | 
+ | chair Average IOU  | 0.630966 | 
+ | sofa Average IOU  | 0.614007 | 
+ | table Average IOU  | 0.602217 | 
+ | door Average IOU  | 0.491299 | 
+ | window Average IOU  | 0.441494 | 
+ | bookshelf Average IOU  | 0.575881 | 
+ | picture Average IOU  | 0.388301 | 
+ | counter Average IOU  | 0.493220 | 
+ | desk Average IOU  | 0.582817 | 
+ | curtain Average IOU  | 0.425537 | 
+ | refrigerator Average IOU  | 0.548687 | 
+ | showercurtrain Average IOU  | 0.459563 | 
+ | toilet Average IOU  | 0.654683 | 
+ | sink Average IOU  | 0.504708 | 
+ | bathtub Average IOU  | 0.623075 | 
+ | garbagebin Average IOU  | 0.488601 | 
+ | AR  | 0.803192 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.081836 | 
+ | bed Average Precision  | 0.790404 | 
+ | chair Average Precision  | 0.674859 | 
+ | sofa Average Precision  | 0.675216 | 
+ | table Average Precision  | 0.428221 | 
+ | door Average Precision  | 0.122065 | 
+ | window Average Precision  | 0.095053 | 
+ | bookshelf Average Precision  | 0.371588 | 
+ | picture Average Precision  | 0.009375 | 
+ | counter Average Precision  | 0.208155 | 
+ | desk Average Precision  | 0.413063 | 
+ | curtain Average Precision  | 0.102806 | 
+ | refrigerator Average Precision  | 0.326966 | 
+ | showercurtrain Average Precision  | 0.055662 | 
+ | toilet Average Precision  | 0.846939 | 
+ | sink Average Precision  | 0.206259 | 
+ | bathtub Average Precision  | 0.786888 | 
+ | garbagebin Average Precision  | 0.118656 | 
+ | mAP  | 0.350778 | 
+ | cabinet Recall  | 0.349462 | 
+ | bed Recall  | 0.839506 | 
+ | chair Recall  | 0.759503 | 
+ | sofa Recall  | 0.804124 | 
+ | table Recall  | 0.637143 | 
+ | door Recall  | 0.344754 | 
+ | window Recall  | 0.226950 | 
+ | bookshelf Recall  | 0.662338 | 
+ | picture Recall  | 0.036036 | 
+ | counter Recall  | 0.423077 | 
+ | desk Recall  | 0.724409 | 
+ | curtain Recall  | 0.238806 | 
+ | refrigerator Recall  | 0.666667 | 
+ | showercurtrain Recall  | 0.250000 | 
+ | toilet Recall  | 0.879310 | 
+ | sink Recall  | 0.316327 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.345283 | 
+ | cabinet Average IOU  | 0.624776 | 
+ | bed Average IOU  | 0.703890 | 
+ | chair Average IOU  | 0.682911 | 
+ | sofa Average IOU  | 0.657143 | 
+ | table Average IOU  | 0.675495 | 
+ | door Average IOU  | 0.617737 | 
+ | window Average IOU  | 0.591840 | 
+ | bookshelf Average IOU  | 0.630884 | 
+ | picture Average IOU  | 0.581205 | 
+ | counter Average IOU  | 0.608181 | 
+ | desk Average IOU  | 0.656892 | 
+ | curtain Average IOU  | 0.605418 | 
+ | refrigerator Average IOU  | 0.661928 | 
+ | showercurtrain Average IOU  | 0.590386 | 
+ | toilet Average IOU  | 0.689028 | 
+ | sink Average IOU  | 0.640729 | 
+ | bathtub Average IOU  | 0.667795 | 
+ | garbagebin Average IOU  | 0.611897 | 
+ | AR  | 0.517230 | 
+| obj_and_cls | | 
+| iou_thresh | 0.250000    | 
+ | cabinet Average Precision  | 0.414653 | 
+ | bed Average Precision  | 0.879225 | 
+ | chair Average Precision  | 0.878261 | 
+ | sofa Average Precision  | 0.888327 | 
+ | table Average Precision  | 0.606238 | 
+ | door Average Precision  | 0.440328 | 
+ | window Average Precision  | 0.357085 | 
+ | bookshelf Average Precision  | 0.485612 | 
+ | picture Average Precision  | 0.037765 | 
+ | counter Average Precision  | 0.532528 | 
+ | desk Average Precision  | 0.711271 | 
+ | curtain Average Precision  | 0.438138 | 
+ | refrigerator Average Precision  | 0.488344 | 
+ | showercurtrain Average Precision  | 0.582810 | 
+ | toilet Average Precision  | 0.975591 | 
+ | sink Average Precision  | 0.459180 | 
+ | bathtub Average Precision  | 0.922080 | 
+ | garbagebin Average Precision  | 0.372018 | 
+ | mAP  | 0.581636 | 
+ | cabinet Recall  | 0.720430 | 
+ | bed Recall  | 0.950617 | 
+ | chair Recall  | 0.921053 | 
+ | sofa Recall  | 0.989691 | 
+ | table Recall  | 0.831429 | 
+ | door Recall  | 0.728051 | 
+ | window Recall  | 0.631206 | 
+ | bookshelf Recall  | 0.818182 | 
+ | picture Recall  | 0.207207 | 
+ | counter Recall  | 0.865385 | 
+ | desk Recall  | 0.952756 | 
+ | curtain Recall  | 0.761194 | 
+ | refrigerator Recall  | 0.964912 | 
+ | showercurtrain Recall  | 0.821429 | 
+ | toilet Recall  | 1.000000 | 
+ | sink Recall  | 0.642857 | 
+ | bathtub Recall  | 0.967742 | 
+ | garbagebin Recall  | 0.669811 | 
+ | cabinet Average IOU  | 0.489084 | 
+ | bed Average IOU  | 0.662300 | 
+ | chair Average IOU  | 0.630134 | 
+ | sofa Average IOU  | 0.616800 | 
+ | table Average IOU  | 0.603684 | 
+ | door Average IOU  | 0.492141 | 
+ | window Average IOU  | 0.440973 | 
+ | bookshelf Average IOU  | 0.581646 | 
+ | picture Average IOU  | 0.383844 | 
+ | counter Average IOU  | 0.484524 | 
+ | desk Average IOU  | 0.581044 | 
+ | curtain Average IOU  | 0.425133 | 
+ | refrigerator Average IOU  | 0.548379 | 
+ | showercurtrain Average IOU  | 0.458897 | 
+ | toilet Average IOU  | 0.647462 | 
+ | sink Average IOU  | 0.502053 | 
+ | bathtub Average IOU  | 0.628763 | 
+ | garbagebin Average IOU  | 0.488597 | 
+ | AR  | 0.802442 | 
+| iou_thresh | 0.500000    | 
+ | cabinet Average Precision  | 0.077891 | 
+ | bed Average Precision  | 0.791504 | 
+ | chair Average Precision  | 0.670736 | 
+ | sofa Average Precision  | 0.705232 | 
+ | table Average Precision  | 0.436465 | 
+ | door Average Precision  | 0.124108 | 
+ | window Average Precision  | 0.097099 | 
+ | bookshelf Average Precision  | 0.375644 | 
+ | picture Average Precision  | 0.009439 | 
+ | counter Average Precision  | 0.188351 | 
+ | desk Average Precision  | 0.407571 | 
+ | curtain Average Precision  | 0.101841 | 
+ | refrigerator Average Precision  | 0.328268 | 
+ | showercurtrain Average Precision  | 0.059748 | 
+ | toilet Average Precision  | 0.794313 | 
+ | sink Average Precision  | 0.199100 | 
+ | bathtub Average Precision  | 0.785544 | 
+ | garbagebin Average Precision  | 0.118827 | 
+ | mAP  | 0.348427 | 
+ | cabinet Recall  | 0.338710 | 
+ | bed Recall  | 0.839506 | 
+ | chair Recall  | 0.755117 | 
+ | sofa Recall  | 0.824742 | 
+ | table Recall  | 0.640000 | 
+ | door Recall  | 0.344754 | 
+ | window Recall  | 0.230496 | 
+ | bookshelf Recall  | 0.662338 | 
+ | picture Recall  | 0.036036 | 
+ | counter Recall  | 0.403846 | 
+ | desk Recall  | 0.724409 | 
+ | curtain Recall  | 0.238806 | 
+ | refrigerator Recall  | 0.666667 | 
+ | showercurtrain Recall  | 0.250000 | 
+ | toilet Recall  | 0.844828 | 
+ | sink Recall  | 0.306122 | 
+ | bathtub Recall  | 0.806452 | 
+ | garbagebin Recall  | 0.345283 | 
+ | cabinet Average IOU  | 0.629688 | 
+ | bed Average IOU  | 0.700764 | 
+ | chair Average IOU  | 0.683093 | 
+ | sofa Average IOU  | 0.654850 | 
+ | table Average IOU  | 0.675829 | 
+ | door Average IOU  | 0.619391 | 
+ | window Average IOU  | 0.591131 | 
+ | bookshelf Average IOU  | 0.637973 | 
+ | picture Average IOU  | 0.579506 | 
+ | counter Average IOU  | 0.603824 | 
+ | desk Average IOU  | 0.656173 | 
+ | curtain Average IOU  | 0.604130 | 
+ | refrigerator Average IOU  | 0.661357 | 
+ | showercurtrain Average IOU  | 0.595663 | 
+ | toilet Average IOU  | 0.689820 | 
+ | sink Average IOU  | 0.644633 | 
+ | bathtub Average IOU  | 0.674622 | 
+ | garbagebin Average IOU  | 0.613134 | 
+ | AR  | 0.514340 | 

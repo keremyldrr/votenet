@@ -6,3 +6,8 @@ sunrgbd
 .vscode/launch.json
 *.pyc
 pointnet2
+eval_scannet/*
+demo_files/input_pc_scannet.ply
+demo_files/input_pc_sunrgbd.ply
+demo_files/pretrained_votenet_on_scannet.tar
+demo_files/pretrained_votenet_on_sunrgbd.tar

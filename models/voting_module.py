@@ -34,7 +34,7 @@ class VotingModule(nn.Module):
         self.conv3 = torch.nn.Conv1d(self.in_dim, (3+self.out_dim) * self.vote_factor, 1)
         self.bn1 = torch.nn.BatchNorm1d(self.in_dim)
         self.bn2 = torch.nn.BatchNorm1d(self.in_dim)
-        
+        self.drop = torch.nn.Dropout(0.5)
     def forward(self, seed_xyz, seed_features):
         """ Forward pass.
 
@@ -49,9 +49,11 @@ class VotingModule(nn.Module):
         num_seed = seed_xyz.shape[1]
         num_vote = num_seed*self.vote_factor
         net = F.relu(self.bn1(self.conv1(seed_features))) 
+        # net = self.drop(net)
         net = F.relu(self.bn2(self.conv2(net))) 
+        # net = self.drop(net)
         net = self.conv3(net) # (batch_size, (3+out_dim)*vote_factor, num_seed)
-                
+            
         net = net.transpose(2,1).view(batch_size, num_seed, self.vote_factor, 3+self.out_dim)
         offset = net[:,:,:,0:3]
         vote_xyz = seed_xyz.unsqueeze(2) + offset

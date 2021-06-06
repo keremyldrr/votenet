@@ -1,18 +1,65 @@
 import numpy as np
 import torch
-from models.ap_helper import softmax
+
 from box_util import box3d_iou
 from sklearn.preprocessing import MinMaxScaler
 
 # THRESHOLD = 0.5
 THRESHOLD = lambda x: x.mean() + 2*x.var()
 
-scaler = MinMaxScaler()
+def softmax(x):
+    ''' Numpy function for softmax'''
+    shape = x.shape
+    probs = np.exp(x - np.max(x, axis=len(shape) - 1, keepdims=True))
+    probs /= np.sum(probs, axis=len(shape) - 1, keepdims=True)
+    return probs
+
 #TODO: make dimensions nicer
 def apply_softmax(samples):
     for e in samples:
         e["sm_objectness_scores"] = (softmax(e["objectness_scores"].cpu().squeeze(0).detach().numpy()))
         e["sm_sem_cls_scores"] = (softmax(e["sem_cls_scores"].cpu().squeeze(0).detach().numpy()))
+
+def accumulate_mc_samples(mc_samples):
+    """
+    This function accumulates everything in the end_points for the evaluation
+
+    """
+    all_centers = [e["center"] for e in mc_samples]
+    all_size_scores = [e["size_scores"] for e in mc_samples]
+    all_size_residuals = [e["size_residuals"] for e in mc_samples]
+    all_cls_scores = [e["sem_cls_scores"] for e in mc_samples]
+    all_head_residuals = [e["heading_residuals"] for e in mc_samples]
+    all_head_scores = [e["heading_scores"] for e in mc_samples]
+    all_objectness_scores = [e["objectness_scores"] for e in mc_samples]
+
+    all_point_clouds = [e["point_clouds"] for e in mc_samples]
+    mean_centers=torch.mean(torch.stack(all_centers),dim = 0)
+    mean_size_scores =torch.mean(torch.stack(all_size_scores),dim = 0)
+    mean_cls_scores =torch.mean(torch.stack(all_cls_scores),dim = 0)
+    mean_heading_residuals =torch.mean(torch.stack(all_head_residuals),dim = 0)
+    mean_size_residuals =torch.mean(torch.stack(all_size_residuals),dim = 0)
+    mean_heading_scores =torch.mean(torch.stack(all_head_scores),dim = 0)
+    mean_objectness_scores =torch.mean(torch.stack(all_objectness_scores),dim = 0)
+
+    mean_point_clouds =torch.mean(torch.stack(all_point_clouds),dim = 0)
+    apply_softmax(mc_samples)
+
+    mean_end_points = {}
+    mean_end_points["center"] = mean_centers
+    
+    mean_end_points["size_scores"] =mean_size_scores
+    mean_end_points["objectness_scores"] =mean_objectness_scores
+    mean_end_points["size_residuals"] =mean_size_residuals
+    mean_end_points["sem_cls_scores"] = mean_cls_scores
+    mean_end_points["point_clouds"] = mean_point_clouds
+    
+    mean_end_points["heading_residuals"] =mean_heading_residuals
+    mean_end_points["heading_scores"] = mean_heading_scores
+    _,mean_end_points["semantic_cls_entropy"] = semantic_cls_uncertainty(mc_samples)
+    _,mean_end_points["objectness_entropy"] = objectness_uncertainty(mc_samples)
+    # mean_end_points["box_size_entropy"] = box_size_uncertainty(mc_samples)
+    return mean_end_points
 
 def semantic_cls_uncertainty(samples,threshold = None):
     mc_cls = np.array([e["sm_sem_cls_scores"] for e in samples])
@@ -22,7 +69,7 @@ def semantic_cls_uncertainty(samples,threshold = None):
     expected_entropy = -np.mean(MC_entropy, axis=0)
     mi = predictive_entropy - expected_entropy
     normalized_mi = map_zero_one(mi)
-    print("Mean classification entropy", normalized_mi.mean())
+    # print("Mean classification entropy", normalized_mi.mean())
 
     if threshold != None:
         mi_mask =np.array((normalized_mi < threshold),dtype=np.int)
@@ -39,7 +86,7 @@ def objectness_uncertainty(samples,threshold = None):
     expected_entropy_obj = -np.mean(MC_entropy_obj, axis=0)
     mi_obj = predictive_entropy_obj - expected_entropy_obj
     normalized_mi_obj = map_zero_one(mi_obj)
-    print("Mean objectness entropy",normalized_mi_obj.mean())
+    # print("Mean objectness entropy",normalized_mi_obj.mean())
 
     if threshold != None:
         mi_obj_mask = np.array((normalized_mi_obj < threshold),dtype=np.int)
@@ -216,8 +263,9 @@ def map_zero_one(A):
     """
     Maps a given array to the interval [0,1]
     """
+    # return A
     A_std = (A - A.min())/(A.max()-A.min())
     retval = A_std * (A.max() - A.min()) + A.min()
-    return retval 
-    #return softmax(A)
+    return retval
+    # return softmax(A)
     # return torch.sigmoid(torch.Tensor(A)).numpy()
