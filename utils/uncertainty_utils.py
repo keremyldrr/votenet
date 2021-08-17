@@ -1,5 +1,8 @@
 import numpy as np
+from numpy.core.defchararray import center
 import torch
+import os
+import sys
 
 from box_util import box3d_iou
 from sklearn.preprocessing import MinMaxScaler
@@ -58,7 +61,37 @@ def accumulate_mc_samples(mc_samples):
     mean_end_points["heading_scores"] = mean_heading_scores
     _,mean_end_points["semantic_cls_entropy"] = semantic_cls_uncertainty(mc_samples)
     _,mean_end_points["objectness_entropy"] = objectness_uncertainty(mc_samples)
-    # mean_end_points["box_size_entropy"] = box_size_uncertainty(mc_samples)
+    # mean_end_points["center_variance"] = center_uncertainty(mc_samples)
+    return mean_end_points
+def accumulate_scores(mc_samples):
+    """
+    This function accumulates everything in the end_points for the evaluation
+
+    """
+    
+    
+    all_cls_scores = [e["sem_cls_scores"] for e in mc_samples]
+    
+    all_objectness_scores = [e["objectness_scores"] for e in mc_samples]
+
+    all_point_clouds = [e["point_clouds"] for e in mc_samples]
+    
+    mean_cls_scores =torch.mean(torch.stack(all_cls_scores),dim = 0)
+    
+    mean_objectness_scores =torch.mean(torch.stack(all_objectness_scores),dim = 0)
+
+    mean_point_clouds =torch.mean(torch.stack(all_point_clouds),dim = 0)
+    apply_softmax(mc_samples)
+
+    mean_end_points = {}
+    
+    
+    mean_end_points["objectness_scores"] =mean_objectness_scores
+    mean_end_points["sem_cls_scores"] = mean_cls_scores
+    mean_end_points["point_clouds"] = mean_point_clouds
+    _,mean_end_points["semantic_cls_entropy"] = semantic_cls_uncertainty(mc_samples)
+    _,mean_end_points["objectness_entropy"] = objectness_uncertainty(mc_samples)
+    # mean_end_points["center_variance"] = center_uncertainty(mc_samples)
     return mean_end_points
 
 def semantic_cls_uncertainty(samples,threshold = None):
@@ -97,15 +130,34 @@ def objectness_uncertainty(samples,threshold = None):
 
 
 def center_uncertainty(samples):
-    expected_centers = torch.zeros([256,3]).unsqueeze(0)
     centers = []
-    for e in samples:
-        centers.append(e["center"])
-    center_variance = np.var(np.array([c.squeeze(0).cpu().detach().numpy() for c in centers]),axis=0)
-    center_mean =np.mean(np.array([c.squeeze(0).cpu().detach().numpy() for c in centers]),axis=0)
-    normalized_center_variance = map_zero_one(center_variance)
-    center_variance_mask = normalized_center_variance > normalized_center_variance.mean()
-    return center_variance_mask,normalized_center_variance
+    logvars = []
+    logvars2 = []
+    num_batch = samples[0]["center"].shape[0]
+    center_variances = np.zeros([num_batch,256])#.unsqueeze(0)
+    
+    center_variances2 = np.zeros([num_batch,256])#.unsqueeze(0)
+    for i in range(num_batch):
+        centers.clear()
+        for s in samples:
+            centers.append(s["center"][i,:])
+            logvars.append(np.exp(s["log_var_center"][i,:].detach().cpu().numpy())*np.exp(s["log_var_center"][i,:].detach().cpu().numpy()))
+            logvars2.append(s["log_var_center"][i,:].detach().cpu().numpy()*s["log_var_center"][i,:].detach().cpu().numpy())
+
+        center_mean =np.mean(np.array([(c*c).squeeze(0).cpu().detach().numpy() for c in centers]),axis=0)
+        center_sq_sum =np.mean(np.array([c.squeeze(0).cpu().detach().numpy() for c in centers]),axis=0)
+        center_sq_sum *= center_sq_sum  
+        # center_variances[i] = map_zero_one(np.sum(center_mean,axis=1) - np.sum(center_sq_sum,axis=1) +  np.sum(np.array(logvars),0))
+        # center_variances[i] = torch.sigmoid(torch.from_numpy(np.sum(center_mean,axis=1) - np.sum(center_sq_sum,axis=1) +  np.sum(np.array(logvars),0))).numpy()
+        center_variances[i] =torch.from_numpy(np.sum(center_mean,axis=1) - np.sum(center_sq_sum,axis=1) +  np.sum(np.array(logvars),0)).numpy()
+        
+        center_variances2[i] = np.var(np.array([c for c in logvars2]),axis=0)
+        # center_mean =np.mean(np.array([c.squeeze(0).cpu().detach().numpy() for c in centers]),axis=0)
+        # normalized_center_variance = map_zero_one(center_variance)
+        # center_variance_mask = normalized_center_variance > normalized_center_variance.mean()
+    
+    
+    return center_variances
     #entropy
 def box_size_uncertainty(samples,threshold = None):
     expected_centers = torch.zeros([256]).unsqueeze(0)
@@ -266,6 +318,6 @@ def map_zero_one(A):
     # return A
     A_std = (A - A.min())/(A.max()-A.min())
     retval = A_std * (A.max() - A.min()) + A.min()
-    return retval
+    return A_std
     # return softmax(A)
     # return torch.sigmoid(torch.Tensor(A)).numpy()

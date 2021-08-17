@@ -83,9 +83,9 @@ class VoteNet(nn.Module):
         """
         end_points = {}
         batch_size = inputs['point_clouds'].shape[0]
-
+        
         end_points = self.backbone_net(inputs['point_clouds'], end_points)
-                
+
         # --------- HOUGH VOTING ---------
         xyz = end_points['fp2_xyz']
         features = end_points['fp2_features']

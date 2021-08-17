@@ -6,6 +6,7 @@
 """
 #!/usr/bin/env python
 
+from models.ap_helper import parse_predictions, parse_predictions_augmented
 from torch.utils.tensorboard import SummaryWriter
 import os
 import sys
@@ -23,9 +24,12 @@ import pandas as pd
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
 sys.path.append(os.path.join(ROOT_DIR, 'models'))
-from ap_helper import APCalculator, parse_predictions_ensemble, parse_groundtruths,parse_predictions_with_custom_mask,parse_predictions
+sys.path.append(os.path.join(ROOT_DIR, 'utils'))
+from ap_helper import APCalculator, parse_predictions_ensemble, parse_groundtruths,parse_predictions_augmented,aggregate_predictions
 from utils.uncertainty_utils import map_zero_one, box_size_uncertainty, semantic_cls_uncertainty, objectness_uncertainty, center_uncertainty, apply_softmax, compute_objectness_accuracy, compute_iou_masks,compute_iou_masks_with_classification
-from utils.binary_filter import UncertaintyFilter
+from dump_helper import dump_results_for_sanity_check,dump_results
+import pc_util
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', default='votenet', help='Model file name [default: votenet]')
 parser.add_argument('--dataset', default='sunrgbd', help='Dataset name. sunrgbd or scannet. [default: sunrgbd]')
@@ -48,8 +52,9 @@ parser.add_argument('--nms_iou', type=float, default=0.25, help='NMS IoU thresho
 parser.add_argument('--conf_thresh', type=float, default=0.05, help='Filter out predictions with obj prob less than it. [default: 0.05]')
 parser.add_argument('--faster_eval', action='store_true', help='Faster evaluation by skippling empty bounding box removal.')
 parser.add_argument('--shuffle_dataset', action='store_true', help='Shuffle the dataset (random order).')
-parser.add_argument('--num_samples',type=int,default=20, help='Number of monte carlo sampling.')
-parser.add_argument('--num_runs',type=int,default=10, help='Number of runs for the experiment.')
+parser.add_argument('--num_samples',type=int,default=5, help='Number of monte carlo sampling.')
+parser.add_argument('--num_runs',type=int,default=1, help='Number of runs for the experiment.')
+parser.add_argument('--num_batches',type=int,default=-1, help='Number of batches to process.')
 
 FLAGS = parser.parse_args()
 
@@ -57,42 +62,6 @@ if FLAGS.use_cls_nms:
     assert(FLAGS.use_3d_nms)
 
 
-# class AttrDict(dict):
-#     def __init__(self, *args, **kwargs):
-#         super(AttrDict, self).__init__(*args, **kwargs)
-#         self.__dict__ = self
-
-# def create_class_dict():
-#     class_dict = {}
-#     for i in range(18):
-#         class_dict[i] = (0,0)
-#     return class_dict
-
-# FLAGS = AttrDict()
-# FLAGS.ap_iou_thresholds = '0.25,0.5'
-# FLAGS.batch_size = 8
-# FLAGS.checkpoint_path = '/home/yildirir/workspace/votenet/demo_files/pretrained_votenet_on_scannet.tar'
-# # FLAGS.checkpoint_path='logs/log_scannet120/checkpoint.tar'
-# # FLAGS.checkpoint_path='logs/log_scannet_dropout_0_1_200/checkpoint128.tar'
-# FLAGS.cluster_sampling = 'seed_fps'
-# FLAGS.conf_thresh = 0.05
-# FLAGS.dataset = 'scannet'
-# FLAGS.dump_dir = 'evals/test_colors'
-# FLAGS.faster_eval = False
-# FLAGS.model = 'votenet'
-# FLAGS.nms_iou = 0.25
-# FLAGS.no_height = False
-# FLAGS.num_point = 40000
-# FLAGS.num_target = 256
-# FLAGS.per_class_proposal = True
-# FLAGS.shuffle_dataset = False
-# FLAGS.use_3d_nms = True
-# FLAGS.use_cls_nms = True
-# FLAGS.use_color = False
-# FLAGS.use_old_type_nms = False
-# FLAGS.use_sunrgbd_v2 = False
-# FLAGS.vote_factor = 1
-# FLAGS.logdir = "logs/sanity_check_partialdropouts"
 BATCH_SIZE = FLAGS.batch_size
 NUM_POINT = FLAGS.num_point
 DUMP_DIR = FLAGS.dump_dir
@@ -103,7 +72,6 @@ AP_IOU_THRESHOLDS = [float(x) for x in FLAGS.ap_iou_thresholds.split(',')]
 NUM_SAMPLES = FLAGS.num_samples
 NUM_RUNS = FLAGS.num_runs
 # Prepare DUMP_DIR
-print(FLAGS)
 if not os.path.exists(DUMP_DIR):
     os.mkdir(DUMP_DIR)
 DUMP_FOUT = open(os.path.join(DUMP_DIR, 'log_eval.txt'), 'w')
@@ -118,9 +86,17 @@ def log_string(out_str):
 
 # Init datasets and dataloaders
 def my_worker_init_fn(worker_id):
-    np.random.seed(np.random.get_state()[1][0] + worker_id)
+    # np.random.seed(np.random.get_state()[1][0] + worker_id)
+    np.random.seed(1)
 
 
+
+angles = [np.pi/2, np.pi,3*np.pi/2]
+# angles = []
+# rotations = [np.eye(3)] + [pc_util.rotx(a) for a in angles] + [pc_util.roty(a) for a in angles] + [pc_util.rotz(a) for a in angles]
+rotations = [np.eye(3)] +  [pc_util.rotz(a) for a in angles]
+# rotations = [pc_util.rotz(a) for a in angles]
+print(rotations)
 if FLAGS.dataset == 'sunrgbd':
     sys.path.append(os.path.join(ROOT_DIR, 'sunrgbd'))
     from sunrgbd_detection_dataset import SunrgbdDetectionVotesDataset, MAX_NUM_OBJ
@@ -138,20 +114,43 @@ elif FLAGS.dataset == 'scannet':
     from scannet_detection_dataset import ScannetDetectionDataset, MAX_NUM_OBJ
     from model_util_scannet import ScannetDatasetConfig
     DATASET_CONFIG = ScannetDatasetConfig()
+
+    # TEST_DATASETS = [ScannetDetectionDataset('val',
+    #                                        num_points=NUM_POINT,
+    #                                        augment=False,
+    #                                        use_color=FLAGS.use_color,
+    #                                        use_height=(not FLAGS.no_height),rot=rot) for rot in rotations]
     TEST_DATASET = ScannetDetectionDataset('val',
                                            num_points=NUM_POINT,
                                            augment=False,
                                            use_color=FLAGS.use_color,
                                            use_height=(not FLAGS.no_height))
+
+elif FLAGS.dataset == 'scannet_single_sanity':
+    sys.path.append(os.path.join(ROOT_DIR, 'scannet'))
+    from scannet_detection_dataset import ScannetDetectionDataset, MAX_NUM_OBJ
+    from model_util_scannet import ScannetDatasetConfig
+    DATASET_CONFIG = ScannetDatasetConfig()
+    
+    TEST_DATASET = ScannetDetectionDataset('single_eval', num_points=NUM_POINT,
+        augment=False,
+        use_color=FLAGS.use_color, use_height=(not FLAGS.no_height))
+
 else:
     print('Unknown dataset %s. Exiting...' % (FLAGS.dataset))
     exit(-1)
-print(len(TEST_DATASET))
+# print(len(TEST_DATASET))
 TEST_DATALOADER = DataLoader(TEST_DATASET,
                              batch_size=BATCH_SIZE,
                              shuffle=FLAGS.shuffle_dataset,
-                             num_workers=4,
+                             num_workers=1,
                              worker_init_fn=my_worker_init_fn)
+
+# TEST_DATALOADERS = [DataLoader(TEST_DATASETS[i],
+#                              batch_size=BATCH_SIZE,
+#                              shuffle=FLAGS.shuffle_dataset,
+#                              num_workers=4,
+#                              worker_init_fn=my_worker_init_fn) for i in range(len(rotations))]
 
 # Init the model and optimzier
 MODEL = importlib.import_module(FLAGS.model)  # import network module
@@ -188,44 +187,41 @@ if CHECKPOINT_PATH is not None and os.path.isfile(CHECKPOINT_PATH):
 CONFIG_DICT = {'remove_empty_box': (not FLAGS.faster_eval), 'use_3d_nms': FLAGS.use_3d_nms, 'nms_iou': FLAGS.nms_iou,
     'use_old_type_nms': FLAGS.use_old_type_nms, 'cls_nms': FLAGS.use_cls_nms, 'per_class_proposal': FLAGS.per_class_proposal,
     'conf_thresh': FLAGS.conf_thresh, 'dataset_config':DATASET_CONFIG}
+
+
+print(CONFIG_DICT)
+print(FLAGS)
+
 # -------------------
 # ----------------------------------------------------------------------
 
 # ------------------------------------------------------------------------- GLOBAL CONFIG END
-def create_filters():
-    objectness = UncertaintyFilter("Objectness Entropy Filter")
-    classification = UncertaintyFilter("Classification Entropy Filter")
-    box_size = UncertaintyFilter("Box Size Entropy Filter")
-    objectness_and_classification = UncertaintyFilter("Objectness and Classification Entropy Filter")
-    objectness_and_box_size = UncertaintyFilter("Objectness and Box Size Entropy Filter")
-    box_size_and_classification = UncertaintyFilter("Box Size and Classification Entropy Filter")
-    no_filter = UncertaintyFilter("All Ones Filter")
-    models_filter = UncertaintyFilter("Model's Filter")
-    models_voted_filter = UncertaintyFilter("Model's Voted Filter")
 
-    model_and_objcls = UncertaintyFilter("Model and Obj & Cls Entropy Filter")
-    model_and_obj = UncertaintyFilter("Model and Obj  Entropy Filter")
-    model_and_cls = UncertaintyFilter("Model and Cls  Entropy Filter")
-    return  {"objectness" : objectness,"classification": classification,
-    "box_size":box_size,
-    "objectness_and_classification":objectness_and_classification,
-    "objectness_and_box_size":objectness_and_box_size,
-    "box_size_and_classification":box_size_and_classification,
-    "no_filter":no_filter,
-    "models_filter" : models_filter,
-    "models_voted_filter" : models_voted_filter,
-    "model_and_objcls":model_and_objcls,
-    "model_and_obj":model_and_obj,
-    "model_and_cls":model_and_cls,
 
-}
+#for single scene make it for batch later
+def prep_augmented_pcds(inputs,rotations):
+    
+    num_batches = inputs["point_clouds"].shape[0]
+    aug_pcds = [None]*len(rotations)
+    for idx,rotmat in enumerate(rotations):
+        aug_pcds[idx] = []
+        for b in range(num_batches):
+            pcd = inputs["point_clouds"][b].clone()
+            xyz = pcd[:,0:3].contiguous()
+            rotated,_ = pc_util.rotate_point_cloud(xyz.cpu().numpy(),rotation_matrix=rotmat)
+            pcd[:,0:3] = torch.Tensor(rotated).to(device)
+            aug_pcds[idx].append(pcd)
+        aug_pcds[idx] = {"point_clouds":torch.stack(aug_pcds[idx])}
+    
+    return aug_pcds
 
 
 
-def evaluate_one_epoch_with_uncertainties():
+
+def evaluate_one_epoch_with_uncertainties_mc():
     stat_dict = {}
     # tb = SummaryWriter(FLAGS.logdir)
-    methods = ["Native","objectness","classification", #TODO: add box size
+    methods = ["Native","center","objectness","classification", #TODO: add box size
         "obj_and_cls"]
     # methods = ["Native"]
     # methods = ["obj_and_cls","Native"]
@@ -236,20 +232,16 @@ def evaluate_one_epoch_with_uncertainties():
     # ap_calculator_list_original = [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
     #                       for iou_thresh in AP_IOU_THRESHOLDS]
     net.eval()  # set model sem_cls_probs[i,j,ii]to eval mode (for bn and dp)
-    #TODO: Unlock this
-    net.enable_dropouts()
+    # net.enable_dropouts()
     
-    stats = []
-    class_acc_dict = {}
-    for i in range(18):
-            class_acc_dict[i] = [0,0]
-    all_filters = create_filters()
+    
     for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
         if batch_idx % 10 == 0:
             print('Eval batch: %d' % (batch_idx))
 
-        # if batch_idx == 1:
-        #     break
+        if batch_idx == FLAGS.num_batches:
+            
+            break
         for key in batch_data_label:
             batch_data_label[key] = batch_data_label[key].to(device)
 
@@ -259,7 +251,10 @@ def evaluate_one_epoch_with_uncertainties():
         with torch.no_grad():
             mc_samples = [net(inputs) for i in range(NUM_SAMPLES)]
 
-        # Compute loss
+
+        #NEED TO UNDO
+        # dump_results_for_sanity_check(batch_data_label,FLAGS.dump_dir,DATASET_CONFIG)
+    #     # Compute loss
         for idx, end_points in enumerate(mc_samples):
             for key in batch_data_label:
                 assert (key not in end_points)
@@ -267,8 +262,8 @@ def evaluate_one_epoch_with_uncertainties():
             local_loss, end_points = criterion(end_points, DATASET_CONFIG)
 
 
-        
-        #This guy has len(methods) elements
+    #     # center_uncertainty(mc_samples)        
+    #     #This guy has len(methods) elements
         import copy
         batch_pred_map_cls =[parse_predictions_ensemble(copy.deepcopy(mc_samples), CONFIG_DICT,m) for m in methods]
         
@@ -288,12 +283,182 @@ def evaluate_one_epoch_with_uncertainties():
             print('|', 'iou_thresh | %f  ' % (ap_calculator.ap_iou_thresh), ' | ')
             metrics_dict = ap_calculator.compute_metrics()
             for key in metrics_dict:
-                # if key == "mAP" or key == "AR":
-                log_string(' | %s  | %f | ' % (key,metrics_dict[key]))
+                if key == "mAP" or key == "AR":
+                    log_string(' | %s  | %f | ' % (key,metrics_dict[key]))
+
+
+def evaluate_one_epoch_with_uncertainties_augmented():
+    stat_dict = {}
+    global rotations
+    # tb = SummaryWriter(FLAGS.logdir)
 
     
 
+    # angles = [np.pi]
 
+    # methods = ["Native","objectness","classification", #TODO: add box size
+    #     "obj_and_cls"]
+    methods = ["Native"]
+    # methods = ["obj_and_cls","Native"]
+    met_dict = {}
+    # for m in methods:
+    #     met_dict[m] =  [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
+    #                       for iou_thresh in AP_IOU_THRESHOLDS]
+    ap_calculator_list_original = [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
+                          for iou_thresh in AP_IOU_THRESHOLDS]
+    net.eval()  # set model sem_cls_probs[i,j,ii]to eval mode (for bn and dp)
+    # net.enable_dropouts()
+    
+    
+    for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
+        if batch_idx % 10 == 0:
+            print('Eval batch: %d' % (batch_idx))
+
+        if batch_idx == FLAGS.num_batches:
+            
+            break
+        for key in batch_data_label:
+            batch_data_label[key] = batch_data_label[key].to(device)
+
+        # Forward pass
+
+        
+        inputs = {'point_clouds': batch_data_label['point_clouds']}
+        
+        aug_pcds = prep_augmented_pcds(inputs,rotations)
+        loss = np.zeros([NUM_SAMPLES])
+        with torch.no_grad():
+
+            mc_samples = [net(pcd) for pcd in aug_pcds]
+
+
+        #NEED TO UNDO
+        # dump_results_for_sanity_check(batch_data_label,FLAGS.dump_dir,DATASET_CONFIG)
+    #     # Compute loss
+        for idx, end_points in enumerate(mc_samples):
+            for key in batch_data_label:
+                assert (key not in end_points)
+                end_points[key] = batch_data_label[key]
+            local_loss, end_points = criterion(end_points, DATASET_CONFIG)
+
+
+    #     # center_uncertainty(mc_samples)        
+    #     #This guy has len(methods) elements
+        import copy
+        # batch_pred_map_cls =[parse_predictions_augmented(copy.deepcopy(mc_samples), CONFIG_DICT,m,rotations) for m in methods]
+        
+        # batch_pred_map_cls =[parse_predictions_ensemble([copy.deepcopy(mc_samples[3])], CONFIG_DICT,m) for m in methods]
+        batch_pred_map_cls_multiple = [parse_predictions(m,CONFIG_DICT,noflip=False) for m in mc_samples]
+        #need to undo the rotations, but is the flip have any effect?
+        
+        batch_pred_map_cls = aggregate_predictions(batch_pred_map_cls_multiple,rotations,dump_dir=FLAGS.DUMP_DIR)
+        # batch_pred_map_cls = batch_pred_map_cls_multiple[0]
+        end_points = mc_samples[0]
+        end_points["batch_pred_map_cls"] = batch_pred_map_cls
+        # batch_pred_map_cls = parse_predictions(mc_samples[0],CONFIG_DICT,noflip=False)
+        org_batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
+        
+        
+        for ap_calculator in ap_calculator_list_original:
+            ap_calculator.step(batch_pred_map_cls, org_batch_gt_map_cls)
+
+    
+        dump_results(end_points,FLAGS.DUMP_DIR, DATASET_CONFIG )
+        
+    for idx,m in enumerate(methods):
+        print("|",m,"|","| ")
+        for ap_calculator in ap_calculator_list_original:
+            print('|', 'iou_thresh | %f  ' % (ap_calculator.ap_iou_thresh), ' | ')
+            metrics_dict = ap_calculator.compute_metrics()
+            for key in metrics_dict:
+                if key == "mAP" or key == "AR":
+                    log_string(' | %s  | %f | ' % (key,metrics_dict[key]))
+
+def evaluate_one_epoch_with_rotation():
+    stat_dict = {}
+    # tb = SummaryWriter(FLAGS.logdir)
+
+    
+    # angles = [np.pi/2,np.pi]
+    # # angles = [np.pi]
+    # rotations = [np.eye(3)] + [pc_util.rotx(a) for a in angles] + [pc_util.roty(a) for a in angles] + [pc_util.rotz(a) for a in angles]
+
+    methods = ["Native"]
+    # methods = ["obj_and_cls","Native"]
+    
+    
+    met_dict = {}
+    for m in methods:
+        met_dict[m] =  [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
+                          for iou_thresh in AP_IOU_THRESHOLDS]
+    # ap_calculator_list_original = [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
+    #                       for iou_thresh in AP_IOU_THRESHOLDS]
+    net.eval()  # set model sem_cls_probs[i,j,ii]to eval mode (for bn and dp)
+    # net.enable_dropouts()
+    
+    for didx,TEST_DATALOADER in enumerate(TEST_DATALOADERS):
+        print("Evaluating dataloader ",didx)
+        for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
+            if batch_idx % 10 == 0:
+                print('Eval batch: %d' % (batch_idx))
+
+            if batch_idx == FLAGS.num_batches:
+                
+                break
+            for key in batch_data_label:
+                batch_data_label[key] = batch_data_label[key].to(device)
+
+            # Forward pass
+
+            
+            inputs = {'point_clouds': batch_data_label['point_clouds']}
+            
+            # loss = np.zeros([NUM_SAMPLES])
+            with torch.no_grad():
+
+                end_points = net(inputs) 
+
+
+            #NEED TO UNDO
+            # dump_results_for_sanity_check(batch_data_label,FLAGS.dump_dir,DATASET_CONFIG)
+        #     # Compute loss
+            # for idx, end_points in enumerate(mc_samples):
+            # dump_results_for_sanity_check(batch_data_label,FLAGS.DUMP_DIR + str(didx), DATASET_CONFIG)
+            for key in batch_data_label:
+                assert (key not in end_points)
+                end_points[key] = batch_data_label[key]
+            local_loss, end_points = criterion(end_points, DATASET_CONFIG)
+
+
+        # #     # center_uncertainty(mc_samples)        
+        # #     #This guy has len(methods) elements
+        #     import copy
+            batch_pred_map_cls = [parse_predictions(end_points,CONFIG_DICT) for m in methods]
+        #     # batch_pred_map_cls =[parse_predictions_ensemble(copy.deepcopy(mc_samples), CONFIG_DICT,m) for m in methods]
+        #     #gotta rotate
+            org_batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
+
+            # for idx,m in enumerate(methods):
+            #     for ap_calculator in met_dict[m]:
+            #         ap_calculator.step(batch_pred_map_cls[idx], org_batch_gt_map_cls)
+
+
+        
+    
+        # for idx,m in enumerate(methods):
+        #     print("|",m,"|","| ")
+        #     for ap_calculator in met_dict[m]:
+        #         print('|', 'iou_thresh | %f  ' % (ap_calculator.ap_iou_thresh), ' | ')
+        #         metrics_dict = ap_calculator.compute_metrics()
+        #         for key in metrics_dict:
+        #             if key == "mAP" or key == "AR":
+        #                 log_string(' | %s  | %f | ' % (key,metrics_dict[key]))
+        
+        
+        # dump_results(end_points,FLAGS.DUMP_DIR + str(didx), DATASET_CONFIG)
+
+        # if didx > 1:
+        #     break
 
 
 
@@ -302,8 +467,8 @@ def eval_uncertainties():
     # Reset numpy seed.
     # REF: https://github.com/pytorch/pytorch/issues/5059
     np.random.seed()
-    return evaluate_one_epoch_with_uncertainties()
-
+    return evaluate_one_epoch_with_uncertainties_augmented()
+    # return evaluate_one_epoch_with_rotation()
 
 # if __name__ == '__main__':
 for i in range(NUM_RUNS):

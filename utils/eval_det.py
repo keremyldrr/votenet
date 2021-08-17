@@ -298,8 +298,8 @@ def eval_det(pred_all, gt_all, ovthresh=0.25, use_07_metric=False, get_iou_func=
     for a in mydict.keys():
         revDict[mydict[a]] = a
     
-    # print("Existing classes in scene: ", [(revDict[k],len([gt[k][a] for a in sorted(gt[k].keys()) if len(gt[k][a]) is not 0])) for k in sorted(gt.keys())])
-    # print("Predicted classes in scene ",[(revDict[k],len(pred[k])) for k in sorted(pred.keys())])
+    print("Existing classes in scene: ", [(revDict[k],len([gt[k][a] for a in sorted(gt[k].keys()) if len(gt[k][a]) is not 0])) for k in sorted(gt.keys())])
+    print("Predicted classes in scene ",[(revDict[k],len(pred[k])) for k in sorted(pred.keys())])
     for classname in gt.keys():
         # print('Computing AP for class: ', classname)
         rec[classname], prec[classname], ap[classname] = eval_det_cls(pred[classname], gt[classname], ovthresh, use_07_metric, get_iou_func)
@@ -350,12 +350,19 @@ def eval_det_iou(pred_all, gt_all, ovthresh=0.25, use_07_metric=False, get_iou_f
     for a in mydict.keys():
         revDict[mydict[a]] = a
     
+    # print(gt.keys())
+    # print(pred.keys())
     # print("Existing classes in scene: ", [(revDict[k],len([gt[k][a] for a in sorted(gt[k].keys()) if len(gt[k][a]) is not 0])) for k in sorted(gt.keys())])
     # print("Predicted classes in scene ",[(revDict[k],len(pred[k])) for k in sorted(pred.keys())])
     for classname in gt.keys():
         # print('Computing AP for class: ', classname)
-        # rec[classname], prec[classname], ap[classname] = eval_det_cls(pred[classname], gt[classname], ovthresh, use_07_metric, get_iou_func)
-        rec[classname], prec[classname], ap[classname],iou_dict[classname] = eval_det_cls_with_iou(pred[classname], gt[classname], ovthresh, use_07_metric, get_iou_func)
+        if classname in pred.keys():
+            rec[classname], prec[classname], ap[classname] = eval_det_cls(pred[classname], gt[classname], ovthresh, use_07_metric, get_iou_func)
+        else:
+            rec[classname] = 0
+            prec[classname] = 0
+            ap[classname] = 0
+        # rec[classname], prec[classname], ap[classname],iou_dict[classname] = eval_det_cls_with_iou(pred[classname], gt[classname], ovthresh, use_07_metric, get_iou_func)
         # print(classname, ap[classname])
     
     return rec, prec, ap,iou_dict

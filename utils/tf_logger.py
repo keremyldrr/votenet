@@ -5,6 +5,8 @@
 
 import tensorflow as tf
 import numpy as np
+from torch.utils.tensorboard import SummaryWriter
+
 import scipy.misc 
 try:
     from StringIO import StringIO  # Python 2.7
@@ -34,14 +36,18 @@ class Logger(object):
         img_summaries = []
         for i, img in enumerate(images):
             # Write the image to a string
-            try:
-                s = StringIO()
-            except:
-                s = BytesIO()
-            scipy.misc.toimage(img).save(s, format="png")
+            import io
+            import base64
+            from PIL import Image
 
+            
+            
+            im = Image.fromarray(img.astype("uint8"))
+            #im.show()  # uncomment to look at the image
+            rawBytes = io.BytesIO()
+            im.save(rawBytes, "PNG")
             # Create an Image object
-            img_sum = tf.Summary.Image(encoded_image_string=s.getvalue(),
+            img_sum = tf.summary.Image(encoded_image_string=rawBytes.getvalue(),
                                        height=img.shape[0],
                                        width=img.shape[1])
             # Create a Summary value
@@ -78,3 +84,23 @@ class Logger(object):
         summary = tf.Summary(value=[tf.Summary.Value(tag=tag, histo=hist)])
         self.writer.add_summary(summary, step)
         self.writer.flush()
+
+
+class MyLogger():
+    def __init__(self, log_dir):
+        """Create a summary writer logging to log_dir."""
+        self.writer =SummaryWriter(log_dir)
+
+    def scalar_summary(self, tag, value, step):
+        """Log a scalar variable."""
+        # summary = tf.Summary(value=[tf.Summary.Value(tag=tag, simple_value=value)])
+        # self.writer.add_summary(summary, step)
+        self.writer.add_scalar(tag,value,step)
+        #               (box_size_var).mean(), batch_idx)
+
+    def plot_summary(self, tag, fig, step):
+        """Log a list of images."""
+        self.writer.add_figure(tag,fig,step)
+
+
+       

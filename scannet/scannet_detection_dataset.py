@@ -27,13 +27,27 @@ MEAN_COLOR_RGB = np.array([109.8, 97.2, 83.8])
 class ScannetDetectionDataset(Dataset):
        
     def __init__(self, split_set='train', num_points=20000,
-        use_color=False, use_height=False, augment=False):
+        use_color=False, use_height=False, augment=False,rot=None):
 
         self.data_path = os.path.join(BASE_DIR, 'scannet_train_detection_data')
         all_scan_names = list(set([os.path.basename(x)[0:12] \
             for x in os.listdir(self.data_path) if x.startswith('scene')]))
         if split_set=='all':            
             self.scan_names = all_scan_names
+
+        elif split_set is 'single_train':
+            split_filenames = os.path.join(ROOT_DIR, 'scannet/meta_data',
+                                           'scannetv2_train.txt')
+            with open(split_filenames, 'r') as f:
+                self.scan_names = f.read().splitlines()
+                # remove unavailiable scans
+            num_scans = len(self.scan_names)
+            self.scan_names = [sname for sname in self.scan_names \
+                               if sname in all_scan_names][:1]
+
+            # self.scan_names = self.scan_names*8
+            print('kept {} scans out of {}'.format(len(self.scan_names), num_scans))
+            num_scans = len(self.scan_names)
         elif split_set in ['train', 'val', 'test']:
             split_filenames = os.path.join(ROOT_DIR, 'scannet/meta_data',
                 'scannetv2_{}.txt'.format(split_set))
@@ -53,7 +67,7 @@ class ScannetDetectionDataset(Dataset):
         self.use_color = use_color        
         self.use_height = use_height
         self.augment = augment
-       
+        self.rot = rot
     def __len__(self):
         return len(self.scan_names)
 
@@ -87,7 +101,7 @@ class ScannetDetectionDataset(Dataset):
             point_cloud = mesh_vertices[:,0:6] 
             point_cloud[:,3:] = (point_cloud[:,3:]-MEAN_COLOR_RGB)/256.0
         
-        if self.use_height:
+        if self.use_height and self.rot is None:
             floor_height = np.percentile(point_cloud[:,2],0.99)
             height = point_cloud[:,2] - floor_height
             point_cloud = np.concatenate([point_cloud, np.expand_dims(height, 1)],1) 
@@ -125,6 +139,14 @@ class ScannetDetectionDataset(Dataset):
             # Rotation along up-axis/Z-axis
             rot_angle = (np.random.random()*np.pi/18) - np.pi/36 # -5 ~ +5 degree
             rot_mat = pc_util.rotz(rot_angle)
+            point_cloud[:,0:3] = np.dot(point_cloud[:,0:3], np.transpose(rot_mat))
+            target_bboxes = rotate_aligned_boxes(target_bboxes, rot_mat)
+        if self.rot is not None:
+            if self.use_height:
+                floor_height = np.percentile(point_cloud[:,2],0.99)
+                height = point_cloud[:,2] - floor_height
+                point_cloud = np.concatenate([point_cloud, np.expand_dims(height, 1)],1) 
+            rot_mat = self.rot
             point_cloud[:,0:3] = np.dot(point_cloud[:,0:3], np.transpose(rot_mat))
             target_bboxes = rotate_aligned_boxes(target_bboxes, rot_mat)
 

@@ -87,7 +87,7 @@ class Pointnet2Backbone(nn.Module):
         )
 
         return xyz, features
-
+    
     def forward(self, pointcloud: torch.cuda.FloatTensor, end_points=None):
         r"""
             Forward pass of the network

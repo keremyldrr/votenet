@@ -261,17 +261,19 @@ def pyplot_draw_volume(vol, output_filename):
 # ----------------------------------------
 # Simple Point manipulations
 # ----------------------------------------
-def rotate_point_cloud(points, rotation_matrix=None):
+def rotate_point_cloud(points, angle=0,rotation_matrix=None):
     """ Input: (n,3), Output: (n,3) """
     # Rotate in-place around Z axis.
     if rotation_matrix is None:
-        rotation_angle = np.random.uniform() * 2 * np.pi
+        # rotation_angle = np.random.uniform() * 2 * np.pi
+        rotation_angle = angle
         sinval, cosval = np.sin(rotation_angle), np.cos(rotation_angle)     
         rotation_matrix = np.array([[cosval, sinval, 0],
                                     [-sinval, cosval, 0],
                                     [0, 0, 1]])
     ctr = points.mean(axis=0)
-    rotated_data = np.dot(points-ctr, rotation_matrix) + ctr
+    # rotated_data = np.dot(points-ctr, rotation_matrix) + ctr
+    rotated_data = np.dot(points, rotation_matrix)
     return rotated_data, rotation_matrix
 
 def rotate_pc_along_y(pc, rot_angle):
@@ -317,6 +319,12 @@ def rotz(t):
                      [0,  0,  1]])
 
 
+def rotx(t):
+    c = np.cos(t)
+    s = np.sin(t)
+    return np.array([[1, 0,  0],
+                     [0,  c,  -s],
+                     [0,  s,  c]])
 # ----------------------------------------
 # BBox
 # ----------------------------------------
@@ -382,11 +390,11 @@ def write_bbox(scene_bbox, out_filename):
     
     mesh_list = trimesh.util.concatenate(scene.dump())
     # save to ply file    
-    trimesh.io.export.export_mesh(mesh_list, out_filename, file_type='ply')
-    
+    # trimesh.io.export.export_mesh(mesh_list, out_filename, file_type='ply')
+    mesh_list.export(out_filename, file_type='ply')
     return
 
-def write_oriented_bbox(scene_bbox, out_filename):
+def write_oriented_bbox(scene_bbox, out_filename,rotmat=None):
     """Export oriented (around Z axis) scene bbox to meshes
     Args:
         scene_bbox: (N x 7 numpy array): xyz pos of center and 3 lengths (dx,dy,dz)
@@ -404,25 +412,28 @@ def write_oriented_bbox(scene_bbox, out_filename):
         rotmat[0:2,0:2] = np.array([[cosval, -sinval],[sinval, cosval]])
         return rotmat
 
-    def convert_oriented_box_to_trimesh_fmt(box):
+    def convert_oriented_box_to_trimesh_fmt(box,rotmat=None):
         ctr = box[:3]
         lengths = box[3:6]
         trns = np.eye(4)
         trns[0:3, 3] = ctr
         trns[3,3] = 1.0            
-        trns[0:3,0:3] = heading2rotmat(box[6])
+        if rotmat is None:
+            trns[0:3,0:3] = heading2rotmat(box[6])
+        else:
+            trns[0:3,0:3] = rotmat
         box_trimesh_fmt = trimesh.creation.box(lengths, trns)
 
         return box_trimesh_fmt
 
     scene = trimesh.scene.Scene()
     for box in scene_bbox:
-        scene.add_geometry(convert_oriented_box_to_trimesh_fmt(box))        
+        scene.add_geometry(convert_oriented_box_to_trimesh_fmt(box,rotmat))        
     
     mesh_list = trimesh.util.concatenate(scene.dump())
     # save to ply file    
-    trimesh.io.export.export_mesh(mesh_list, out_filename, file_type='ply')
-    
+    # trimesh.io.export.export_mesh(mesh_list, out_filename, file_type='ply')
+    mesh_list.export(out_filename, file_type='ply')
     return
 def write_oriented_bbox_with_color(scene_bbox, out_filename):
     """Export oriented (around Z axis) scene bbox to meshes

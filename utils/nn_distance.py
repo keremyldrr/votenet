@@ -10,6 +10,7 @@ Author: Charles R. Qi
 import torch
 import torch.nn as nn
 import numpy as np
+from box_util import box3d_iou
 
 
 def huber_loss(error, delta=1.0):
@@ -59,6 +60,22 @@ def nn_distance(pc1, pc2, l1smooth=False, delta=1.0, l1=False):
     dist1, idx1 = torch.min(pc_dist, dim=2) # (B,N)
     dist2, idx2 = torch.min(pc_dist, dim=1) # (B,M)
     return dist1, idx1, dist2, idx2
+
+
+
+def nn_distance_iou(boxes1,boxes2):
+    
+    dists = torch.zeros((len(boxes1),len(boxes2)))
+    for idx,b1 in enumerate(boxes1):
+        for idy,b2 in enumerate(boxes2):
+            iou,iou_2d = box3d_iou(b1, b2)
+            dists[idx,idy] = iou 
+
+
+    best_matches,best_matches_ind = torch.max(dists,axis=1)
+    
+    return best_matches
+
 
 def demo_nn_distance():
     np.random.seed(0)

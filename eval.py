@@ -69,8 +69,8 @@ def log_string(out_str):
 
 # Init datasets and dataloaders 
 def my_worker_init_fn(worker_id):
-    np.random.seed(np.random.get_state()[1][0] + worker_id)
-
+    # np.random.seed(np.random.get_state()[1][0] + worker_id)
+    np.random.seed(1)
 if FLAGS.dataset == 'sunrgbd':
     sys.path.append(os.path.join(ROOT_DIR, 'sunrgbd'))
     from sunrgbd_detection_dataset import SunrgbdDetectionVotesDataset, MAX_NUM_OBJ
@@ -92,7 +92,7 @@ else:
     exit(-1)
 print(len(TEST_DATASET))
 TEST_DATALOADER = DataLoader(TEST_DATASET, batch_size=BATCH_SIZE,
-    shuffle=FLAGS.shuffle_dataset, num_workers=4, worker_init_fn=my_worker_init_fn)
+    shuffle=FLAGS.shuffle_dataset, num_workers=1, worker_init_fn=my_worker_init_fn)
 
 # Init the model and optimzier
 MODEL = importlib.import_module(FLAGS.model) # import network module
@@ -132,6 +132,7 @@ CONFIG_DICT = {'remove_empty_box': (not FLAGS.faster_eval), 'use_3d_nms': FLAGS.
     'conf_thresh': FLAGS.conf_thresh, 'dataset_config':DATASET_CONFIG}
 # ------------------------------------------------------------------------- GLOBAL CONFIG END
 print(CONFIG_DICT)
+print(FLAGS)
 def evaluate_one_epoch():
     stat_dict = {}
     ap_calculator_list = [APCalculator(iou_thresh, DATASET_CONFIG.class2type) \
@@ -156,7 +157,7 @@ def evaluate_one_epoch():
             assert(key not in end_points)
             end_points[key] = batch_data_label[key]
         loss, end_points = criterion(end_points, DATASET_CONFIG)
-
+        # print(loss)
         # Accumulate statistics and print out
         for key in end_points:
             if 'loss' in key or 'acc' in key or 'ratio' in key:
@@ -171,7 +172,8 @@ def evaluate_one_epoch():
         # Dump evaluation results for visualization
         if batch_idx == 0:
             MODEL.dump_results(end_points, DUMP_DIR, DATASET_CONFIG)
-
+        # if batch_idx >20:
+        #     break
     # Log statistics
     for key in sorted(stat_dict.keys()):
         log_string('eval mean %s: %f'%(key, stat_dict[key]/(float(batch_idx+1))))
@@ -182,6 +184,7 @@ def evaluate_one_epoch():
         metrics_dict = ap_calculator.compute_metrics()
         for key in metrics_dict:
             log_string('eval %s: %f'%(key, metrics_dict[key]))
+    # print("SKIPPING STATS")
 
     mean_loss = stat_dict['loss']/float(batch_idx+1)
     return mean_loss
@@ -191,7 +194,7 @@ def eval():
     log_string(str(datetime.now()))
     # Reset numpy seed.
     # REF: https://github.com/pytorch/pytorch/issues/5059
-    np.random.seed()
+    np.random.seed(1)
     loss = evaluate_one_epoch()
 
 if __name__=='__main__':

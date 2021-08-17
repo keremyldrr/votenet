@@ -17,7 +17,7 @@ class Visualizer():
         # self.opt = opt
         #self.logger = tf_logger.Logger(os.path.join(opt.logging_dir, opt.name))
         #self.log_name = os.path.join(opt.checkpoint_dir, opt.name, 'loss_log.txt')
-        self.logger = tf_logger.Logger(os.path.join(opt.log_dir, name))
+        self.logger = tf_logger.MyLogger(os.path.join(opt.log_dir, name))
         self.log_name = os.path.join(opt.log_dir, 'tf_visualizer_log.txt')
         with open(self.log_name, "a") as log_file:
             now = time.strftime("%c")
@@ -29,6 +29,9 @@ class Visualizer():
                 self.logger.image_summary(
                     label, [image_numpy], step=step)
 
+    def plot_sum(self,tag,fig,step):
+        self.logger.plot_summary(tag,fig,step)
+    #     tb.add_figure("Mean Objectness Accuracies",fig,0)
     # scalars: dictionary of scalar labels and values
     def log_scalars(self, scalars, step):
         for label, val in scalars.items():
