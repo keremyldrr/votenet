@@ -1,7 +1,10 @@
 settings.json
 logs/
 evals/
-scannet
+scannet/scans
+scannet/scannet_train_detection_data
+scannet/meta_data
+scannet/__pycache__
 sunrgbd
 .vscode/launch.json
 *.pyc
@@ -11,3 +14,4 @@ demo_files/input_pc_scannet.ply
 demo_files/input_pc_sunrgbd.ply
 demo_files/pretrained_votenet_on_scannet.tar
 demo_files/pretrained_votenet_on_sunrgbd.tar
+*.txt

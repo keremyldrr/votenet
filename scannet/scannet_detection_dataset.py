@@ -27,8 +27,9 @@ MEAN_COLOR_RGB = np.array([109.8, 97.2, 83.8])
 class ScannetDetectionDataset(Dataset):
        
     def __init__(self, split_set='train', num_points=20000,
-        use_color=False, use_height=False, augment=False,rot=None):
-
+        use_color=False, use_height=False, augment=False,rot=None,ratio = None,custom_path=None):
+        self.custom_path = custom_path
+        
         self.data_path = os.path.join(BASE_DIR, 'scannet_train_detection_data')
         all_scan_names = list(set([os.path.basename(x)[0:12] \
             for x in os.listdir(self.data_path) if x.startswith('scene')]))
@@ -48,6 +49,35 @@ class ScannetDetectionDataset(Dataset):
             # self.scan_names = self.scan_names*8
             print('kept {} scans out of {}'.format(len(self.scan_names), num_scans))
             num_scans = len(self.scan_names)
+        elif split_set is 'fractional_train':
+            split_filenames = os.path.join(ROOT_DIR, 'scannet/meta_data',
+                                           'scannetv2_train.txt')
+            if self.custom_path is not None:
+                with open(self.custom_path, 'r') as f:
+                    self.scan_names = f.read().splitlines()
+                    # remove unavailiable scans
+                num_scans = len(self.scan_names)
+                self.scan_names = [sname for sname in self.scan_names \
+                                if sname in all_scan_names]
+
+            else:
+                with open(split_filenames, 'r') as f:
+                    self.scan_names = f.read().splitlines()
+                    # remove unavailiable scans
+                num_scans = len(self.scan_names)
+                self.scan_names = [sname for sname in self.scan_names \
+                                if sname in all_scan_names]
+
+                # self.scan_names = self.scan_names*8
+                # print('kept {} scans out of {}'.format(len(self.scan_names), num_scans))
+                #TODO: Dont forget to shuffle back
+                num_scans = len(self.scan_names)
+                # np.random.seed(99)
+                inds = np.arange(num_scans)
+                # np.random.shuffle(inds)
+                inds = inds[:np.int(ratio*num_scans)]
+                self.scan_names = list(np.array(self.scan_names)[inds])
+            print('kept {} scans out of {}'.format(len(self.scan_names), num_scans))
         elif split_set in ['train', 'val', 'test']:
             split_filenames = os.path.join(ROOT_DIR, 'scannet/meta_data',
                 'scannetv2_{}.txt'.format(split_set))

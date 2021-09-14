@@ -711,6 +711,49 @@ def parse_predictions_ensemble(mc_samples, config_dict,extension = None):
     return batch_pred_map_cls
 
 
+def parse_predictions_ensemble_only_entropy(mc_samples, config_dict,extension = None):
+    """ Parse predictions to OBB parameters and suppress overlapping boxes
+    
+    Args:
+        end_points: list of dicts, results of MC sampling
+            {point_clouds, center, heading_scores, heading_residuals,
+            size_scores, size_residuals, sem_cls_scores}
+        config_dict: dict
+            {dataset_config, remove_empty_box, use_3d_nms, nms_iou,
+            use_old_type_nms, conf_thresh, per_class_proposal}
+
+    Returns:
+        batch_pred_map_cls: a list of len == batch size (BS)
+            [pred_list_i], i = 0, 1, ..., BS-1
+            where pred_list_i = [(pred_sem_cls, box_params, box_score)_j]
+            where j = 0, ..., num of valid detections - 1 from sample input i
+    """
+    
+    end_points = accumulate_mc_samples(mc_samples)
+    
+    obj_logits = end_points['objectness_scores'].detach().cpu().numpy()
+    obj_prob = softmax(obj_logits)[:, :, 1]  # (B,K)
+    cls_entropy = end_points["semantic_cls_entropy"]
+    obj_entropy = end_points["objectness_entropy"]
+    extra = np.ones_like(obj_entropy)
+    if extension == "objectness":
+        extra = 1 - obj_entropy
+    elif extension == "classification":
+        extra = 1 - cls_entropy
+    elif extension == "obj_and_cls":
+        extra = (1 - obj_entropy )*(1 -  cls_entropy)
+
+    obj_prob =obj_prob *  extra
+    # box_size_entropy = end_points["box_size_entropy"]
+        # ---------- NMS output: pred_mask in (B,K) -----------
+
+    obj_and_cls_uncertainties = (1 - extra) # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
+    # final_mask = np.zeros_like(pred_mask)
+ 
+    # print(extension)
+    
+    # end_points["final_masks"] = final_mask
+    return obj_and_cls_uncertainties
 
 def make_box_and_unrotate(end_points,config_dict,rot):
     

@@ -6,7 +6,7 @@
 """
 #!/usr/bin/env python
 
-from models.ap_helper import parse_predictions, parse_predictions_augmented
+from models.ap_helper import parse_predictions, parse_predictions_augmented, parse_predictions_ensemble_only_entropy
 from torch.utils.tensorboard import SummaryWriter
 import os
 import sys
@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = BASE_DIR
 sys.path.append(os.path.join(ROOT_DIR, 'models'))
 sys.path.append(os.path.join(ROOT_DIR, 'utils'))
-from ap_helper import APCalculator, parse_predictions_ensemble, parse_groundtruths,parse_predictions_augmented,aggregate_predictions
+from ap_helper import APCalculator, parse_predictions_ensemble, parse_groundtruths,parse_predictions_augmented,aggregate_predictions,parse_predictions_ensemble_only_entropy
 from utils.uncertainty_utils import map_zero_one, box_size_uncertainty, semantic_cls_uncertainty, objectness_uncertainty, center_uncertainty, apply_softmax, compute_objectness_accuracy, compute_iou_masks,compute_iou_masks_with_classification
 from dump_helper import dump_results_for_sanity_check,dump_results
 import pc_util
@@ -34,6 +34,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model', default='votenet', help='Model file name [default: votenet]')
 parser.add_argument('--dataset', default='sunrgbd', help='Dataset name. sunrgbd or scannet. [default: sunrgbd]')
 parser.add_argument('--checkpoint_path', default=None, help='Model checkpoint path [default: None]')
+parser.add_argument('--custom_path', default=None, help='Custom data txt path [default: None]')
 parser.add_argument('--dump_dir', default=None, help='Dump dir to save sample outputs [default: None]')
 parser.add_argument('--num_point', type=int, default=20000, help='Point Number [default: 20000]')
 parser.add_argument('--num_target', type=int, default=256, help='Point Number [default: 256]')
@@ -55,6 +56,7 @@ parser.add_argument('--shuffle_dataset', action='store_true', help='Shuffle the 
 parser.add_argument('--num_samples',type=int,default=5, help='Number of monte carlo sampling.')
 parser.add_argument('--num_runs',type=int,default=1, help='Number of runs for the experiment.')
 parser.add_argument('--num_batches',type=int,default=-1, help='Number of batches to process.')
+parser.add_argument('--ratio', type=float, default=1, help='Fractional [default: 1]')
 
 FLAGS = parser.parse_args()
 
@@ -120,11 +122,19 @@ elif FLAGS.dataset == 'scannet':
     #                                        augment=False,
     #                                        use_color=FLAGS.use_color,
     #                                        use_height=(not FLAGS.no_height),rot=rot) for rot in rotations]
-    TEST_DATASET = ScannetDetectionDataset('val',
-                                           num_points=NUM_POINT,
-                                           augment=False,
-                                           use_color=FLAGS.use_color,
-                                           use_height=(not FLAGS.no_height))
+    if FLAGS.custom_path is None:
+        TEST_DATASET = ScannetDetectionDataset('val',
+                                            num_points=NUM_POINT,
+                                            augment=False,
+                                            use_color=FLAGS.use_color,
+                                            use_height=(not FLAGS.no_height))
+        
+    else:
+        TEST_DATASET = ScannetDetectionDataset('fractional_train',
+                                            num_points=NUM_POINT,
+                                            augment=False,
+                                            use_color=FLAGS.use_color,
+                                            use_height=(not FLAGS.no_height),custom_path=FLAGS.custom_path)
 
 elif FLAGS.dataset == 'scannet_single_sanity':
     sys.path.append(os.path.join(ROOT_DIR, 'scannet'))
@@ -232,7 +242,7 @@ def evaluate_one_epoch_with_uncertainties_mc():
     # ap_calculator_list_original = [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
     #                       for iou_thresh in AP_IOU_THRESHOLDS]
     net.eval()  # set model sem_cls_probs[i,j,ii]to eval mode (for bn and dp)
-    # net.enable_dropouts()
+    net.enable_dropouts()
     
     
     for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
@@ -286,7 +296,71 @@ def evaluate_one_epoch_with_uncertainties_mc():
                 if key == "mAP" or key == "AR":
                     log_string(' | %s  | %f | ' % (key,metrics_dict[key]))
 
+def compute_uncertainties_mc():
+    stat_dict = {}
+    # tb = SummaryWriter(FLAGS.logdir)
+    methods = ["obj_and_cls"]
+    # methods = ["Native"]
+    # methods = ["obj_and_cls","Native"]
+    met_dict = {}
+    for m in methods:
+        met_dict[m] =  [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
+                          for iou_thresh in AP_IOU_THRESHOLDS]
+    # ap_calculator_list_original = [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
+    #                       for iou_thresh in AP_IOU_THRESHOLDS]
+    net.eval()  # set model sem_cls_probs[i,j,ii]to eval mode (for bn and dp)
+    net.enable_dropouts()
+    
+    entropies = []
+    for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
+        if batch_idx % 10 == 0:
+            print('Eval batch: %d' % (batch_idx))
 
+        if batch_idx == FLAGS.num_batches:
+            
+            break
+        for key in batch_data_label:
+            batch_data_label[key] = batch_data_label[key].to(device)
+
+        # Forward pass
+        inputs = {'point_clouds': batch_data_label['point_clouds']}
+        loss = np.zeros([NUM_SAMPLES])
+        with torch.no_grad():
+            mc_samples = [net(inputs) for i in range(NUM_SAMPLES)]
+
+        for idx, end_points in enumerate(mc_samples):
+            for key in batch_data_label:
+                assert (key not in end_points)
+                end_points[key] = batch_data_label[key]
+        #NEED TO UNDO
+        # dump_results_for_sanity_check(batch_data_label,FLAGS.dump_dir,DATASET_CONFIG)
+    #     # Compute loss
+          #This guy has len(methods) elements
+        unc =parse_predictions_ensemble_only_entropy(mc_samples, CONFIG_DICT,"obj_and_cls")
+        if unc.shape[0] == 256:
+            unc_sum = unc.sum()
+            
+            entropies.append(unc_sum)
+        else:
+            unc_sum = unc.sum(axis=1)
+            for i in unc_sum:
+                entropies.append(i)
+    #0.1 of original is 120
+    entropies = np.array(entropies)
+    entropy_sorted_inds = np.argsort(entropies)[::-1]
+    sorted_entropies = entropies[entropy_sorted_inds]
+    selected_scan_names = np.array(TEST_DATASET.scan_names)[entropy_sorted_inds][:120]
+    selected_scan_entropies = sorted_entropies[:120]
+    unselected_scan_names = np.array(TEST_DATASET.scan_names)[entropy_sorted_inds][120:]
+    unselected_scan_entropies = sorted_entropies[120:]
+    with open("selected_ratio_{}_{}.txt".format(len(selected_scan_names),len(unselected_scan_names)),"w") as f:
+        for idx,n in enumerate(selected_scan_names):
+            f.write(str(n) +  "\n")    
+    with open("unselected_ratio_{}_{}.txt".format(len(selected_scan_names),len(unselected_scan_names)),"w+") as f:
+        for idx,n in enumerate(unselected_scan_names):
+            f.write(str(n) + "\n")    
+        
+        
 def evaluate_one_epoch_with_uncertainties_augmented():
     stat_dict = {}
     global rotations
@@ -466,10 +540,16 @@ def eval_uncertainties():
     log_string(str(datetime.now()))
     # Reset numpy seed.
     # REF: https://github.com/pytorch/pytorch/issues/5059
-    np.random.seed()
-    return evaluate_one_epoch_with_uncertainties_augmented()
+    
+    # return evaluate_one_epoch_with_uncertainties_augmented()
+    if FLAGS.custom_path is None:
+        return evaluate_one_epoch_with_uncertainties_mc()
+    else:
+        return compute_uncertainties_mc()
+
     # return evaluate_one_epoch_with_rotation()
 
 # if __name__ == '__main__':
+np.random.seed(1)
 for i in range(NUM_RUNS):
     eval_uncertainties()
