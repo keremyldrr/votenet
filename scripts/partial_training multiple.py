@@ -12,9 +12,9 @@ for n in range(trial_start,trial_end + 1):
 
     for idx,s in enumerate(splits):
         custom_path = os.path.join("splits",s)
-        log_dir =  os.path.join("logs","random_accumulation_{}_{}".format(idx,n))
+        log_dir =  os.path.join("logs","second_random_accumulation_{}_{}".format(idx,n))
         if idx > 0:
-            prev_log_dir =  os.path.join("logs","random_accumulation_{}_{}".format(idx-1,n))
+            prev_log_dir =  os.path.join("logs","second_random_accumulation_{}_{}".format(idx-1,n))
             checkpoints = glob.glob("{}/*.tar".format(prev_log_dir))
             print(prev_log_dir)
             checkpoints.sort(key=os.path.getmtime, reverse=True)
@@ -25,7 +25,7 @@ for n in range(trial_start,trial_end + 1):
             start_iter = start_iter[dash+1:dot]
 
 
-            checkpoint_path =  os.path.join("logs","random_accumulation_{}_{}".format(idx-1,n),"best_checkpoint_{}.tar".format(start_iter))
+            checkpoint_path =  os.path.join("logs","second_random_accumulation_{}_{}".format(idx-1,n),"best_checkpoint_{}.tar".format(start_iter))
         else:
             # continue
             checkpoint_path =  "NONEXISTING/PATH"

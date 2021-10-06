@@ -36,6 +36,8 @@ sys.path.append(os.path.join(ROOT_DIR, 'utils'))
 sys.path.append(os.path.join(ROOT_DIR, 'pointnet2'))
 sys.path.append(os.path.join(ROOT_DIR, 'models'))
 print(sys.path)
+
+
 from pytorch_utils import BNMomentumScheduler
 from tf_visualizer import Visualizer as TfVisualizer
 from ap_helper import APCalculator, parse_predictions, parse_groundtruths
@@ -59,6 +61,7 @@ parser.add_argument('--ratio', type=float, default=1, help='Fractional [default:
 parser.add_argument('--weight_decay', type=float, default=0, help='Optimization L2 weight decay [default: 0]')
 parser.add_argument('--bn_decay_step', type=int, default=20, help='Period of BN decay (in epochs) [default: 20]')
 parser.add_argument('--bn_decay_rate', type=float, default=0.5, help='Decay rate for BN decay [default: 0.5]')
+parser.add_argument('--fixed_lr', type=float, default=0, help='Fixed LR for not doing scheduling')
 parser.add_argument('--lr_decay_steps', default='80,120,160,200,240,280,320', help='When to decay the learning rate (in epochs) [default: 80,120,160]')
 parser.add_argument('--lr_decay_rates', default='0.1,0.1,0.1,0.1,0.1,0.1,0.1', help='Decay rates for lr decay [default: 0.1,0.1,0.1]')
 parser.add_argument('--no_height', action='store_true', help='Do NOT use height signal in input.')
@@ -67,6 +70,8 @@ parser.add_argument('--use_sunrgbd_v2', action='store_true', help='Use V2 box la
 parser.add_argument('--overwrite', action='store_true', help='Overwrite existing log and dump folders.')
 parser.add_argument('--start_iter', type=int, default=0, help='Starting iterationg')
 parser.add_argument('--dump_results', action='store_true', help='Dump results.')
+parser.add_argument('--num_val_batches', type=int, default=-1, help='num val batches')
+
 FLAGS = parser.parse_args()
 
 # ------------------------------------------------------------------------- GLOBAL CONFIG BEG
@@ -74,6 +79,8 @@ BATCH_SIZE = FLAGS.batch_size
 NUM_POINT = FLAGS.num_point
 MAX_EPOCH = FLAGS.max_epoch
 BASE_LEARNING_RATE = FLAGS.learning_rate
+if FLAGS.fixed_lr !=0:
+    BASE_LEARNING_RATE = FLAGS.fixed_lr
 BN_DECAY_STEP = FLAGS.bn_decay_step
 BN_DECAY_RATE = FLAGS.bn_decay_rate
 LR_DECAY_STEPS = [int(x) for x in FLAGS.lr_decay_steps.split(',')]
@@ -87,7 +94,6 @@ CHECKPOINT_PATH = FLAGS.checkpoint_path if FLAGS.checkpoint_path is not None \
     else DEFAULT_CHECKPOINT_PATH
 FLAGS.DUMP_DIR = DUMP_DIR
 
-print(FLAGS)
 # Prepare LOG_DIR and DUMP_DIR
 if os.path.exists(LOG_DIR) and FLAGS.overwrite:
     print('Log folder %s already exists. Are you sure to overwrite? (Y/N)'%(LOG_DIR))
@@ -101,16 +107,18 @@ if os.path.exists(LOG_DIR) and FLAGS.overwrite:
 
 if not os.path.exists(LOG_DIR):
     os.mkdir(LOG_DIR)
-
 LOG_FOUT = open(os.path.join(LOG_DIR, 'log_train.txt'), 'a')
 LOG_FOUT.write(str(FLAGS)+'\n')
+
 def log_string(out_str):
     LOG_FOUT.write(out_str+'\n')
     LOG_FOUT.flush()
     print(out_str)
 
+log_string(str(FLAGS))
 
-if FLAGS.DUMP_DIR is not None:
+
+if FLAGS.dump_results:
     if not os.path.exists(DUMP_DIR): os.mkdir(DUMP_DIR)
 
 # Init datasets and dataloaders 
@@ -151,7 +159,7 @@ elif FLAGS.dataset == 'scannet':
 else:
     print('Unknown dataset %s. Exiting...'%(FLAGS.dataset))
     exit(-1)
-print(len(TRAIN_DATASET), len(TEST_DATASET))
+# log_string(str(len(TRAIN_DATASET)))
 TRAIN_DATALOADER = DataLoader(TRAIN_DATASET, batch_size=BATCH_SIZE,
     shuffle=True, num_workers=4, worker_init_fn=my_worker_init_fn)
 TEST_DATALOADER = DataLoader(TEST_DATASET, batch_size=BATCH_SIZE,
@@ -206,6 +214,7 @@ bnm_scheduler = BNMomentumScheduler(net, bn_lambda=bn_lbmd, last_epoch=start_epo
 
 def get_current_lr(epoch):
     lr = BASE_LEARNING_RATE
+    
     for i,lr_decay_epoch in enumerate(LR_DECAY_STEPS):
         if epoch >= lr_decay_epoch:
             lr *= LR_DECAY_RATES[i]
@@ -213,24 +222,35 @@ def get_current_lr(epoch):
 
 def get_current_lr_by_iters(epoch):
     lr = BASE_LEARNING_RATE
-    START_ITER = FLAGS.start_iter
-    ITER_DECAY_STEPS = [12000,18000,24000]
-    DATA_SIZE = len(TRAIN_DATALOADER)
-    ITERS_PER_EPOCH = DATA_SIZE
-    NUM_ITERS_TOTAL = START_ITER + ITERS_PER_EPOCH*epoch
+    
+    if FLAGS.fixed_lr == 0:
+        START_ITER = FLAGS.start_iter
+        ITER_DECAY_STEPS = [12000,18000,24000]
+        DATA_SIZE = len(TRAIN_DATALOADER)
+        ITERS_PER_EPOCH = DATA_SIZE
+        NUM_ITERS_TOTAL = START_ITER + ITERS_PER_EPOCH*epoch
 
-    print(NUM_ITERS_TOTAL,ITER_DECAY_STEPS,ITERS_PER_EPOCH,DATA_SIZE)
-    for i,lr_decay_epoch in enumerate(ITER_DECAY_STEPS):
-        print(NUM_ITERS_TOTAL , lr_decay_epoch)
-        if NUM_ITERS_TOTAL >= lr_decay_epoch:
-            lr *= 0.1
-            print("Shrank")
+        print(NUM_ITERS_TOTAL,ITER_DECAY_STEPS,ITERS_PER_EPOCH,DATA_SIZE)
+        for i,lr_decay_epoch in enumerate(ITER_DECAY_STEPS):
+            print(NUM_ITERS_TOTAL , lr_decay_epoch)
+            if NUM_ITERS_TOTAL >= lr_decay_epoch:
+                lr *= 0.1
+                print("Shrank")
     
     return lr
 
 def adjust_learning_rate(optimizer, epoch):
     # lr = get_current_lr(epoch)
-    lr = get_current_lr_by_iters(epoch)
+    if FLAGS.fixed_lr == 0 :
+        
+        if FLAGS.start_iter != 0:
+            lr = get_current_lr_by_iters(epoch)
+            print("ITERS")
+        else:
+            lr = get_current_lr(epoch)
+            print("NORMAL SCHEDULING")
+    else:
+        lr = FLAGS.fixed_lr
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
@@ -286,6 +306,8 @@ def train_one_epoch():
 
 def evaluate_one_epoch():
     global best_map
+    
+
     stat_dict = {} # collect statistics
     ap_calculator = APCalculator(ap_iou_thresh=FLAGS.ap_iou_thresh,
         class2type_map=DATASET_CONFIG.class2type)
@@ -297,6 +319,7 @@ def evaluate_one_epoch():
             batch_data_label[key] = batch_data_label[key].to(device)
         
         # Forward pass
+         
         inputs = {'point_clouds': batch_data_label['point_clouds']}
         with torch.no_grad():
             end_points = net(inputs)
@@ -320,7 +343,10 @@ def evaluate_one_epoch():
         # Dump evaluation results for visualization
         if FLAGS.dump_results and batch_idx == 0 and EPOCH_CNT %10 == 0:
             MODEL.dump_results(end_points, DUMP_DIR, DATASET_CONFIG) 
-
+        if FLAGS.num_val_batches != -1:
+            if batch_idx > FLAGS.num_val_batches:
+                best_map = -1
+                break
     # Log statistics
     TEST_VISUALIZER.log_scalars({key:stat_dict[key]/float(batch_idx+1) for key in stat_dict},
         (EPOCH_CNT+1)*len(TRAIN_DATALOADER)*BATCH_SIZE)
@@ -345,7 +371,10 @@ def train(start_epoch):
     for epoch in range(start_epoch, MAX_EPOCH):
         EPOCH_CNT = epoch
         log_string('**** EPOCH %03d ****' % (epoch))
-        log_string('Current learning rate: %f'%(get_current_lr_by_iters(epoch)))
+        if FLAGS.start_iter !=0:
+            log_string('Current learning rate: %f'%(get_current_lr_by_iters(epoch)))
+        else:
+            log_string('Current learning rate: %f'%(get_current_lr(epoch)))
         log_string('Current BN decay momentum: %f'%(bnm_scheduler.lmbd(bnm_scheduler.last_epoch)))
         log_string(str(datetime.now()))
         # Reset numpy seed.

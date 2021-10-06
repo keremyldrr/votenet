@@ -6,7 +6,6 @@
 """
 #!/usr/bin/env python
 
-from models.ap_helper import parse_predictions, parse_predictions_augmented, parse_predictions_ensemble_only_entropy
 from torch.utils.tensorboard import SummaryWriter
 import os
 import sys
@@ -21,12 +20,15 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import pandas as pd
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+#BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.abspath("/home/yildirir/workspace/votenet/README.md"))
 ROOT_DIR = BASE_DIR
 sys.path.append(os.path.join(ROOT_DIR, 'models'))
 sys.path.append(os.path.join(ROOT_DIR, 'utils'))
+print(sys.path)
+# from models.ap_helper import parse_predictions, parse_predictions_augmented, parse_predictions_ensemble_only_entropy
 from ap_helper import APCalculator, parse_predictions_ensemble, parse_groundtruths,parse_predictions_augmented,aggregate_predictions,parse_predictions_ensemble_only_entropy
-from utils.uncertainty_utils import map_zero_one, box_size_uncertainty, semantic_cls_uncertainty, objectness_uncertainty, center_uncertainty, apply_softmax, compute_objectness_accuracy, compute_iou_masks,compute_iou_masks_with_classification
+from uncertainty_utils import map_zero_one, box_size_uncertainty, semantic_cls_uncertainty, objectness_uncertainty, center_uncertainty, apply_softmax, compute_objectness_accuracy, compute_iou_masks,compute_iou_masks_with_classification
 from dump_helper import dump_results_for_sanity_check,dump_results
 import pc_util
 
@@ -34,6 +36,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--model', default='votenet', help='Model file name [default: votenet]')
 parser.add_argument('--dataset', default='sunrgbd', help='Dataset name. sunrgbd or scannet. [default: sunrgbd]')
 parser.add_argument('--checkpoint_path', default=None, help='Model checkpoint path [default: None]')
+parser.add_argument('--selected_path', default=None, help='Selected path')
+parser.add_argument('--unselected_path', default=None, help='Unselected path')
 parser.add_argument('--custom_path', default=None, help='Custom data txt path [default: None]')
 parser.add_argument('--dump_dir', default=None, help='Dump dir to save sample outputs [default: None]')
 parser.add_argument('--num_point', type=int, default=20000, help='Point Number [default: 20000]')
@@ -57,7 +61,7 @@ parser.add_argument('--num_samples',type=int,default=5, help='Number of monte ca
 parser.add_argument('--num_runs',type=int,default=1, help='Number of runs for the experiment.')
 parser.add_argument('--num_batches',type=int,default=-1, help='Number of batches to process.')
 parser.add_argument('--ratio', type=float, default=1, help='Fractional [default: 1]')
-
+parser.add_argument('--dump_results', action='store_true', help='dump it or not')
 FLAGS = parser.parse_args()
 
 if FLAGS.use_cls_nms:
@@ -74,15 +78,17 @@ AP_IOU_THRESHOLDS = [float(x) for x in FLAGS.ap_iou_thresholds.split(',')]
 NUM_SAMPLES = FLAGS.num_samples
 NUM_RUNS = FLAGS.num_runs
 # Prepare DUMP_DIR
-if not os.path.exists(DUMP_DIR):
-    os.mkdir(DUMP_DIR)
-DUMP_FOUT = open(os.path.join(DUMP_DIR, 'log_eval.txt'), 'w')
-DUMP_FOUT.write(str(FLAGS) + '\n')
+if FLAGS.dump_results:
+    if not os.path.exists(DUMP_DIR):
+        os.mkdir(DUMP_DIR)
+    DUMP_FOUT = open(os.path.join(DUMP_DIR, 'log_eval.txt'), 'w')
+    DUMP_FOUT.write(str(FLAGS) + '\n')
 
 
 def log_string(out_str):
-    DUMP_FOUT.write(out_str + '\n')
-    DUMP_FOUT.flush()
+    if FLAGS.dump_results:
+        DUMP_FOUT.write(out_str + '\n')
+        DUMP_FOUT.flush()
     print(out_str)
 
 
@@ -193,7 +199,8 @@ if CHECKPOINT_PATH is not None and os.path.isfile(CHECKPOINT_PATH):
     optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     epoch = checkpoint['epoch']
     log_string("Loaded checkpoint %s (epoch: %d)" % (CHECKPOINT_PATH, epoch))
-
+else:
+    log_string("INVALID CHECKPOINT")
 CONFIG_DICT = {'remove_empty_box': (not FLAGS.faster_eval), 'use_3d_nms': FLAGS.use_3d_nms, 'nms_iou': FLAGS.nms_iou,
     'use_old_type_nms': FLAGS.use_old_type_nms, 'cls_nms': FLAGS.use_cls_nms, 'per_class_proposal': FLAGS.per_class_proposal,
     'conf_thresh': FLAGS.conf_thresh, 'dataset_config':DATASET_CONFIG}
@@ -353,10 +360,10 @@ def compute_uncertainties_mc():
     selected_scan_entropies = sorted_entropies[:120]
     unselected_scan_names = np.array(TEST_DATASET.scan_names)[entropy_sorted_inds][120:]
     unselected_scan_entropies = sorted_entropies[120:]
-    with open("selected_ratio_{}_{}.txt".format(len(selected_scan_names),len(unselected_scan_names)),"w") as f:
+    with open(FLAGS.selected_path,"a+") as f:
         for idx,n in enumerate(selected_scan_names):
             f.write(str(n) +  "\n")    
-    with open("unselected_ratio_{}_{}.txt".format(len(selected_scan_names),len(unselected_scan_names)),"w+") as f:
+    with open(FLAGS.unselected_path,"w+") as f:
         for idx,n in enumerate(unselected_scan_names):
             f.write(str(n) + "\n")    
         

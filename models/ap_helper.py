@@ -1214,11 +1214,11 @@ class APCalculator(object):
     def compute_metrics(self):
         """ Use accumulated predictions and groundtruths to compute Average Precision.
         """
-        # rec, prec, ap = eval_det_multiprocessing(self.pred_map_cls, self.gt_map_cls, ovthresh=self.ap_iou_thresh, get_iou_func=get_iou_obb)
-        rec, prec, ap,ious = eval_det_iou(self.pred_map_cls,
-                                 self.gt_map_cls,
-                                 ovthresh=self.ap_iou_thresh,
-                                 get_iou_func=get_iou_obb)
+        rec, prec, ap = eval_det_multiprocessing(self.pred_map_cls, self.gt_map_cls, ovthresh=self.ap_iou_thresh, get_iou_func=get_iou_obb)
+        # rec, prec, ap,ious = eval_det_iou(self.pred_map_cls,
+                                #  self.gt_map_cls,
+                                #  ovthresh=self.ap_iou_thresh,
+                                #  get_iou_func=get_iou_obb)
 
         ret_dict = {}
         for key in sorted(ap.keys()):
@@ -1237,10 +1237,10 @@ class APCalculator(object):
                 ret_dict['%s Recall' % (clsname)] = 0
                 rec_list.append(0)
 
-        for key in sorted(ious.keys()):
-            clsname = self.class2type_map[key] if self.class2type_map else str(
-                key)
-            ret_dict['%s Average IOU' % (clsname)] = np.array(ious[key]).mean()
+        # for key in sorted(ious.keys()):
+        #     clsname = self.class2type_map[key] if self.class2type_map else str(
+        #         key)
+        #     ret_dict['%s Average IOU' % (clsname)] = np.array(ious[key]).mean()
         ret_dict['AR'] = np.mean(rec_list)
         return ret_dict
 
