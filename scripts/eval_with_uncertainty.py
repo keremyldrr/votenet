@@ -353,13 +353,34 @@ def compute_uncertainties_mc():
             for i in unc_sum:
                 entropies.append(i)
     #0.1 of original is 120
+
+    chunk_size = 240
     entropies = np.array(entropies)
+    dicty = {}
+    for idx,line in enumerate(TEST_DATASET.scan_names[:(batch_idx)*BATCH_SIZE]):
+        name = line[:line.find("_")] 
+        if name in dicty.keys():
+            dicty[name][0].append(line[:])
+            dicty[name][1].append(entropies[idx])
+        else:
+            dicty[name] = [[line[:]],[entropies[idx]]]
+    
+    scenes = list(dicty.keys())
+    entropies = np.array([np.mean(ent[1][1]) for ent in dicty.items()])
     entropy_sorted_inds = np.argsort(entropies)[::-1]
     sorted_entropies = entropies[entropy_sorted_inds]
-    selected_scan_names = np.array(TEST_DATASET.scan_names)[entropy_sorted_inds][:120]
-    selected_scan_entropies = sorted_entropies[:120]
-    unselected_scan_names = np.array(TEST_DATASET.scan_names)[entropy_sorted_inds][120:]
-    unselected_scan_entropies = sorted_entropies[120:]
+    sorted_scenes = np.array(scenes)[entropy_sorted_inds]
+    sorted_scan_names = []
+    for s in sorted_scenes:
+        elems = dicty[s][0]
+        for e in elems:
+            sorted_scan_names.append(e)
+
+    sorted_scan_names = np.array(sorted_scan_names)
+    selected_scan_names =sorted_scan_names[:chunk_size]
+    # selected_scan_entropies = sorted_entropies[:chunk_size]
+    unselected_scan_names = sorted_scan_names[chunk_size:]
+    # unselected_scan_entropies = sorted_entropies[chunk_size:]
     with open(FLAGS.selected_path,"a+") as f:
         for idx,n in enumerate(selected_scan_names):
             f.write(str(n) +  "\n")    
