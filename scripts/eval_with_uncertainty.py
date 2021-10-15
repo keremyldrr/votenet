@@ -62,6 +62,7 @@ parser.add_argument('--num_runs',type=int,default=1, help='Number of runs for th
 parser.add_argument('--num_batches',type=int,default=-1, help='Number of batches to process.')
 parser.add_argument('--ratio', type=float, default=1, help='Fractional [default: 1]')
 parser.add_argument('--dump_results', action='store_true', help='dump it or not')
+parser.add_argument('--chunk_size',type=int,default=120, help='Chunk size of a fraction.')
 FLAGS = parser.parse_args()
 
 if FLAGS.use_cls_nms:
@@ -339,22 +340,32 @@ def compute_uncertainties_mc():
             for key in batch_data_label:
                 assert (key not in end_points)
                 end_points[key] = batch_data_label[key]
+        # dump_results_for_sanity_check(end_points,FLAGS.DUMP_DIR, DATASET_CONFIG )
+
         #NEED TO UNDO
-        # dump_results_for_sanity_check(batch_data_label,FLAGS.dump_dir,DATASET_CONFIG)
+        if FLAGS.dump_results:
+            if not os.path.exists(FLAGS.dump_dir + "_batch_{}".format(batch_idx)):
+                os.makedirs(FLAGS.dump_dir + "_batch_{}".format(batch_idx))
+        # dump_results_for_sanity_check(batch_data_label,FLAGS.dump_dir + "_batch_{}".format(batch_idx),DATASET_CONFIG)
+                scan_name_path = os.path.join(FLAGS.dump_dir + "_batch_{}".format(batch_idx),"scan_names.txt")
+
+            
     #     # Compute loss
           #This guy has len(methods) elements
         unc =parse_predictions_ensemble_only_entropy(mc_samples, CONFIG_DICT,"obj_and_cls")
-        if unc.shape[0] == 256:
-            unc_sum = unc.sum()
-            
-            entropies.append(unc_sum)
-        else:
-            unc_sum = unc.sum(axis=1)
-            for i in unc_sum:
-                entropies.append(i)
+       
+       # unc_sum = unc.sum()
+        for i in unc:
+            entropies.append(i)
     #0.1 of original is 120
+        if FLAGS.dump_results:
+            entropies_in_scenes = np.array(entropies)[batch_data_label["scan_idx"].cpu()]
+            with open(scan_name_path,"w") as f:
+                files = np.array(TEST_DATASET.scan_names)[batch_data_label["scan_idx"].cpu()]
+                for idx,l in enumerate(files):
+                    f.write(l + " " + str(entropies_in_scenes[idx]) + "\n" )
 
-    chunk_size = 240
+    chunk_size = FLAGS.chunk_size
     entropies = np.array(entropies)
     dicty = {}
     for idx,line in enumerate(TEST_DATASET.scan_names[:(batch_idx)*BATCH_SIZE]):
@@ -380,7 +391,7 @@ def compute_uncertainties_mc():
     selected_scan_names =sorted_scan_names[:chunk_size]
     # selected_scan_entropies = sorted_entropies[:chunk_size]
     unselected_scan_names = sorted_scan_names[chunk_size:]
-    # unselected_scan_entropies = sorted_entropies[chunk_size:]
+    unselected_scan_entropies = sorted_entropies[chunk_size:]
     with open(FLAGS.selected_path,"a+") as f:
         for idx,n in enumerate(selected_scan_names):
             f.write(str(n) +  "\n")    
