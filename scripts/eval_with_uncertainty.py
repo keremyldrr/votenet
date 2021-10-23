@@ -40,6 +40,8 @@ parser.add_argument('--selected_path', default=None, help='Selected path')
 parser.add_argument('--unselected_path', default=None, help='Unselected path')
 parser.add_argument('--custom_path', default=None, help='Custom data txt path [default: None]')
 parser.add_argument('--dump_dir', default=None, help='Dump dir to save sample outputs [default: None]')
+parser.add_argument('--expected_ent', default=None, help='Use expected entropy instead of mutual information')
+
 parser.add_argument('--num_point', type=int, default=20000, help='Point Number [default: 20000]')
 parser.add_argument('--num_target', type=int, default=256, help='Point Number [default: 256]')
 parser.add_argument('--batch_size', type=int, default=8, help='Batch Size during training [default: 8]')
@@ -62,6 +64,7 @@ parser.add_argument('--num_runs',type=int,default=1, help='Number of runs for th
 parser.add_argument('--num_batches',type=int,default=-1, help='Number of batches to process.')
 parser.add_argument('--ratio', type=float, default=1, help='Fractional [default: 1]')
 parser.add_argument('--dump_results', action='store_true', help='dump it or not')
+
 parser.add_argument('--chunk_size',type=int,default=120, help='Chunk size of a fraction.')
 FLAGS = parser.parse_args()
 
@@ -239,14 +242,16 @@ def prep_augmented_pcds(inputs,rotations):
 def evaluate_one_epoch_with_uncertainties_mc():
     stat_dict = {}
     # tb = SummaryWriter(FLAGS.logdir)
-    methods = ["Native","center","objectness","classification", #TODO: add box size
+    methods = ["Native","objectness","classification", #TODO: add box size
         "obj_and_cls"]
     # methods = ["Native"]
     # methods = ["obj_and_cls","Native"]
     met_dict = {}
+    unc_dict = {}
     for m in methods:
         met_dict[m] =  [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
                           for iou_thresh in AP_IOU_THRESHOLDS]
+        unc_dict[m] = [0,0]
     # ap_calculator_list_original = [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
     #                       for iou_thresh in AP_IOU_THRESHOLDS]
     net.eval()  # set model sem_cls_probs[i,j,ii]to eval mode (for bn and dp)
@@ -269,7 +274,7 @@ def evaluate_one_epoch_with_uncertainties_mc():
         with torch.no_grad():
             mc_samples = [net(inputs) for i in range(NUM_SAMPLES)]
 
-
+        # print("Batch ",batch_idx, " samples done")
         #NEED TO UNDO
         # dump_results_for_sanity_check(batch_data_label,FLAGS.dump_dir,DATASET_CONFIG)
     #     # Compute loss
@@ -283,10 +288,18 @@ def evaluate_one_epoch_with_uncertainties_mc():
     #     # center_uncertainty(mc_samples)        
     #     #This guy has len(methods) elements
         import copy
-        batch_pred_map_cls =[parse_predictions_ensemble(copy.deepcopy(mc_samples), CONFIG_DICT,m) for m in methods]
+        # print("Predictions parsing")
+        batch_pred_map_cls =[parse_predictions_ensemble(copy.deepcopy(mc_samples), CONFIG_DICT,m,FLAGS.expected_ent) for m in methods]
+        # print("Predictions computed")
+        bsize = FLAGS.batch_size
         
+        for idx,m in enumerate(methods):
+            num_proposals = np.array([np.sum(len(batch_pred_map_cls[idx][i]) for i in range(bsize))]) # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
+            obj_and_cls_uncertainties = np.array([np.sum([ (a[2]) for a in batch_pred_map_cls[idx][i]]) for i in range(bsize)]) # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
+            # print("{} {} {}".format(m,np.sum(num_proposals),obj_and_cls_uncertainties.sum()))
+            unc_dict[m] += np.array([np.sum(num_proposals),obj_and_cls_uncertainties.sum()])
         org_batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
-
+        
 
         for idx,m in enumerate(methods):
             for ap_calculator in met_dict[m]:
@@ -294,7 +307,9 @@ def evaluate_one_epoch_with_uncertainties_mc():
 
 
     
-   
+    for k in unc_dict.keys():
+        summed_elem = unc_dict[k]
+        print("{} {}".format(k,summed_elem/len(TEST_DATASET)))
     for idx,m in enumerate(methods):
         print("|",m,"|","| ")
         for ap_calculator in met_dict[m]:
@@ -311,9 +326,11 @@ def compute_uncertainties_mc():
     # methods = ["Native"]
     # methods = ["obj_and_cls","Native"]
     met_dict = {}
+    unc_dict = {}
     for m in methods:
         met_dict[m] =  [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
                           for iou_thresh in AP_IOU_THRESHOLDS]
+        unc_dict[m] = 0
     # ap_calculator_list_original = [APCalculator(iou_thresh, DATASET_CONFIG.class2type)
     #                       for iou_thresh in AP_IOU_THRESHOLDS]
     net.eval()  # set model sem_cls_probs[i,j,ii]to eval mode (for bn and dp)
@@ -591,4 +608,5 @@ def eval_uncertainties():
 # if __name__ == '__main__':
 np.random.seed(1)
 for i in range(NUM_RUNS):
+    
     eval_uncertainties()
