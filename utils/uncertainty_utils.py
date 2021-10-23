@@ -23,7 +23,7 @@ def apply_softmax(samples):
         e["sm_objectness_scores"] = (softmax(e["objectness_scores"].cpu().squeeze(0).detach().numpy()))
         e["sm_sem_cls_scores"] = (softmax(e["sem_cls_scores"].cpu().squeeze(0).detach().numpy()))
 
-def accumulate_mc_samples(mc_samples):
+def accumulate_mc_samples(mc_samples,classification=None):
     """
     This function accumulates everything in the end_points for the evaluation
 
@@ -59,8 +59,12 @@ def accumulate_mc_samples(mc_samples):
     
     mean_end_points["heading_residuals"] =mean_heading_residuals
     mean_end_points["heading_scores"] = mean_heading_scores
-    _,mean_end_points["semantic_cls_entropy"] = semantic_cls_uncertainty(mc_samples)
-    _,mean_end_points["objectness_entropy"] = objectness_uncertainty(mc_samples)
+    if classification is None:
+        _,mean_end_points["semantic_cls_entropy"] = semantic_cls_uncertainty(mc_samples)
+        _,mean_end_points["objectness_entropy"] = objectness_uncertainty(mc_samples)
+    else:
+        _,mean_end_points["semantic_cls_entropy"] = semantic_cls_uncertainty(mc_samples,classification=classification)
+        _,mean_end_points["objectness_entropy"] = objectness_uncertainty(mc_samples,classification=None)
     # mean_end_points["center_variance"] = center_uncertainty(mc_samples)
     return mean_end_points
 def accumulate_scores(mc_samples):
@@ -94,13 +98,17 @@ def accumulate_scores(mc_samples):
     # mean_end_points["center_variance"] = center_uncertainty(mc_samples)
     return mean_end_points
 
-def semantic_cls_uncertainty(samples,threshold = None):
+def semantic_cls_uncertainty(samples,threshold = None,classification=None):
     mc_cls = np.array([e["sm_sem_cls_scores"] for e in samples])
     expected_p = np.mean(mc_cls, axis=0)
     predictive_entropy = -np.sum(expected_p *np.log(expected_p), axis=-1)
     MC_entropy = np.sum(mc_cls * np.log(mc_cls),axis=-1)
     expected_entropy = -np.mean(MC_entropy, axis=0)
-    mi = predictive_entropy - expected_entropy
+    if classification is None: 
+        mi = predictive_entropy - expected_entropy
+    else:
+        mi = predictive_entropy
+
     normalized_mi = map_zero_one(mi)
     # print("Mean classification entropy", normalized_mi.mean())
 
@@ -111,13 +119,16 @@ def semantic_cls_uncertainty(samples,threshold = None):
     return mi_mask,normalized_mi
 
 
-def objectness_uncertainty(samples,threshold = None):
+def objectness_uncertainty(samples,threshold = None,classification=None):
     mc_objs = np.array([e["sm_objectness_scores"] for e in samples])
     expected_p_obj = np.mean(mc_objs, axis=0)
     predictive_entropy_obj = -np.sum(expected_p_obj *np.log(expected_p_obj), axis=-1)
     MC_entropy_obj = np.sum(mc_objs * np.log(mc_objs),axis=-1)
     expected_entropy_obj = -np.mean(MC_entropy_obj, axis=0)
-    mi_obj = predictive_entropy_obj - expected_entropy_obj
+    if classification is None:
+        mi_obj = predictive_entropy_obj - expected_entropy_obj
+    else:
+        mi_obj = predictive_entropy_obj
     normalized_mi_obj = map_zero_one(mi_obj)
     # print("Mean objectness entropy",normalized_mi_obj.mean())
 

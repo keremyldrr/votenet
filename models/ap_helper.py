@@ -498,7 +498,7 @@ def parse_predictions_with_custom_mask(end_points, config_dict):
     # end_points["final_masks"] = final_mask
     return batch_pred_map_cls
 
-def parse_predictions_ensemble(mc_samples, config_dict,extension = None):
+def parse_predictions_ensemble(mc_samples, config_dict,extension = None,expected_ent=None):
     """ Parse predictions to OBB parameters and suppress overlapping boxes
     
     Args:
@@ -516,7 +516,7 @@ def parse_predictions_ensemble(mc_samples, config_dict,extension = None):
             where j = 0, ..., num of valid detections - 1 from sample input i
     """
     
-    end_points = accumulate_mc_samples(mc_samples)
+    end_points = accumulate_mc_samples(mc_samples,classification=expected_ent)
     pred_center = end_points['center']  # B,num_proposal,3
     pred_heading_class = torch.argmax(end_points['heading_scores'],
                                       -1)  # B,num_proposal
@@ -565,17 +565,17 @@ def parse_predictions_ensemble(mc_samples, config_dict,extension = None):
             corners_3d_upright_camera = get_3d_box(
                 box_size, heading_angle, pred_center_upright_camera[i, j, :])
             pred_corners_3d_upright_camera[i, j] = corners_3d_upright_camera
-            pred_box_sizes[i, j] = np.linalg.norm(
-                corners_3d_upright_camera[0] - corners_3d_upright_camera[1]
-            ) * np.linalg.norm(corners_3d_upright_camera[2] -
-                               corners_3d_upright_camera[1]) * np.linalg.norm(
-                                   corners_3d_upright_camera[4] -
-                                   corners_3d_upright_camera[1])
+            # pred_box_sizes[i, j] = np.linalg.norm(
+            #     corners_3d_upright_camera[0] - corners_3d_upright_camera[1]
+            # ) * np.linalg.norm(corners_3d_upright_camera[2] -
+            #                    corners_3d_upright_camera[1]) * np.linalg.norm(
+            #                        corners_3d_upright_camera[4] -
+            #                        corners_3d_upright_camera[1])
 
     K = pred_center.shape[1]  # K==num_proposal
     nonempty_box_mask = np.ones((bsize, K))
-    end_points["pred_box_sizes"] = torch.Tensor(pred_box_sizes)
-    end_points["raw_pred_boxes"] = pred_corners_3d_upright_camera
+    # end_points["pred_box_sizes"] = torch.Tensor(pred_box_sizes)
+    # end_points["raw_pred_boxes"] = pred_corners_3d_upright_camera
     if config_dict['remove_empty_box']:
         # -------------------------------------
         # Remove predicted boxes without any point within them..
@@ -707,6 +707,7 @@ def parse_predictions_ensemble(mc_samples, config_dict,extension = None):
             #         final_mask[i,j] = 1
     # print("*******************")
     end_points['batch_pred_map_cls'] = batch_pred_map_cls
+    
     # end_points["final_masks"] = final_mask
     return batch_pred_map_cls
 
