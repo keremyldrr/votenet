@@ -22,6 +22,7 @@ class ScannetDatasetConfig(object):
             'window':6,'bookshelf':7,'picture':8, 'counter':9, 'desk':10, 'curtain':11,
             'refrigerator':12, 'showercurtrain':13, 'toilet':14, 'sink':15, 'bathtub':16, 'garbagebin':17}  
         self.class2type = {self.type2class[t]:t for t in self.type2class}
+        self.class_ids = np.arange(18)
         self.nyu40ids = np.array([3,4,5,6,7,8,9,10,11,12,14,16,24,28,33,34,36,39])
         self.nyu40id2class = {nyu40id: i for i,nyu40id in enumerate(list(self.nyu40ids))}
         self.mean_size_arr = np.load(os.path.join(ROOT_DIR,'scannet/meta_data/scannet_means.npz'))['arr_0']

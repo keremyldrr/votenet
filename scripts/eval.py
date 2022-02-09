@@ -87,12 +87,29 @@ elif FLAGS.dataset == 'scannet':
     TEST_DATASET = ScannetDetectionDataset('val', num_points=NUM_POINT,
         augment=False,
         use_color=FLAGS.use_color, use_height=(not FLAGS.no_height))
+elif FLAGS.dataset == 'scannet_frames':
+
+    sys.path.append(os.path.join(ROOT_DIR, 'scannet'))
+    sys.path.append(os.path.join(ROOT_DIR, 'scannet'))
+    from scannet_frames_dataset import ScannetDetectionFramesDataset, MAX_NUM_OBJ
+    from model_util_scannet import ScannetDatasetConfig
+    DATASET_CONFIG = ScannetDatasetConfig()
+    data_setting = {
+        "dataset_path":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/",
+        "train_source":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/train_frames.txt",
+        "eval_source":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/val_frames.txt",
+        "frames_path": "/home/yildirir/workspace/kerem/TorchSSC/DATA/scannet_frames_25k/"
+    }
+    TEST_DATASET = ScannetDetectionFramesDataset(data_setting,split_set="val",num_points=NUM_POINT,use_color=False,use_height=True,augment=False)
+     
 else:
     print('Unknown dataset %s. Exiting...'%(FLAGS.dataset))
     exit(-1)
 print(len(TEST_DATASET))
+
+# TODO: add sampler here :with expression as target:
 TEST_DATALOADER = DataLoader(TEST_DATASET, batch_size=BATCH_SIZE,
-    shuffle=FLAGS.shuffle_dataset, num_workers=1, worker_init_fn=my_worker_init_fn)
+    shuffle=FLAGS.shuffle_dataset, num_workers=4, worker_init_fn=my_worker_init_fn)
 
 # Init the model and optimzier
 MODEL = importlib.import_module(FLAGS.model) # import network module
