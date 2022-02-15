@@ -44,6 +44,7 @@ parser.add_argument('--nms_iou', type=float, default=0.25, help='NMS IoU thresho
 parser.add_argument('--conf_thresh', type=float, default=0.05, help='Filter out predictions with obj prob less than it. [default: 0.05]')
 parser.add_argument('--faster_eval', action='store_true', help='Faster evaluation by skippling empty bounding box removal.')
 parser.add_argument('--shuffle_dataset', action='store_true', help='Shuffle the dataset (random order).')
+parser.add_argument('--thresholds', type=float,nargs="+", default=[0.3],help='thresholds for rejecting objects while loading frames')
 FLAGS = parser.parse_args()
 
 if FLAGS.use_cls_nms:
@@ -100,16 +101,17 @@ elif FLAGS.dataset == 'scannet_frames':
         "eval_source":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/val_frames.txt",
         "frames_path": "/home/yildirir/workspace/kerem/TorchSSC/DATA/scannet_frames_25k/"
     }
-    TEST_DATASET = ScannetDetectionFramesDataset(data_setting,split_set="val",num_points=NUM_POINT,use_color=False,use_height=True,augment=False)
+    
+    TEST_DATASETS = [ScannetDetectionFramesDataset(data_setting,split_set="val",num_points=NUM_POINT,use_color=False,use_height=True,augment=False,thresh=t) for t in FLAGS.thresholds]
      
 else:
     print('Unknown dataset %s. Exiting...'%(FLAGS.dataset))
     exit(-1)
-print(len(TEST_DATASET))
+print([len(T) for T in TEST_DATASETS])
 
 # TODO: add sampler here :with expression as target:
-TEST_DATALOADER = DataLoader(TEST_DATASET, batch_size=BATCH_SIZE,
-    shuffle=FLAGS.shuffle_dataset, num_workers=4, worker_init_fn=my_worker_init_fn)
+TEST_DATALOADERS = [DataLoader(T, batch_size=BATCH_SIZE,
+    shuffle=FLAGS.shuffle_dataset, num_workers=4, worker_init_fn=my_worker_init_fn) for T in TEST_DATASETS]
 
 # Init the model and optimzier
 MODEL = importlib.import_module(FLAGS.model) # import network module
@@ -151,60 +153,65 @@ CONFIG_DICT = {'remove_empty_box': (not FLAGS.faster_eval), 'use_3d_nms': FLAGS.
 print(CONFIG_DICT)
 print(FLAGS)
 def evaluate_one_epoch():
-    stat_dict = {}
-    ap_calculator_list = [APCalculator(iou_thresh, DATASET_CONFIG.class2type) \
-        for iou_thresh in AP_IOU_THRESHOLDS]
-    net.eval() # set model to eval mode (for bn and dp)
-    for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
-        if batch_idx % 10 == 0:
-            
-            print('Eval batch: %d'%(batch_idx))
-        # if batch_idx > 2:
-        #     break    
-        for key in batch_data_label:
-            batch_data_label[key] = batch_data_label[key].to(device)
+    for TEST_DATALOADER in TEST_DATALOADERS:
+        print("------------------------------------------{}-------------------------------------------".format(TEST_DATALOADER.dataset.thresh))
+        stat_dict = {}
+        ap_calculator_list = [APCalculator(iou_thresh, DATASET_CONFIG.class2type) \
+            for iou_thresh in AP_IOU_THRESHOLDS]
+        net.eval() # set model to eval mode (for bn and dp)
+
+        for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
+            if batch_idx % 10 == 0:
+                
+                print('Eval batch: %d'%(batch_idx))
+            # if batch_idx > 2:
+            #     break    
+            for key in batch_data_label:
+                batch_data_label[key] = batch_data_label[key].to(device)
+         
+            # Forward pass
+            inputs = {'point_clouds': batch_data_label['point_clouds']}
+            with torch.no_grad():
+                end_points = net(inputs)
+
+            # Compute loss
+            for key in batch_data_label:
+                assert(key not in end_points)
+                end_points[key] = batch_data_label[key]
+            loss, end_points = criterion(end_points, DATASET_CONFIG)
+            # print(loss)
+            # Accumulate statistics and print out
+            for key in end_points:
+                if 'loss' in key or 'acc' in key or 'ratio' in key:
+                    if key not in stat_dict: stat_dict[key] = 0
+                    stat_dict[key] += end_points[key].item()
+
+            batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT) 
+            batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT) 
+            for ap_calculator in ap_calculator_list:
+                ap_calculator.step(batch_pred_map_cls, batch_gt_map_cls)
         
-        # Forward pass
-        inputs = {'point_clouds': batch_data_label['point_clouds']}
-        with torch.no_grad():
-            end_points = net(inputs)
+            # Dump evaluation results for visualization
+            if batch_idx == 0:
+                MODEL.dump_results(end_points, DUMP_DIR, DATASET_CONFIG)
+            # if batch_idx >20:
+            #     break
+        # Log statistics
 
-        # Compute loss
-        for key in batch_data_label:
-            assert(key not in end_points)
-            end_points[key] = batch_data_label[key]
-        loss, end_points = criterion(end_points, DATASET_CONFIG)
-        # print(loss)
-        # Accumulate statistics and print out
-        for key in end_points:
-            if 'loss' in key or 'acc' in key or 'ratio' in key:
-                if key not in stat_dict: stat_dict[key] = 0
-                stat_dict[key] += end_points[key].item()
+        print("--------------------------------------END_OF_{}-------------------------------------------".format(TEST_DATALOADER.dataset.thresh))
+        # for key in sorted(stat_dict.keys()):
+        #     log_string('eval mean %s: %f'%(key, stat_dict[key]/(float(batch_idx+1))))
 
-        batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT) 
-        batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT) 
-        for ap_calculator in ap_calculator_list:
-            ap_calculator.step(batch_pred_map_cls, batch_gt_map_cls)
-    
-        # Dump evaluation results for visualization
-        if batch_idx == 0:
-            MODEL.dump_results(end_points, DUMP_DIR, DATASET_CONFIG)
-        # if batch_idx >20:
-        #     break
-    # Log statistics
-    for key in sorted(stat_dict.keys()):
-        log_string('eval mean %s: %f'%(key, stat_dict[key]/(float(batch_idx+1))))
-
-    # Evaluate average precision
-    for i, ap_calculator in enumerate(ap_calculator_list):
-        print('-'*10, 'iou_thresh: %f'%(AP_IOU_THRESHOLDS[i]), '-'*10)
-        metrics_dict = ap_calculator.compute_metrics()
-        for key in metrics_dict:
-            log_string('eval %s: %f'%(key, metrics_dict[key]))
-    # print("SKIPPING STATS")
-
-    mean_loss = stat_dict['loss']/float(batch_idx+1)
-    return mean_loss
+        # Evaluate average precision
+        for i, ap_calculator in enumerate(ap_calculator_list):
+            print('-'*10, 'iou_thresh: %f'%(AP_IOU_THRESHOLDS[i]), '-'*10)
+            metrics_dict = ap_calculator.compute_metrics()
+            for key in metrics_dict:
+                log_string('eval %s: %f'%(key, metrics_dict[key]))
+        # print("SKIPPING STATS")
+        
+        # mean_loss = stat_dict['loss']/float(batch_idx+1)
+        # return mean_loss
 
 
 def eval():

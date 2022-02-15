@@ -65,6 +65,7 @@ parser.add_argument('--num_batches',type=int,default=-1, help='Number of batches
 parser.add_argument('--ratio', type=float, default=1, help='Fractional [default: 1]')
 parser.add_argument('--dump_results', action='store_true', help='dump it or not')
 
+parser.add_argument('--thresholds', type=float,nargs="+", default=[0.3],help='thresholds for rejecting objects while loading frames')
 parser.add_argument('--chunk_size',type=int,default=120, help='Chunk size of a fraction.')
 FLAGS = parser.parse_args()
 
@@ -145,7 +146,33 @@ elif FLAGS.dataset == 'scannet':
                                             augment=False,
                                             use_color=FLAGS.use_color,
                                             use_height=(not FLAGS.no_height),custom_path=FLAGS.custom_path)
+elif FLAGS.dataset == 'scannet_frames':
 
+    # sys.path.append(os.path.join(ROOT_DIR, 'scannet'))
+    # sys.path.append(os.path.join(ROOT_DIR, 'scannet'))
+    # from scannet_frames_dataset import ScannetDetectionFramesDataset, MAX_NUM_OBJ
+    # from model_util_scannet import ScannetDatasetConfig
+    # DATASET_CONFIG = ScannetDatasetConfig()
+    # data_setting = {
+    #     "dataset_path":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/",
+    #     "train_source":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/train_frames.txt",
+    #     "eval_source":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/val_frames.txt",
+    #     "frames_path": "/home/yildirir/workspace/kerem/TorchSSC/DATA/scannet_frames_25k/"
+    # }
+    # TEST_DATASET = ScannetDetectionFramesDataset(data_setting,split_set="val",num_points=NUM_POINT,use_color=False,use_height=True,augment=False)
+    sys.path.append(os.path.join(ROOT_DIR, 'scannet'))
+    from scannet_frames_dataset import ScannetDetectionFramesDataset, MAX_NUM_OBJ
+    from model_util_scannet import ScannetDatasetConfig
+    DATASET_CONFIG = ScannetDatasetConfig()
+    data_setting = {
+        "dataset_path":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/",
+        "train_source":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/train_frames.txt",
+        "eval_source":"/home/yildirir/workspace/kerem/TorchSSC/DATA/ScanNet/val_frames.txt",
+        "frames_path": "/home/yildirir/workspace/kerem/TorchSSC/DATA/scannet_frames_25k/"
+    }
+    
+    TEST_DATASETS = [ScannetDetectionFramesDataset(data_setting,split_set="val",num_points=NUM_POINT,use_color=False,use_height=True,augment=False,thresh=t) for t in FLAGS.thresholds]
+         
 elif FLAGS.dataset == 'scannet_single_sanity':
     sys.path.append(os.path.join(ROOT_DIR, 'scannet'))
     from scannet_detection_dataset import ScannetDetectionDataset, MAX_NUM_OBJ
@@ -160,11 +187,11 @@ else:
     print('Unknown dataset %s. Exiting...' % (FLAGS.dataset))
     exit(-1)
 # print(len(TEST_DATASET))
-TEST_DATALOADER = DataLoader(TEST_DATASET,
+TEST_DATALOADERS =[ DataLoader(TEST_DATASET,
                              batch_size=BATCH_SIZE,
                              shuffle=FLAGS.shuffle_dataset,
                              num_workers=1,
-                             worker_init_fn=my_worker_init_fn)
+                             worker_init_fn=my_worker_init_fn) for TEST_DATASET in TEST_DATASETS]
 
 # TEST_DATALOADERS = [DataLoader(TEST_DATASETS[i],
 #                              batch_size=BATCH_SIZE,
@@ -257,68 +284,73 @@ def evaluate_one_epoch_with_uncertainties_mc():
     net.eval()  # set model sem_cls_probs[i,j,ii]to eval mode (for bn and dp)
     net.enable_dropouts()
     
-    
-    for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
-        if batch_idx % 10 == 0:
-            print('Eval batch: %d' % (batch_idx))
+    for TEST_DATALOADER in TEST_DATALOADERS: 
 
-        if batch_idx == FLAGS.num_batches:
-            
-            break
-        for key in batch_data_label:
-            batch_data_label[key] = batch_data_label[key].to(device)
-
-        # Forward pass
-        inputs = {'point_clouds': batch_data_label['point_clouds']}
-        loss = np.zeros([NUM_SAMPLES])
-        with torch.no_grad():
-            mc_samples = [net(inputs) for i in range(NUM_SAMPLES)]
-
-        # print("Batch ",batch_idx, " samples done")
-        #NEED TO UNDO
-        # dump_results_for_sanity_check(batch_data_label,FLAGS.dump_dir,DATASET_CONFIG)
-    #     # Compute loss
-        for idx, end_points in enumerate(mc_samples):
+        print("------------------------------------------{}-------------------------------------------".format(TEST_DATALOADER.dataset.thresh))
+        for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
+            if batch_idx % 10 == 0:
+                print('Eval batch: %d' % (batch_idx))
+            if batch_idx < 2:
+                continue
+            if batch_idx == FLAGS.num_batches:
+                
+                break
             for key in batch_data_label:
-                assert (key not in end_points)
-                end_points[key] = batch_data_label[key]
-            local_loss, end_points = criterion(end_points, DATASET_CONFIG)
+                if key != 'name':
+                    batch_data_label[key] = batch_data_label[key].to(device)
+
+            # Forward pass
+            inputs = {'point_clouds': batch_data_label['point_clouds'],'name':batch_data_label["name"]}
+            loss = np.zeros([NUM_SAMPLES])
+            with torch.no_grad():
+                mc_samples = [net(inputs) for i in range(NUM_SAMPLES)]
+
+            # print("Batch ",batch_idx, " samples done")
+            #NEED TO UNDO
+            # dump_results_for_sanity_check(batch_data_label,FLAGS.dump_dir,DATASET_CONFIG)
+        #     # Compute loss
+            for idx, end_points in enumerate(mc_samples):
+                for key in batch_data_label:
+                    assert (key not in end_points)
+                    end_points[key] = batch_data_label[key]
+                local_loss, end_points = criterion(end_points, DATASET_CONFIG)
 
 
-    #     # center_uncertainty(mc_samples)        
-    #     #This guy has len(methods) elements
-        import copy
-        # print("Predictions parsing")
-        batch_pred_map_cls =[parse_predictions_ensemble(copy.deepcopy(mc_samples), CONFIG_DICT,m,FLAGS.expected_ent) for m in methods]
-        # print("Predictions computed")
-        bsize = FLAGS.batch_size
+        #     # center_uncertainty(mc_samples)        
+        #     #This guy has len(methods) elements
+            import copy
+            # print("Predictions parsing")
+            batch_pred_map_cls =[parse_predictions_ensemble(copy.deepcopy(mc_samples), CONFIG_DICT,m,FLAGS.expected_ent) for m in methods]
+            # print("Predictions computed")
+            bsize = FLAGS.batch_size
+            
+            for idx,m in enumerate(methods):
+                num_proposals = np.array([np.sum(len(batch_pred_map_cls[idx][i]) for i in range(bsize))]) # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
+                obj_and_cls_uncertainties = np.array([np.sum([ (a[2]) for a in batch_pred_map_cls[idx][i]]) for i in range(bsize)]) # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
+                # print("{} {} {}".format(m,np.sum(num_proposals),obj_and_cls_uncertainties.sum()))
+                unc_dict[m] += np.array([np.sum(num_proposals),obj_and_cls_uncertainties.sum()])
+            org_batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
+            
+
+            for idx,m in enumerate(methods):
+                for ap_calculator in met_dict[m]:
+                    ap_calculator.step(batch_pred_map_cls[idx], org_batch_gt_map_cls)
+
+
         
+        for k in unc_dict.keys():
+            summed_elem = unc_dict[k]
+            # print("{} {}".format(k,summed_elem/len(TEST_DATASET)))
         for idx,m in enumerate(methods):
-            num_proposals = np.array([np.sum(len(batch_pred_map_cls[idx][i]) for i in range(bsize))]) # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
-            obj_and_cls_uncertainties = np.array([np.sum([ (a[2]) for a in batch_pred_map_cls[idx][i]]) for i in range(bsize)]) # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
-            # print("{} {} {}".format(m,np.sum(num_proposals),obj_and_cls_uncertainties.sum()))
-            unc_dict[m] += np.array([np.sum(num_proposals),obj_and_cls_uncertainties.sum()])
-        org_batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
-        
-
-        for idx,m in enumerate(methods):
+            print("|",m,"|","| ")
             for ap_calculator in met_dict[m]:
-                ap_calculator.step(batch_pred_map_cls[idx], org_batch_gt_map_cls)
-
-
-    
-    for k in unc_dict.keys():
-        summed_elem = unc_dict[k]
-        print("{} {}".format(k,summed_elem/len(TEST_DATASET)))
-    for idx,m in enumerate(methods):
-        print("|",m,"|","| ")
-        for ap_calculator in met_dict[m]:
-            print('|', 'iou_thresh | %f  ' % (ap_calculator.ap_iou_thresh), ' | ')
-            metrics_dict = ap_calculator.compute_metrics()
-            for key in metrics_dict:
-                if key == "mAP" or key == "AR":
-                    log_string(' | %s  | %f | ' % (key,metrics_dict[key]))
-
+                print('|', 'iou_thresh | %f  ' % (ap_calculator.ap_iou_thresh), ' | ')
+                metrics_dict = ap_calculator.compute_metrics()
+                for key in metrics_dict:
+                    if key == "mAP" or key == "AR":
+                        log_string(' | %s  | %f | ' % (key,metrics_dict[key]))
+        
+        print("------------------------------------------END OF {}-------------------------------------------".format(TEST_DATALOADER.dataset.thresh))
 def compute_uncertainties_mc():
     stat_dict = {}
     # tb = SummaryWriter(FLAGS.logdir)
@@ -338,6 +370,7 @@ def compute_uncertainties_mc():
     
     entropies = []
     for batch_idx, batch_data_label in enumerate(TEST_DATALOADER):
+        print("INSIDE")
         if batch_idx % 10 == 0:
             print('Eval batch: %d' % (batch_idx))
 
@@ -357,8 +390,9 @@ def compute_uncertainties_mc():
             for key in batch_data_label:
                 assert (key not in end_points)
                 end_points[key] = batch_data_label[key]
-        # dump_results_for_sanity_check(end_points,FLAGS.DUMP_DIR, DATASET_CONFIG )
-
+        
+        dump_results_for_sanity_check(end_points,FLAGS.DUMP_DIR, DATASET_CONFIG )
+        """
         #NEED TO UNDO
         if FLAGS.dump_results:
             if not os.path.exists(FLAGS.dump_dir + "_batch_{}".format(batch_idx)):
@@ -415,7 +449,7 @@ def compute_uncertainties_mc():
     with open(FLAGS.unselected_path,"w+") as f:
         for idx,n in enumerate(unselected_scan_names):
             f.write(str(n) + "\n")    
-        
+        """
         
 def evaluate_one_epoch_with_uncertainties_augmented():
     stat_dict = {}

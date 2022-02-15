@@ -707,7 +707,8 @@ def parse_predictions_ensemble(mc_samples, config_dict,extension = None,expected
             #         final_mask[i,j] = 1
     # print("*******************")
     end_points['batch_pred_map_cls'] = batch_pred_map_cls
-    
+    print(extension,sum([len(a) for a in batch_pred_map_cls]),obj_prob) 
+
     # end_points["final_masks"] = final_mask
     return batch_pred_map_cls
 

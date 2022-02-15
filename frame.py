@@ -30,14 +30,14 @@ data_setting = {
     "frames_path": "/home/yildirir/workspace/kerem/TorchSSC/DATA/scannet_frames_25k/"
 
 }
-TRAIN_DATASET = ScannetDetectionFramesDataset(data_setting,split_set="train",num_points=NUM_POINT,use_color=False,use_height=True,augment=False)
+
+threshes = [0.3,0.5,0.7, 0.8]
+
+for t in threshes:
+    TRAIN_DATASET = ScannetDetectionFramesDataset(data_setting,split_set="train",num_points=NUM_POINT,use_color=False,use_height=True,augment=False,thresh=t)
+    print(len(TRAIN_DATASET))
     
-TRAIN_DATASET_WHOLE= ScannetDetectionDataset('train', num_points=NUM_POINT,augment=True,use_color=False, use_height=True)
+# TRAIN_DATASET_WHOLE= ScannetDetectionDataset('train', num_points=NUM_POINT,augment=True,use_color=False, use_height=True)
  
-elem = TRAIN_DATASET[90]
-scene_elem = TRAIN_DATASET_WHOLE[170]
-# dump_results_for_sanity_check(elem,dump_dir=".",config=DC)
-print(elem.keys())
-for idx,(val1,val2) in enumerate(zip(list(elem.values()),list(scene_elem.values()))):
-    # print(val1.shape,val2.shape)
-    print(list(elem.keys())[idx],np.unique(val1),np.unique(val2)) 
+
+

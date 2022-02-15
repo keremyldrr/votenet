@@ -12,7 +12,7 @@ from varname import nameof
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'utils'))
-from backbone_module import Pointnet2Backbone
+#from backbone_module import Pointet2Backbone
 
 import pc_util
 from matplotlib import cm
@@ -311,6 +311,7 @@ def dump_results_for_sanity_check(end_points, dump_dir, config, inference_switch
         for j in range(gt_center.shape[1]):
             if gt_mask[i,j] == 0: continue
             #center is rotated here if needed 
+            print("HC HR SC SR",gt_heading_class[i,j], gt_heading_residual[i,j],gt_size_class[i,j],gt_size_residual[i,j])
             obb = config.param2obb(gt_center[i,j,0:3], gt_heading_class[i,j], gt_heading_residual[i,j],
                             gt_size_class[i,j], gt_size_residual[i,j])
             obbs.append(obb)

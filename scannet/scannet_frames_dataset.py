@@ -7,8 +7,10 @@
 An axis aligned bounding box is parameterized by (cx,cy,cz) and (dx,dy,dz)
 where (cx,cy,cz) is the center point of the box, dx is the x-axis length of the box.
 """
+import time
 import os
 import sys
+from time import thread_time
 import numpy as np
 import cv2
 from torch.utils.data import Dataset
@@ -37,7 +39,8 @@ class ScannetDetectionFramesDataset(Dataset):
                  num_points=20000,
                  use_color=False,
                  use_height=False,
-                 augment=False):
+                 augment=False,
+                 thresh = 0.3):
         """[summary]
 
         Args:
@@ -54,14 +57,13 @@ from pandas.core.dtypes.common import classes
         self._path = setting['dataset_path']
         self._train_source = setting['train_source']
         self._eval_source = setting['eval_source']
-        self._file_names = self._get_file_names(split_set)
-        self._file_length = len(self._file_names)
         self._frames_path = setting["frames_path"]
-        self.scan_names = self._get_file_names(split_set)
-        inds = np.arange(len(self.scan_names)).astype(int)
-        np.random.shuffle(inds)
-        self.scan_names =np.array(self.scan_names)[inds][:1000]
+        self.thresh = thresh
+        self.scan_names = self._get_file_names(split_set,thresh)
+                 
+
         self.num_points = num_points
+        self._file_length = len(self.scan_names)
         self.use_color = use_color
         self.use_height = use_height
         self.augment = augment
@@ -69,7 +71,8 @@ from pandas.core.dtypes.common import classes
     def __len__(self):
         return len(self.scan_names)
 
-    def _get_file_names(self, split_name):
+
+    def _get_file_names(self, split_name,thresh=.3):
         assert split_name in ['train', 'val']
         source = self._train_source
         if split_name == "val":
@@ -78,13 +81,30 @@ from pandas.core.dtypes.common import classes
         file_names = []
         with open(source) as f:
             files = f.readlines()
-
-        for item in files:
+        #files = files[:500]
+        print("Recreating files")  
+        st = time.time()
+        for item in files[:]:
             item = item.strip()
             item = item.split('\t')
             img_name = item[0]
-            file_names.append([img_name, None])
+            item_idx = img_name
+            scene_name = item_idx[:item_idx.rfind("_")]
+            unformatted = item_idx[item_idx.rfind("_") + 1:]
 
+            instancedir = os.path.join(self._path, scene_name, "PCD",
+                                   "instances_{}".format(unformatted))
+
+            objs_in_scene = os.listdir(instancedir)        
+            # instances = get_instance_boxes(instancedir,with_classes=False,thresh=thresh)
+            
+            scores = np.array([float(a[:-4].split("_")[5]) for a in objs_in_scene])
+            if len(scores[scores > thresh]) > 0:
+                file_names.append([img_name,None])
+        with open("{}_{}.txt".format(str(thresh),split_name),"w") as out:
+            for f in file_names:
+                out.write(f[0] + "\n")
+        print("Dataset created with size ", len(file_names), " took ",  time.time() - st, "seconds") 
         return file_names
 
     def __getitem__(self, idx):
@@ -240,6 +260,7 @@ from pandas.core.dtypes.common import classes
         ret_dict['scan_idx'] = torch.from_numpy(np.array(idx).astype(np.int64))
 
         ret_dict['pcl_color'] = (pcl_color)
+        ret_dict['name'] = item_idx
         return ret_dict
 
 

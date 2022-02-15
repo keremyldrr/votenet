@@ -1,4 +1,5 @@
 import numpy as np
+import trimesh
 from numpy.core.defchararray import center
 import torch
 import os
@@ -14,6 +15,7 @@ def softmax(x):
     ''' Numpy function for softmax'''
     shape = x.shape
     probs = np.exp(x - np.max(x, axis=len(shape) - 1, keepdims=True))
+    
     probs /= np.sum(probs, axis=len(shape) - 1, keepdims=True)
     return probs
 
@@ -108,10 +110,15 @@ def semantic_cls_uncertainty(samples,threshold = None,classification=None):
         mi = predictive_entropy - expected_entropy
     else:
         mi = predictive_entropy
-
-    normalized_mi = map_zero_one(mi)
-    # print("Mean classification entropy", normalized_mi.mean())
-
+    normalized_mi = np.zeros_like(mi)
+    for i in range(len(mi)):
+        # print("item ",(samples[0]["names"][i]))
+        normalized_mi[i] = map_zero_one(mi[i])
+        # trimesh.points.PointCloud(samples[0]["point_clouds"][i,:,:3].cpu().numpy()).export("{}.ply".format(samples[0]["names"][i]))
+        
+    # # print("Mean classification entropy", normalized_mi.mean())
+    # print(normalized_mi)
+    # raise NotImplementedError
     if threshold != None:
         mi_mask =np.array((normalized_mi < threshold),dtype=np.int)
     else:
@@ -129,7 +136,10 @@ def objectness_uncertainty(samples,threshold = None,classification=None):
         mi_obj = predictive_entropy_obj - expected_entropy_obj
     else:
         mi_obj = predictive_entropy_obj
-    normalized_mi_obj = map_zero_one(mi_obj)
+    normalized_mi_obj = np.zeros_like(mi_obj) 
+    for i in range(len(mi_obj)):
+        # print("item ",(samples[0]["names"][i]))
+        normalized_mi_obj[i] = map_zero_one(mi_obj[i])
     # print("Mean objectness entropy",normalized_mi_obj.mean())
 
     if threshold != None:
@@ -327,6 +337,7 @@ def map_zero_one(A):
     Maps a given array to the interval [0,1]
     """
     # return A
+    # print("MI max and min ",A.max(),A.min())
     A_std = (A - A.min())/(A.max()-A.min())
     retval = A_std * (A.max() - A.min()) + A.min()
     return A_std
