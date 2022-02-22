@@ -17,7 +17,9 @@ class Visualizer():
         # self.opt = opt
         #self.logger = tf_logger.Logger(os.path.join(FLAGS.logging_dir, FLAGS.name))
         #self.log_name = os.path.join(FLAGS.checkpoint_dir, FLAGS.name, 'loss_log.txt')
+
         self.logger = tf_logger.MyLogger(os.path.join(FLAGS.LOG_DIR, name))
+        print(self.logger.writer.log_dir)
         self.log_name = os.path.join(FLAGS.LOG_DIR, 'tf_visualizer_log.txt')
         with open(self.log_name, "a") as log_file:
             now = time.strftime("%c")

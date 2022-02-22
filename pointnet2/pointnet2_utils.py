@@ -1,9 +1,9 @@
 # Copyright (c) Facebook, Inc. and its affiliates.
-# 
+#
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-''' Modified based on: https://github.com/erikwijmans/Pointnet2_PyTorch '''
+""" Modified based on: https://github.com/erikwijmans/Pointnet2_PyTorch """
 from __future__ import (
     division,
     absolute_import,
@@ -24,7 +24,8 @@ except:
 
 try:
     import pointnet2._ext as _ext
-except ImportError:
+except Exception as e:
+    print(e)
     if not getattr(builtins, "__POINTNET2_SETUP__", False):
         raise ImportError(
             "Could not import _ext module.\n"
@@ -303,7 +304,16 @@ class QueryAndGroup(nn.Module):
         Maximum number of features to gather in the ball
     """
 
-    def __init__(self, radius, nsample, use_xyz=True, ret_grouped_xyz=False, normalize_xyz=False, sample_uniformly=False, ret_unique_cnt=False):
+    def __init__(
+        self,
+        radius,
+        nsample,
+        use_xyz=True,
+        ret_grouped_xyz=False,
+        normalize_xyz=False,
+        sample_uniformly=False,
+        ret_unique_cnt=False,
+    ):
         # type: (QueryAndGroup, float, int, bool) -> None
         super(QueryAndGroup, self).__init__()
         self.radius, self.nsample, self.use_xyz = radius, nsample, use_xyz
@@ -312,7 +322,7 @@ class QueryAndGroup(nn.Module):
         self.sample_uniformly = sample_uniformly
         self.ret_unique_cnt = ret_unique_cnt
         if self.ret_unique_cnt:
-            assert(self.sample_uniformly)
+            assert self.sample_uniformly
 
     def forward(self, xyz, new_xyz, features=None):
         # type: (QueryAndGroup, torch.Tensor. torch.Tensor, torch.Tensor) -> Tuple[Torch.Tensor]
@@ -340,10 +350,11 @@ class QueryAndGroup(nn.Module):
                     unique_ind = torch.unique(idx[i_batch, i_region, :])
                     num_unique = unique_ind.shape[0]
                     unique_cnt[i_batch, i_region] = num_unique
-                    sample_ind = torch.randint(0, num_unique, (self.nsample - num_unique,), dtype=torch.long)
+                    sample_ind = torch.randint(
+                        0, num_unique, (self.nsample - num_unique,), dtype=torch.long
+                    )
                     all_ind = torch.cat((unique_ind, unique_ind[sample_ind]))
                     idx[i_batch, i_region, :] = all_ind
-
 
         xyz_trans = xyz.transpose(1, 2).contiguous()
         grouped_xyz = grouping_operation(xyz_trans, idx)  # (B, 3, npoint, nsample)

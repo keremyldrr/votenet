@@ -167,8 +167,10 @@ def evaluate_one_epoch():
             # if batch_idx > 2:
             #     break    
             for key in batch_data_label:
-                batch_data_label[key] = batch_data_label[key].to(device)
-         
+                try:
+                    batch_data_label[key] = batch_data_label[key].to(device)
+                except Exception as e:
+                    print(e)
             # Forward pass
             inputs = {'point_clouds': batch_data_label['point_clouds']}
             with torch.no_grad():

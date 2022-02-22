@@ -277,7 +277,7 @@ def get_instance_boxes(instancedir,with_classes=False, thresh=0.3):
     instances = np.array(sorted(os.listdir(instancedir)))
     scores = np.array([float(a[:-4].split("_")[5]) for a in instances])
     classes =  np.array([float(a[:-4].split("_")[3]) for a in instances])
-     
+    # print(classes,scores)
     boxes = [trimesh.load(os.path.join(instancedir, i)).bounding_box.vertices for i in instances[scores > thresh]]
     # DONE: get the classses here
     if with_classes == False:
