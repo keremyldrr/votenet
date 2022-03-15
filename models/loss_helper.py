@@ -16,6 +16,8 @@ ROOT_DIR = os.path.dirname(BASE_DIR)
 # sys.path.append(os.path.join(ROOT_DIR, "utils"))
 from nn_distance import nn_distance, huber_loss
 
+from ap_helper import sample_centers
+
 FAR_THRESHOLD = 0.6
 NEAR_THRESHOLD = 0.3
 GT_VOTE_FACTOR = 3  # number of GT votes per point
@@ -159,13 +161,16 @@ def compute_box_and_sem_cls_loss(end_points, config):
     box_label_mask = end_points["box_label_mask"]
     objectness_label = end_points["objectness_label"].float()
     # Compute NLL for center uncertainty
-    log_vars = end_points["log_vars"]
     num_boxes = (gt_center.sum(-1) != 0).sum(1)
 
     log_var_per_gt_box = []
-    if log_vars is None:
-        center_nll = 0
+    if end_points["log_vars"] is None:
+
+        log_vars = None  # end_points["log_vars"] * objectness_label
+        center_nll = torch.Tensor([0]).cuda()
     else:
+
+        log_vars = end_points["log_vars"] * objectness_label
         for batch in range(gt_center.shape[0]):
             nb_in_frame = num_boxes[batch]
             log_var_per_gt_box.append([])
@@ -177,14 +182,13 @@ def compute_box_and_sem_cls_loss(end_points, config):
                 # print(objectness_scores.shape)
                 # pdb.set_trace()
                 log_var_per_gt_box[batch].append((proposals, objectness_scores))
-
         # pdb.set_trace()
         precision = torch.exp(log_vars)
         diff = dist1 * objectness_label
+        # print(precision.max(), log_vars.min())
         center_nll = torch.sum(diff / (precision + 1e-6) + log_vars) / (
             torch.sum(objectness_label) + 1e-6
         )
-
     end_points["log_var_per_gt"] = log_var_per_gt_box
     # ddcenter_nll = 0
     centroid_reg_loss1 = torch.sum(dist1 * objectness_label) / (
@@ -193,10 +197,11 @@ def compute_box_and_sem_cls_loss(end_points, config):
     centroid_reg_loss2 = torch.sum(dist2 * box_label_mask) / (
         torch.sum(box_label_mask) + 1e-6
     )
-    center_loss = (
-        0.001 * center_nll + centroid_reg_loss1 + centroid_reg_loss2
-    )  # FIXME find a good coefficient for nll
 
+    center_loss = (
+        center_nll * 1e-2 + centroid_reg_loss1 + centroid_reg_loss2
+    )  # FIXME find a good coefficient for nll
+    # center_loss = center_nll
     # Compute heading loss
     heading_class_label = torch.gather(
         end_points["heading_class_label"], 1, object_assignment
@@ -238,6 +243,7 @@ def compute_box_and_sem_cls_loss(end_points, config):
     size_class_label = torch.gather(
         end_points["size_class_label"], 1, object_assignment
     )  # select (B,K) from (B,K2)
+
     criterion_size_class = nn.CrossEntropyLoss(reduction="none")
     size_class_loss = criterion_size_class(
         end_points["size_scores"].transpose(2, 1), size_class_label
@@ -262,14 +268,14 @@ def compute_box_and_sem_cls_loss(end_points, config):
     )  # (B,K,num_size_cluster,3)
     predicted_size_residual_normalized = torch.sum(
         end_points["size_residuals_normalized"] * size_label_one_hot_tiled, 2
-    )  # (B,K,3)
+    )  # (B,K,3)s
 
     mean_size_arr_expanded = (
         torch.from_numpy(mean_size_arr.astype(np.float32))
         .cuda()
         .unsqueeze(0)
         .unsqueeze(0)
-    )  # (1,1,num_size_cluster,3)
+    )  # (1,1,num_size_cluster,3    )
     mean_size_label = torch.sum(
         size_label_one_hot_tiled * mean_size_arr_expanded, 2
     )  # (B,K,3)
@@ -347,6 +353,14 @@ def get_loss(end_points, config):
     end_points["objectness_label"] = objectness_label
     end_points["objectness_mask"] = objectness_mask
     end_points["object_assignment"] = object_assignment
+
+    sample_centers(end_points, {"num_samples": config.num_samples})
+    dist1, ind1, dist2, _ = nn_distance(
+        end_points["center"], end_points["center_label"]
+    )  # dist1: BxK, dist2: BxK2
+
+    end_points["object_assignment"] = ind1
+
     total_num_proposal = objectness_label.shape[0] * objectness_label.shape[1]
     end_points["pos_ratio"] = torch.sum(objectness_label.float().cuda()) / float(
         total_num_proposal
@@ -384,6 +398,7 @@ def get_loss(end_points, config):
 
     # Final loss function
     loss = vote_loss + 0.5 * objectness_loss + box_loss + 0.1 * sem_cls_loss
+    # loss = center_loss
     loss *= 10
     end_points["loss"] = loss
 

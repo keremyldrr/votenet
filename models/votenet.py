@@ -53,7 +53,7 @@ class VoteNet(nn.Module):
         num_proposal=128,
         vote_factor=1,
         sampling="vote_fps",
-        log_var=False,
+        log_var=True,
     ):
         super().__init__()
 

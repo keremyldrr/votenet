@@ -10,15 +10,40 @@ import os
 import sys
 from varname import nameof
 import trimesh
-from models import ap_helper
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(os.path.join(ROOT_DIR, "utils"))
 # from backbone_module import Pointet2Backbone
-
+sys.path.append(os.path.join(ROOT_DIR, "models"))
+import ap_helper
 import pc_util
 from matplotlib import cm
+
+mydict = {
+    "cabinet": 0,
+    "bed": 1,
+    "chair": 2,
+    "sofa": 3,
+    "table": 4,
+    "door": 5,
+    "window": 6,
+    "bookshelf": 7,
+    "picture": 8,
+    "counter": 9,
+    "desk": 10,
+    "curtain": 11,
+    "refrigerator": 12,
+    "showercurtrain": 13,
+    "toilet": 14,
+    "sink": 15,
+    "bathtub": 16,
+    "garbagebin": 17,
+}
+revDict = {}
+for a in mydict.keys():
+    revDict[mydict[a]] = a
+
 
 viridis = cm.get_cmap("jet", 64)
 DUMP_CONF_THRESH = 0.5  # Dump boxes with obj prob larger than that.
@@ -47,11 +72,15 @@ def dump_only_boxes_gt(boxes, dump_dir):
             # print("cls", cls)
             # print("bbox", bbox)
 
-            filename = "gt_{}_{}_{}.ply".format(bidx, iidx, cls)
+            filename = "gt_{}_{}_{}_bbox.ply".format(bidx, iidx, revDict[cls])
 
+            filename_center = "gt_{}_{}_{}_center.ply".format(bidx, iidx, revDict[cls])
             path = os.path.join(dump_dir, filename)
-            ss = ap_helper.flip_axis_to_depth(bbox)
+            path_center = os.path.join(dump_dir, filename_center)
+            ss = bbox  # ap_helper.flip_axis_to_depth(bbox)
             trimesh.points.PointCloud(ss).convex_hull.export(path)
+
+            trimesh.points.PointCloud([ss.mean(0)]).export(path_center)
 
 
 def dump_only_boxes(boxes, dump_dir):
@@ -61,9 +90,33 @@ def dump_only_boxes(boxes, dump_dir):
                           pred_variances[i, j],
 
     """
-    N = 10  # num samples
+    mydict = {
+        "cabinet": 0,
+        "bed": 1,
+        "chair": 2,
+        "sofa": 3,
+        "table": 4,
+        "door": 5,
+        "window": 6,
+        "bookshelf": 7,
+        "picture": 8,
+        "counter": 9,
+        "desk": 10,
+        "curtain": 11,
+        "refrigerator": 12,
+        "showercurtrain": 13,
+        "toilet": 14,
+        "sink": 15,
+        "bathtub": 16,
+        "garbagebin": 17,
+    }
+    revDict = {}
+    for a in mydict.keys():
+        revDict[mydict[a]] = a
+
+    N = 1  # num samples
     for bidx, item in enumerate(boxes):
-        print(item[0])
+        # print(item[0])
         for iidx, q in enumerate(item):
             cls, var, bbox = q
             # print("bidx", bidx)
@@ -74,11 +127,19 @@ def dump_only_boxes(boxes, dump_dir):
             sampled_boxes = [bbox + np.random.randn(3) * var.item() for i in range(N)]
 
             for idx, ss in enumerate(sampled_boxes):
-                filename = "{}_{}_{}_{}.ply".format(bidx, iidx, cls, idx)
+                filename = "{}_{}_{}_{}_{}_box.ply".format(
+                    bidx, iidx, revDict[cls], idx, var
+                )
+                filename_center = "{}_{}_{}_{}_{}_center.ply".format(
+                    bidx, iidx, revDict[cls], idx, var
+                )
 
                 path = os.path.join(dump_dir, filename)
+                path_center = os.path.join(dump_dir, filename_center)
                 ss = ap_helper.flip_axis_to_depth(ss)
                 trimesh.points.PointCloud(ss).convex_hull.export(path)
+
+                trimesh.points.PointCloud([ss.mean(0)]).export(path_center)
 
 
 def dump_results(end_points, dump_dir, config, inference_switch=False):

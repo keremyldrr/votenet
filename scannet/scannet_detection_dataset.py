@@ -15,10 +15,11 @@ from torch.utils.data import Dataset
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
-import utils.pc_util as pc_util
-from scannet.model_util_scannet import rotate_aligned_boxes
+sys.path.append(ROOT_DIR)
+import pc_util as pc_util
+from model_util_scannet import rotate_aligned_boxes
 
-from scannet.model_util_scannet import ScannetDatasetConfig
+from model_util_scannet import ScannetDatasetConfig
 
 DC = ScannetDatasetConfig()
 MAX_NUM_OBJ = 64
@@ -93,7 +94,6 @@ class ScannetDetectionDataset(Dataset):
                 # print('kept {} scans out of {}'.format(len(self.scan_names), num_scans))
                 # TODO: Dont forget to shuffle back
                 num_scans = len(self.scan_names)
-                # np.random.seed(99)
                 inds = np.arange(num_scans)
                 # np.random.shuffle(inds)
                 inds = inds[: np.int(ratio * num_scans)]

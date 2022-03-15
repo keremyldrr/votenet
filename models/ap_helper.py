@@ -8,6 +8,7 @@ import os
 import sys
 import numpy as np
 import torch
+import pdb
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
@@ -52,80 +53,74 @@ def softmax(x):
     return probs
 
 
-def end_pts_to_bb(
-    end_points,
-    config_dict,
+def sample_centers(end_points, config):
+    pred_mean = end_points["center"]
+    if end_points["log_vars"] is None:
+        return
+    pred_var = torch.exp(end_points["log_vars"]) ** 0.5
+    bsize = pred_mean.shape[0]
+    N = config["num_samples"]
+    gt_center = end_points["center_label"][:, :, 0:3]
+    for i in range(bsize):
+
+        gt_centers = gt_center[i]
+        samples = [
+            np.multiply(pred_var[i].cpu().numpy(), np.random.randn(256, 3).T).T
+            + pred_mean[i].cpu().numpy()
+            for _ in range(N)
+        ]
+        # samples = []
+        samples.append(pred_mean[i].cpu().numpy())
+        dists = []
+        inds = []
+        for s in samples:
+            dist1, inds1, dist2, _ = nn_distance(
+                torch.from_numpy(s).unsqueeze(0).cuda().float(), gt_centers.unsqueeze(0)
+            )
+            inds.append(inds1)
+            dists.append(dist1)
+
+            # pdb.set_trace()
+        samples = torch.Tensor(samples)
+        inds = torch.cat(inds)
+        # print([a.sum() for a in dists])
+        # pdb.set_trace()
+        selected_centers = []
+        min_dists = torch.min(torch.cat(dists, 0), 0)[1]
+        # pdb.set_trace()
+        dists = torch.stack(dists).squeeze(1)
+        for idx, j in enumerate(min_dists):
+            if idx == len(min_dists):
+                break
+            if inds[-1][idx] == inds[j][idx]:
+                # print("better", idx, dists[-1][idx], dists[j][idx])
+                selected_centers.append(samples[j][idx])
+            else:
+
+                # print("wrong", idx, dists[-1][idx], dists[j][idx])
+                # selected_centers.append(samples[-1][idx])
+
+                selected_centers.append(samples[j][idx])
+        # selected_inds = torch.stack(
+        #     [inds[j][idx] for idx, j in enumerate(torch.min(torch.cat(dists, 0), 0)[1])]
+        # )
+        # refined = torch.stack(selected_centers)
+
+        end_points["center"][i] = torch.stack(selected_centers)
+
+
+# d1, _, _, _ = nn_distance(
+#     end_points["center"][i].unsqueeze(0), gt_centers.unsqueeze(0)
+# )
+# print(d1.sum())
+
+
+def construct_boxes_and_nms(
+    end_points, config_dict, pred_corners_3d_upright_camera, nonempty_box_mask
 ):
-    pred_center = end_points["center"]  # B,num_proposal,3
-    pred_variances = torch.exp(end_points["log_vars"]) ** 0.5
-
-    pred_heading_class = torch.argmax(
-        end_points["heading_scores"], -1
-    )  # B,num_proposal
-    pred_heading_residual = torch.gather(
-        end_points["heading_residuals"], 2, pred_heading_class.unsqueeze(-1)
-    )  # B,num_proposal,1
-    pred_heading_residual.squeeze_(2)
-    pred_size_class = torch.argmax(end_points["size_scores"], -1)  # B,num_proposal
-    pred_size_residual = torch.gather(
-        end_points["size_residuals"],
-        2,
-        pred_size_class.unsqueeze(-1).unsqueeze(-1).repeat(1, 1, 1, 3),
-    )  # B,num_proposal,1,3
-    pred_size_residual.squeeze_(2)
-    pred_sem_cls = torch.argmax(end_points["sem_cls_scores"], -1)  # B,num_proposal
-    num_proposal = pred_center.shape[1]
-    # Since we operate in upright_depth coord for points, while util functions
-    # assume upright_camera coord.
+    pred_center = end_points["center"]
     bsize = pred_center.shape[0]
-    pred_corners_3d_upright_camera = np.zeros((bsize, num_proposal, 8, 3))
-    pred_center_upright_camera = flip_axis_to_camera(pred_center.detach().cpu().numpy())
-    for i in range(bsize):
-        for j in range(num_proposal):
-            heading_angle = config_dict["dataset_config"].class2angle(
-                pred_heading_class[i, j].detach().cpu().numpy(),
-                pred_heading_residual[i, j].detach().cpu().numpy(),
-            )
-            box_size = config_dict["dataset_config"].class2size(
-                int(pred_size_class[i, j].detach().cpu().numpy()),
-                pred_size_residual[i, j].detach().cpu().numpy(),
-            )
-            corners_3d_upright_camera = get_3d_box(
-                box_size, heading_angle, pred_center_upright_camera[i, j, :]
-            )
-            pred_center.shape[0]
-    pred_corners_3d_upright_camera = np.zeros((bsize, num_proposal, 8, 3))
-
-    pred_center_upright_camera = flip_axis_to_camera(pred_center.detach().cpu().numpy())
-    for i in range(bsize):
-        for j in range(num_proposal):
-            heading_angle = config_dict["dataset_config"].class2angle(
-                pred_heading_class[i, j].detach().cpu().numpy(),
-                pred_heading_residual[i, j].detach().cpu().numpy(),
-            )
-            box_size = config_dict["dataset_config"].class2size(
-                int(pred_size_class[i, j].detach().cpu().numpy()),
-                pred_size_residual[i, j].detach().cpu().numpy(),
-            )
-            corners_3d_upright_camera = get_3d_box(
-                box_size, heading_angle, pred_center_upright_camera[i, j, :]
-            )
-            pred_corners_3d_upright_camera[i, j] = corners_3d_upright_camera
-            # pred_box_sizes[i, j] = (
-            #     np.linalg.norm(
-            #         corners_3d_upright_camera[0] - corners_3d_upright_camera[1]
-            #     )
-            #     * np.linalg.norm(
-            #         corners_3d_upright_camera[2] - corners_3d_upright_camera[1]
-            #     )
-            #     * np.linalg.norm(
-            #         corners_3d_upright_camera[4] - corners_3d_upright_camera[1]
-            #     )
-            # )
-
-    K = pred_center.shape[1]  # K==num_proposal
-    nonempty_box_mask = np.ones((bsize, K))
-    end_points["raw_pred_boxes"] = pred_corners_3d_upright_camera
+    K = pred_center.shape[1]
     if config_dict["remove_empty_box"]:
         # -------------------------------------
         # Remove predicted boxes without any point within them..
@@ -135,15 +130,19 @@ def end_pts_to_bb(
             for j in range(K):
 
                 box3d = pred_corners_3d_upright_camera[i, j, :, :]  # (8,3)
-                if not noflip:
-                    box3d = flip_axis_to_depth(box3d)
+                box3d = flip_axis_to_depth(box3d)
                 pc_in_box, inds = extract_pc_in_box3d(pc, box3d)
                 if len(pc_in_box) < 5:
                     nonempty_box_mask[i, j] = 0
         # -------------------------------------
 
+    pred_sem_cls = torch.argmax(end_points["sem_cls_scores"], -1)  # B,num_proposal
     obj_logits = end_points["objectness_scores"].detach().cpu().numpy()
-    obj_prob = softmax(obj_logits)[:, :, 1]  # (B,K)
+    obj_prob = torch.from_numpy(softmax(obj_logits)[:, :, 1]) * (
+        1 - torch.exp(end_points["log_vars"]).cpu() ** 0.5
+    )  # (B,K)
+    #
+
     if not config_dict["use_3d_nms"]:
         # ---------- NMS input: pred_with_prob in (B,K,7) -----------
         pred_mask = np.zeros((bsize, K))
@@ -236,7 +235,12 @@ def end_pts_to_bb(
                 boxes_3d_with_prob[j, 7] = pred_sem_cls[
                     i, j
                 ]  # only suppress if the two boxes are of the same class!!
+
             nonempty_box_inds = np.where(nonempty_box_mask[i, :] == 1)[0]
+            # pdb.set_trace()
+            if len(nonempty_box_inds) == 0:
+                pred_mask[i] = -1
+                continue
             pick = nms_3d_faster_samecls(
                 boxes_3d_with_prob[nonempty_box_mask[i, :] == 1, :],
                 config_dict["nms_iou"],
@@ -244,12 +248,132 @@ def end_pts_to_bb(
             )
             assert len(pick) > 0
             pred_mask[i, nonempty_box_inds[pick]] = 1
-        end_points["pred_mask"] = pred_mask
-        # ---------- NMS output: pred_mask in (B,K) -----------
-        return pred_corners_3d_upright_camera, pred_mask, pred_center, end_points
+
+        return pred_mask
+
+
+def end_pts_to_bb(
+    end_points,
+    config_dict,
+):
+    pred_center = end_points["center"]  # B,num_proposal,3
+    # pred_variances = torch.exp(end_points["log_vars"]) ** 0.5
+
+    pred_heading_class = torch.argmax(
+        end_points["heading_scores"], -1
+    )  # B,num_proposal
+    pred_heading_residual = torch.gather(
+        end_points["heading_residuals"], 2, pred_heading_class.unsqueeze(-1)
+    )  # B,num_proposal,1
+    pred_heading_residual.squeeze_(2)
+    pred_size_class = torch.argmax(end_points["size_scores"], -1)  # B,num_proposal
+    pred_size_residual = torch.gather(
+        end_points["size_residuals"],
+        2,
+        pred_size_class.unsqueeze(-1).unsqueeze(-1).repeat(1, 1, 1, 3),
+    )  # B,num_proposal,1,3
+    pred_size_residual.squeeze_(2)
+    num_proposal = pred_center.shape[1]
+    # Since we operate in upright_depth coord for points, while util functions
+    # assume upright_camera coord.
+    # pdb.set_trace()
+    bsize = pred_center.shape[0]
+    pred_corners_3d_upright_camera = np.zeros((bsize, num_proposal, 8, 3))
+    pred_center_upright_camera = flip_axis_to_camera(pred_center.detach().cpu().numpy())
+    # for i in range(bsize):
+    #     for j in range(num_proposal):
+    #         heading_angle = config_dict["dataset_config"].class2angle(
+    #             pred_heading_class[i, j].detach().cpu().numpy(),
+    #             pred_heading_residual[i, j].detach().cpu().numpy(),
+    #         )
+    #         box_size = config_dict["dataset_config"].class2size(
+    #             int(pred_size_class[i, j].detach().cpu().numpy()),
+    #             pred_size_residual[i, j].detach().cpu().numpy(),
+    #         )
+    #         corners_3d_upright_camera = get_3d_box(
+    #             box_size, heading_angle, pred_center_upright_camera[i, j, :]
+    # )
+    # pred_center.shape[0]
+    # pred_corners_3d_upright_camera = np.zeros((bsize, num_proposal, 8, 3))
+
+    pred_center_upright_camera = flip_axis_to_camera(pred_center.detach().cpu().numpy())
+    for i in range(bsize):
+        for j in range(num_proposal):
+            heading_angle = config_dict["dataset_config"].class2angle(
+                pred_heading_class[i, j].detach().cpu().numpy(),
+                pred_heading_residual[i, j].detach().cpu().numpy(),
+            )
+            box_size = config_dict["dataset_config"].class2size(
+                int(pred_size_class[i, j].detach().cpu().numpy()),
+                pred_size_residual[i, j].detach().cpu().numpy(),
+            )
+            corners_3d_upright_camera = get_3d_box(
+                box_size, heading_angle, pred_center_upright_camera[i, j, :]
+            )
+            pred_corners_3d_upright_camera[i, j] = corners_3d_upright_camera
+    # pred_box_sizes[i, j] = (
+    #     np.linalg.norm(
+    #         corners_3d_upright_camera[0] - corners_3d_upright_camera[1]
+    #     )
+    #     * np.linalg.norm(
+    #         corners_3d_upright_camera[2] - corners_3d_upright_camera[1]
+    #     )
+    #     * np.linalg.norm(
+    #         corners_3d_upright_camera[4] - corners_3d_upright_camera[1]
+    #     )
+    # )
+
+    K = pred_center.shape[1]  # K==num_proposal
+    end_points["raw_pred_boxes"] = pred_corners_3d_upright_camera
+    vis_masks = end_points["vis_masks"]
+
+    num_bins = vis_masks.shape[1]
+    ass = end_points["object_assignment"]
+
+    nonempty_box_masks = [torch.ones((bsize, K)).cuda().int() for b in range(num_bins)]
+
+    # pdb.set_trace()
+    visible_preds = []
+    # vis_masks = vis_masks.permute([1, 0, 2])
+    for bb in range(num_bins):
+        for bidx in range(bsize):
+            mask = vis_masks[bidx, bb]
+            valid_inds = torch.where(mask)[0]
+            valid_mask = torch.zeros(K).int().cuda()
+            for ind in valid_inds:
+                valid_mask = (valid_mask.int() + (ass[bidx] == ind).int()) > 0
+
+            if valid_mask.sum() == 0:
+                nonempty_box_masks[bb][bidx] *= -1
+            else:
+                nonempty_box_masks[bb][bidx] *= valid_mask.int()
+    # pdb.set_trace()
+    pred_masks = []
+    pred_masks = [
+        construct_boxes_and_nms(
+            end_points, config_dict, pred_corners_3d_upright_camera, nb.cpu().numpy()
+        )
+        for nb in nonempty_box_masks
+    ]
+    # end_points["pred_mask"] = pred_mask
+    # pdb.set_trace()
+    # print("Predicted ", len(pick), nonempty_box_mask.sum(), " boxes")
+    # ---------- NMS output: pred_mask in (B,K) -----------
+    # pdb.set_trace()
+    # np.save(
+    #     "boxes_num_samples{}".format(config_dict["num_samples"]),
+    #     pred_corners_3d_upright_camera,
+    # )
+    # np.save(
+    #     "pick_num_samples{}".format(config_dict["num_samples"]),
+    #     pick,
+    # )
+    # print((pred_corners_3d_upright_camera).shape)
+    return pred_corners_3d_upright_camera, pred_masks, pred_center, end_points
 
 
 def parse_predictions_with_log_var(end_points, config_dict):
+
     """Parse predictions to OBB parameters and suppress overlapping boxes
 
     Args:
@@ -267,74 +391,100 @@ def parse_predictions_with_log_var(end_points, config_dict):
             where j = 0, ..., num of valid detections - 1 from sample input i
     """
 
-    pred_corners_3d_upright_camera, pred_mask, pred_center, end_points = end_pts_to_bb(
+    # print(config_dict)
+    # pdb.set_trace()
+    pred_corners_3d_upright_camera, pred_masks, pred_center, end_points = end_pts_to_bb(
         end_points, config_dict
     )
-    print(end_points["raw_pred_boxes"].shape)
-    pred_variances = torch.exp(end_points["log_vars"]) ** 0.5
+    # pdb.set_trace()
+    # print(end_points["raw_pred_boxes"].shape)
+    # pred_variances = torch.exp(end_points["log_vars"]) ** 0.5
     obj_logits = end_points["objectness_scores"].detach().cpu().numpy()
     obj_prob = softmax(obj_logits)[:, :, 1]  #
+    var_weight = 1 - torch.exp(end_points["log_vars"]).cpu().numpy() ** 0.5
+    # pdb.set_trace()
+    obj_prob = torch.from_numpy(softmax(obj_logits)[:, :, 1])  # * var_weight)  # (B,K)
+
     sem_cls_probs = softmax(
         end_points["sem_cls_scores"].detach().cpu().numpy()
     )  # B,num_proposal,10
 
     bsize = pred_center.shape[0]
     pred_sem_cls = torch.argmax(end_points["sem_cls_scores"], -1)  # B,num_proposal
-    batch_pred_map_cls = (
-        []
-    )  # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
-    # final_mask = np.zeros_like(pred_mask)
-    selected_raw_boxes = []
-    for i in range(bsize):
+    rets = []
+    vraw = []
+    for pred_mask in pred_masks:
+        batch_pred_map_cls = (
+            []
+        )  # a list (len: batch_size) of list (len: num of predictions per sample) of tuples of pred_cls, pred_box and conf (0-1)
+        # final_mask = np.zeros_like(pred_mask)
+        selected_raw_boxes = []
+        for i in range(bsize):
 
-        if config_dict["per_class_proposal"]:
-            cur_list = []
-            for ii in range(config_dict["dataset_config"].num_class):
-                cur_list += [
-                    (
-                        ii,
-                        pred_corners_3d_upright_camera[i, j],
-                        sem_cls_probs[i, j, ii] * obj_prob[i, j],
-                    )
-                    for j in range(pred_center.shape[1])
-                    if pred_mask[i, j] == 1
-                    and obj_prob[i, j] > config_dict["conf_thresh"]
-                ]
-            batch_pred_map_cls.append(cur_list)
-        else:
-            batch_pred_map_cls.append(
-                [
-                    (
-                        pred_sem_cls[i, j].item(),
-                        pred_corners_3d_upright_camera[i, j],
-                        obj_prob[i, j],
-                    )
-                    for j in range(pred_center.shape[1])
-                    if pred_mask[i, j] == 1
-                    and obj_prob[i, j] > config_dict["conf_thresh"]
-                ]
-            )
-            selected_raw_boxes.append(
-                [
-                    (
-                        pred_sem_cls[i, j].item(),
-                        pred_variances[i, j],
-                        pred_corners_3d_upright_camera[i, j],
-                    )
-                    for j in range(pred_center.shape[1])
-                    if pred_mask[i, j] == 1
-                    and obj_prob[i, j] > config_dict["conf_thresh"]
-                ]
-            )
-            # for j in range(pred_center.shape[1]):
-            #     if pred_mask[i,j]==1 and obj_prob[i,j]>config_dict['conf_thresh']:
+            if config_dict["per_class_proposal"]:
+                cur_list = []
+                for ii in range(config_dict["dataset_config"].num_class):
+                    cur_list += [
+                        (
+                            ii,
+                            pred_corners_3d_upright_camera[i, j],
+                            sem_cls_probs[i, j, ii] * obj_prob[i, j],
+                        )
+                        for j in range(pred_center.shape[1])
+                        if pred_mask[i, j] == 1
+                        and obj_prob[i, j] > config_dict["conf_thresh"]
+                    ]
+                batch_pred_map_cls.append(cur_list)
+            else:
+                batch_pred_map_cls.append(
+                    [
+                        (
+                            pred_sem_cls[i, j].item(),
+                            pred_corners_3d_upright_camera[i, j],
+                            obj_prob[i, j],
+                        )
+                        for j in range(pred_center.shape[1])
+                        if pred_mask[i, j] == 1
+                        and obj_prob[i, j] > config_dict["conf_thresh"]
+                    ]
+                )
+                selected_raw_boxes.append(
+                    [
+                        (
+                            pred_sem_cls[i, j].item(),
+                            end_points["log_vars"][i, j],
+                            end_points["object_assignment"][i, j],
+                            obj_prob[i, j],
+                        )
+                        for j in range(pred_center.shape[1])
+                        if pred_mask[i, j] == 1
+                        and obj_prob[i, j] > config_dict["conf_thresh"]
+                    ]
+                )
 
+        vraw.append(selected_raw_boxes)
+        rets.append(batch_pred_map_cls)
+        # for j in range(pred_center.shape[1]):
+        #     if pred_mask[i,j]==1 and obj_prob[i,j]>config_dict['conf_thresh']:
+
+    # for idx, raw in enumerate(vraw):
+    #     if len(raw) > 0:
+
+    #         sigmas, clss, assignments, obj_probs = zip(
+    #             *[
+    #                 ((torch.exp(a[1]) ** 0.5).item(), a[0], a[2].item(), a[3])
+    #                 for a in raw[0]
+    #             ]
+    #         )
+    # print("bin", idx, sigmas, obj_probs)
     # import pdb
 
     # pdb.set_trace()
-    end_points["batch_pred_map_cls"] = batch_pred_map_cls
+
+    # pdb.set_trace()
+    # end_points["batch_pred_map_cls"] = batch_pred_map_cls
     # end_points["final_masks"] = final_mask
-    return batch_pred_map_cls, selected_raw_boxes
+    return rets  # batch_pred_map_cls, selected_raw_boxes
 
 
 def parse_predictions(end_points, config_dict, noflip=False):
@@ -402,12 +552,7 @@ def parse_predictions(end_points, config_dict, noflip=False):
     pred_corners_3d_upright_camera = np.zeros((bsize, num_proposal, 8, 3))
     pred_box_sizes = np.zeros((bsize, num_proposal))
 
-    if noflip:
-        pred_center_upright_camera = pred_center.detach().cpu().numpy()
-    else:
-        pred_center_upright_camera = flip_axis_to_camera(
-            pred_center.detach().cpu().numpy()
-        )
+    pred_center_upright_camera = flip_axis_to_camera(pred_center.detach().cpu().numpy())
     for i in range(bsize):
         for j in range(num_proposal):
             heading_angle = config_dict["dataset_config"].class2angle(
@@ -1985,24 +2130,29 @@ class APCalculator(object):
         """
 
         bsize = len(batch_pred_map_cls)
-        assert bsize == len(batch_gt_map_cls)
+
+        assert bsize == len(batch_gt_map_cls), (bsize, len(batch_gt_map_cls))
         for i in range(bsize):
-            self.gt_map_cls[self.scan_cnt] = batch_gt_map_cls[i]
-            self.pred_map_cls[self.scan_cnt] = batch_pred_map_cls[i]
-            self.scan_cnt += 1
+            # print(len(batch_gt_map_cls[i]), len(batch_pred_map_cls[i]))
+            if len(batch_gt_map_cls[i]) > 0:
+                self.gt_map_cls[self.scan_cnt] = batch_gt_map_cls[i]
+                self.pred_map_cls[self.scan_cnt] = batch_pred_map_cls[i]
+                self.scan_cnt += 1
 
     def compute_metrics(self):
         """Use accumulated predictions and groundtruths to compute Average Precision."""
-        rec, prec, ap = eval_det_multiprocessing(
+        # rec, prec, ap = eval_det_multiprocessing(
+        #     self.pred_map_cls,
+        #     self.gt_map_cls,
+        #     ovthresh=self.ap_iou_thresh,
+        #     get_iou_func=get_iou_obb,
+        # )
+        rec, prec, ap, ious = eval_det_iou(
             self.pred_map_cls,
             self.gt_map_cls,
             ovthresh=self.ap_iou_thresh,
             get_iou_func=get_iou_obb,
         )
-        # rec, prec, ap,ious = eval_det_iou(self.pred_map_cls,
-        #  self.gt_map_cls,
-        #  ovthresh=self.ap_iou_thresh,
-        #  get_iou_func=get_iou_obb)
 
         ret_dict = {}
         for key in sorted(ap.keys()):

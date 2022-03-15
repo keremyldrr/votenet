@@ -18,12 +18,13 @@ Then go to local browser and type:
 """
 # Python stuff
 import os
-import pdb
 import sys
+import time
 import numpy as np
 from datetime import datetime
 import importlib.util
 import argparse
+import matplotlib.pyplot as plt
 from numpy.random.mtrand import set_state
 
 # pytorch stuff
@@ -31,6 +32,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
+from torch_lr_finder import LRFinder
 
 BASE_DIR = os.path.dirname(
     os.path.abspath("/home/yildirir/workspace/votenet/README.md")
@@ -60,17 +62,17 @@ def get_current_lr_by_iters(epoch, FLAGS):
     lr = FLAGS.LEARNING_RATE
     if FLAGS.FIXED_LR == 0:
         START_ITER = FLAGS.START_ITER
-        ITER_DECAY_STEPS = [12000, 18000, 24000]
+        ITER_DECAY_STEPS = [12000, 18000, 24000, 30000, 36000, 42000]
         DATA_SIZE = len(FLAGS.TRAIN_DATALOADER)
         ITERS_PER_EPOCH = DATA_SIZE
         NUM_ITERS_TOTAL = START_ITER + ITERS_PER_EPOCH * epoch
 
-        print(NUM_ITERS_TOTAL, ITER_DECAY_STEPS, ITERS_PER_EPOCH, DATA_SIZE)
+        # print(NUM_ITERS_TOTAL, ITER_DECAY_STEPS, ITERS_PER_EPOCH, DATA_SIZE)
         for i, lr_decay_epoch in enumerate(ITER_DECAY_STEPS):
-            print(NUM_ITERS_TOTAL, lr_decay_epoch)
+            # print(NUM_ITERS_TOTAL, lr_decay_epoch)
             if NUM_ITERS_TOTAL >= lr_decay_epoch:
                 lr *= 0.1
-                print("Shrank")
+                # print("Shrank")
 
     return lr
 
@@ -81,10 +83,10 @@ def adjust_learning_rate(optimizer, epoch, FLAGS):
     if FLAGS.FIXED_LR == 0:
         if FLAGS.START_ITER != 0:
             lr = get_current_lr_by_iters(epoch, FLAGS)
-            print("ITERS")
+            # print("ITERS")
         else:
-            lr = get_current_lr(epoch, FLAGS)
-            print("NORMAL SCHEDULING")
+            # lr = get_current_lr(epoch, FLAGS)
+            lr = get_current_lr_by_iters(epoch, FLAGS)
     else:
         lr = FLAGS.FIXED_LR
     for param_group in optimizer.param_groups:
@@ -99,17 +101,26 @@ def train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS):
     adjust_learning_rate(optimizer, EPOCH_CNT, FLAGS)
     bnm_scheduler.step()  # decay BN momentum
     net.train()  # set model to training mode
+    #
+    # lr_finder = CustomLRFinder(net, optimizer, criterion, FLAGS.DEVICE)
+    # lr_finder.range_test(FLAGS.TRAIN_DATALOADER, end_lr=10, num_iter=1000)
+    # lr_finder.plot()
+    # plt.savefig("LRvsLoss.png")
+    # plt.close()
     for batch_idx, batch_data_label in enumerate(FLAGS.TRAIN_DATALOADER):
         # for key in batch_data_label:
         #     batch_data_label[key] = batch_data_label[key].to(FLAGS.DEVICE)
         #     i
 
+        adjust_learning_rate(optimizer, EPOCH_CNT, FLAGS)
         # Forward pass
         for key in batch_data_label:
             if key != "name":
                 batch_data_label[key] = batch_data_label[key].to(FLAGS.DEVICE)
 
             # Forward pass
+
+        curr_lr = optimizer.param_groups[0]["lr"]
 
         optimizer.zero_grad()
         if "name" not in batch_data_label.keys():
@@ -120,6 +131,7 @@ def train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS):
                 "point_clouds": batch_data_label["point_clouds"],
                 "name": batch_data_label["name"],
             }
+        st = time.time()
         end_points = net(inputs)
 
         # Compute loss and gradients, update parameters.
@@ -129,18 +141,19 @@ def train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS):
         loss, end_points = criterion(end_points, FLAGS.DATASET_CONFIG)
         loss.backward()
         optimizer.step()
-
-        # pdb.set_trace()
-        print("ADDED SIGMA ", FLAGS.SIGMA)
-        for bdx, log_vars_frame in enumerate(end_points["log_var_per_gt"]):
-            for cdx, (box, sc) in enumerate(log_vars_frame):
-                sigma = torch.exp(box.mean()) ** 0.5
-                print(
-                    bdx,
-                    cdx,
-                    sigma.item(),
-                    np.unique(sc.detach().cpu(), return_counts=True),
-                )
+        print(time.time() - st, "seconds per iter")
+        # # pdb.set_trace()
+        if FLAGS.OVERFIT:
+            print("ADDED SIGMA ", FLAGS.SIGMA)
+            for bdx, log_vars_frame in enumerate(end_points["log_var_per_gt"]):
+                for cdx, (box, sc) in enumerate(log_vars_frame):
+                    sigma = torch.exp(box.mean()) ** 0.5
+                    print(
+                        bdx,
+                        cdx,
+                        sigma.item(),
+                        np.unique(sc.detach().cpu(), return_counts=True),
+                    )
         # end_points["sigma"] = torch.exp(end_points["log_var"].mean())**0.5
         # Accumulate statistics and print out
         for key in end_points:
@@ -156,11 +169,16 @@ def train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS):
                     stat_dict[key] = 0
                 stat_dict[key] += end_points[key].item()
 
-        batch_interval = 1
+        batch_interval = 1 if FLAGS.OVERFIT == True else 10
         if (batch_idx + 1) % batch_interval == 0:
             log_string(FLAGS.LOGGER, " ---- batch: %03d ----" % (batch_idx + 1))
             FLAGS.TRAIN_VISUALIZER.log_scalars(
                 {key: stat_dict[key] / batch_interval for key in stat_dict},
+                step=(EPOCH_CNT * len(FLAGS.TRAIN_DATALOADER) + batch_idx)
+                * FLAGS.BATCH_SIZE,
+            )
+            FLAGS.TRAIN_VISUALIZER.log_scalars(
+                {"lr": curr_lr},
                 step=(EPOCH_CNT * len(FLAGS.TRAIN_DATALOADER) + batch_idx)
                 * FLAGS.BATCH_SIZE,
             )
@@ -270,6 +288,8 @@ def train(FLAGS):
 
     net, criterion, optimizer, bnm_scheduler = initialize_model(FLAGS)
     # TODO: initialize everything here and create optimizer, net and criterion here, then pass it to the corresponding functions
+    if FLAGS.LOG_VAR:
+        torch.nn.init.normal_(net.pnet.conv4.weight, mean=0.0, std=1e-4)
     for epoch in range(FLAGS.START_EPOCH, FLAGS.MAX_EPOCH):
         EPOCH_CNT = epoch
         log_string(FLAGS.LOGGER, "**** EPOCH %03d ****" % (epoch))
@@ -293,43 +313,55 @@ def train(FLAGS):
         # REF: https://github.com/pytorc /pytorch/issues/5059
         np.random.seed()
         train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS)
-        if EPOCH_CNT % 1000 == 1:  # Eval every 2 epochs
+        if EPOCH_CNT % 3 == 1:  # Eval every 2 epochs
             # TODO: make this dataset dependent, or iterations
             DATA_SIZE = len(FLAGS.TRAIN_DATALOADER)
             ITERS_PER_EPOCH = DATA_SIZE
 
             NUM_ITERS_TOTAL = FLAGS.START_ITER + ITERS_PER_EPOCH * epoch
-            save_dict["model_state_dict"] = net.state_dict()
-            torch.save(
-                save_dict,
-                os.path.join(
-                    FLAGS.LOG_DIR, "best_checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
-                ),
-            )  #
-            # loss,curr_map = evaluate_one_epoch(net,criterion,FLAGS)
-        # Save checkpoint
-        save_dict = {
-            "epoch": epoch
-            + 1,  # after training one epoch, the start_epoch should be epoch+1
-            "optimizer_state_dict": optimizer.state_dict(),
-            "loss": loss,
-        }
-        try:  # with nn.DataParallel() the net is added as a submodule of DataParallel
-            save_dict["model_state_dict"] = net.module.state_dict()
-        except:
-            save_dict["model_state_dict"] = net.state_dict()
-
-        if curr_map > best_map:
-            DATA_SIZE = len(FLAGS.TRAIN_DATALOADER)
-            ITERS_PER_EPOCH = DATA_SIZE
-            NUM_ITERS_TOTAL = FLAGS.START_ITER + ITERS_PER_EPOCH * epoch
-            # torch.save(save_dict, os.path.join(FLAGS.LOG_DIR, 'best_checkpoint_{}.tar'.format(NUM_ITERS_TOTAL))) #FIXME re enable
-            log_string(
-                FLAGS.LOGGER, "Best changed from {} to {}".format(best_map, curr_map)
+            # torch.save(
+            #     save_dict,
+            #     os.path.join(
+            #         FLAGS.LOG_DIR, "best_checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
+            #     ),
+            # )  #
+            if not FLAGS.OVERFIT:
+                loss, curr_map = evaluate_one_epoch(net, criterion, FLAGS)
+            FLAGS.TEST_VISUALIZER.log_scalars(
+                {"mAP": curr_map},
+                (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
             )
-            best_map = curr_map
-        else:
-            log_string(FLAGS.LOGGER, "No change, best is {}".format(best_map))
+
+            # Save checkpoint
+            save_dict = {
+                "epoch": epoch
+                + 1,  # after training one epoch, the start_epoch should be epoch+1
+                "optimizer_state_dict": optimizer.state_dict(),
+                "loss": loss,
+            }
+            try:  # with nn.DataParallel() the net is added as a submodule of DataParallel
+                save_dict["model_state_dict"] = net.module.state_dict()
+            except:
+                save_dict["model_state_dict"] = net.state_dict()
+
+            if curr_map > best_map:
+                DATA_SIZE = len(FLAGS.TRAIN_DATALOADER)
+                ITERS_PER_EPOCH = DATA_SIZE
+                NUM_ITERS_TOTAL = FLAGS.START_ITER + ITERS_PER_EPOCH * epoch
+                torch.save(
+                    save_dict,
+                    os.path.join(
+                        FLAGS.LOG_DIR, "best_checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
+                    ),
+                )  # FIXME re enable
+                log_string(
+                    FLAGS.LOGGER,
+                    "Best changed from {} to {}".format(best_map, curr_map),
+                )
+                best_map = curr_map
+            else:
+
+                log_string(FLAGS.LOGGER, "No change, best is {}".format(best_map))
 
 
 if __name__ == "__main__":

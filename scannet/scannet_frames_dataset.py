@@ -8,6 +8,8 @@ An axis aligned bounding box is parameterized by (cx,cy,cz) and (dx,dy,dz)
 where (cx,cy,cz) is the center point of the box, dx is the x-axis length of the box.
 """
 import time
+
+import pdb
 import os
 import sys
 from time import thread_time
@@ -42,6 +44,30 @@ DC = ScannetDatasetConfig()
 MAX_NUM_OBJ = 64
 MEAN_COLOR_RGB = np.array([109.8, 97.2, 83.8])
 
+mydict = {
+    "cabinet": 0,
+    "bed": 1,
+    "chair": 2,
+    "sofa": 3,
+    "table": 4,
+    "door": 5,
+    "window": 6,
+    "bookshelf": 7,
+    "picture": 8,
+    "counter": 9,
+    "desk": 10,
+    "curtain": 11,
+    "refrigerator": 12,
+    "showercurtrain": 13,
+    "toilet": 14,
+    "sink": 15,
+    "bathtub": 16,
+    "garbagebin": 17,
+}
+revDict = {}
+for a in mydict.keys():
+    revDict[mydict[a]] = a
+
 
 class ScannetDetectionFramesDataset(Dataset):
     def __init__(
@@ -56,6 +82,9 @@ class ScannetDetectionFramesDataset(Dataset):
         center_noise_var=0,
         overfit=False,
         box_noise_var=0,
+        bin_thresholds=[0.5, 0.7, 1.0],
+        classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+        # classes=[2],
     ):
         """[summary]
 
@@ -76,9 +105,11 @@ class ScannetDetectionFramesDataset(Dataset):
         self._frames_path = setting["frames_path"]
         self.thresh = thresh
 
+        self.classes = classes
         self.overfit = overfit
         self.scan_names = self._get_file_names(split_set, thresh)
-
+        if split_set == "val":
+            self.scan_names = self.scan_names[:500]
         self.num_points = num_points
         self._file_length = len(self.scan_names)
         self.use_color = use_color
@@ -88,7 +119,7 @@ class ScannetDetectionFramesDataset(Dataset):
         self.center_noise_var = center_noise_var
         self.box_size_noise_mean = 0
         self.box_noise_var = box_noise_var
-        print("init")
+        self.bin_thresholds = bin_thresholds
 
     def __len__(self):
         return len(self.scan_names)
@@ -124,6 +155,10 @@ class ScannetDetectionFramesDataset(Dataset):
             # instances = get_instance_boxes(instancedir,with_classes=False,thresh=thresh)
 
             scores = np.array([float(a[:-4].split("_")[5]) for a in objs_in_scene])
+            classes = np.array([float(a[:-4].split("_")[3]) for a in objs_in_scene])
+            cls_mask = np.array([cls in self.classes for cls in classes])
+            scores = scores[cls_mask]
+            # pdb.set_trace()
             if len(scores[scores > thresh]) > 0:
                 file_names.append([img_name, None])
         with open("{}_{}.txt".format(str(thresh), split_name), "w") as out:
@@ -137,7 +172,8 @@ class ScannetDetectionFramesDataset(Dataset):
             "seconds",
         )
         if self.overfit:
-            return [["scene0000_00_1", None], ["scene0000_00_3", None]]
+            return [["scene0655_01_9", None]]  # , ["scene0000_00_3", None]]
+        np.random.seed(10)
         np.random.shuffle(file_names)
         return file_names  # [:500]
 
@@ -185,26 +221,33 @@ class ScannetDetectionFramesDataset(Dataset):
         tl = transform[:-1, 3]
         pts = np.matmul(rot, pts3d[valid_depth_inds].T).T + tl
         # worldToCam = get_grid_to_camera(camera_pose=camera_pose,axis_align_matrix=axis_align_matrix)
-        boxes, classes = get_instance_boxes(
+        boxes, classes, scores = get_instance_boxes(
             instancedir=instancedir, with_classes=True, thresh=self.thresh
         )
-        classes += 0
+        cls_mask = np.array([a in self.classes for a in classes])
+        boxes = np.array(boxes)[cls_mask]
+        scores = np.array(scores)[cls_mask]
+        classes = np.array(classes)[cls_mask]
+        # classes += 0 TODO: Make classes compatible with SSC
         instance_labels, semantic_labels = get_instance_and_semantic_pcd_from_boxes(
             points=pts, boxes=boxes, classes=classes
         )
+
+        # pdb.set_trace()
         VOX_SIZE = 1  # double check
         grid_shape = np.array([60, 36, 60])
-        pts = pts[:, [0, 1, 2]] / VOX_SIZE
+        pts = pts[:, [0, 1, 2]]
 
         ptrans = grid_shape / 2 - pts.mean(0)
         pts = pts + ptrans  # .astype(int) #Not yet integet
-
+        pts = pts / VOX_SIZE
         boxes_in_grid = []
         for b in boxes:
 
-            bpts = b[:, [0, 1, 2]] / VOX_SIZE
+            bpts = b[:, [0, 1, 2]]
 
             bpts = bpts + ptrans
+            bpts = bpts / VOX_SIZE
             boxes_in_grid.append(bpts)
 
         instance_bboxes = corners_to_obb(
@@ -240,7 +283,6 @@ class ScannetDetectionFramesDataset(Dataset):
         )
         instance_labels = instance_labels[choices]
         semantic_labels = semantic_labels[choices]
-        print(choices)
         pcl_color = pcl_color[choices]
 
         target_bboxes_mask[0 : instance_bboxes.shape[0]] = 1
@@ -269,10 +311,14 @@ class ScannetDetectionFramesDataset(Dataset):
         class_ind = [np.where(DC.class_ids == x)[0][0] for x in instance_bboxes[:, -1]]
 
         # NOTE: set size class as semantic class. Consider use size2class.
-        center_noise = (
-            np.random.randn(3) * self.center_noise_var + self.center_noise_mean
-        )
-        target_bboxes[0, :3] += center_noise
+
+        # np.random.seed()
+        # center_noise = (
+        #     np.random.randn(3) * self.center_noise_var + self.center_noise_mean
+        # )
+        # target_bboxes[0, :3] += center_noise
+
+        # print(center_noise)
         # print("**************************")
         # print(target_bboxes[0:instance_bboxes.shape[0],:3])
         # print("**************************")
@@ -294,9 +340,23 @@ class ScannetDetectionFramesDataset(Dataset):
         ret_dict["heading_residual_label"] = torch.from_numpy(
             angle_residuals.astype(np.float32)
         )
+        arr_scores = np.zeros([64])
+        arr_scores[: len(scores)] = np.array(scores)
+        scores = arr_scores
 
         ret_dict["size_class_label"] = torch.from_numpy(size_classes.astype(np.int64))
+        # ret_dict["score_labels"] = scores
+        vis_masks = np.zeros([len(self.bin_thresholds), len(scores)])
+        prev = 0.3
+        for idx, trs in enumerate(self.bin_thresholds):
+            # print(prev, trs)
 
+            mm = (scores >= prev) & (scores < trs)
+            prev = trs
+
+            vis_masks[idx, :] = mm
+        ret_dict["vis_masks"] = torch.from_numpy(vis_masks)
+        # print(scores)
         ret_dict["size_residual_label"] = torch.from_numpy(
             size_residuals.astype(np.float32)
         )
@@ -324,6 +384,8 @@ class ScannetDetectionFramesDataset(Dataset):
 
         ret_dict["pcl_color"] = pcl_color
         ret_dict["name"] = item_idx
+        print(classes, item_idx)
+
         return ret_dict
 
 

@@ -4,7 +4,7 @@ import numpy as np
 from datetime import datetime
 import importlib.util
 import argparse
-
+import trimesh
 
 # pytorch stuff
 import torch
@@ -47,14 +47,15 @@ def evaluate_with_sampling(FLAGS):
     net, criterion, optimizer, bnm_scheduler = initialize_model(FLAGS)
     net.eval()
     # TODO: D eal with dropouts, for now they are closed
+    # Used for AP calculation during evaluation
     CONFIG_DICT = {
-        "remove_empty_box": False,
+        "remove_empty_box": True,
         "use_3d_nms": True,
         "nms_iou": 0.25,
         "use_old_type_nms": False,
         "cls_nms": True,
-        "per_class_proposal": False,
-        "conf_thresh": 0.8,
+        "per_class_proposal": True,
+        "conf_thresh": 0.05,
         "dataset_config": FLAGS.DATASET_CONFIG,
     }
 
@@ -78,11 +79,16 @@ def evaluate_with_sampling(FLAGS):
                 "point_clouds": batch_data_label["point_clouds"],
                 "name": batch_data_label["name"],
             }
-            print(inputs)
+            # print(inputs)
+            # for idx, pc in enumerate(batch_data_label["point_clouds"]):
+            #     filename = os.path.join(
+            #         FLAGS.DUMP_DIR, "{}.ply".format(batch_data_label["name"][idx])
+            #     )
+            # trimesh.points.PointCloud(pc[:, :3].cpu().numpy()).export(filename)
+
             # inputs = {'point_clouds': batch_data_label['point_clouds']}
             with torch.no_grad():
                 end_points = net(inputs)
-
             # Compute loss8
             for key in batch_data_label:
                 assert key not in end_points
@@ -96,9 +102,9 @@ def evaluate_with_sampling(FLAGS):
                     if key not in stat_dict:
                         stat_dict[key] = 0
                     stat_dict[key] += end_points[key].item()
-
+            # batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT)
             batch_pred_map_cls, selected_raw_boxes = parse_predictions_with_log_var(
-                end_points, CONFIG_DICT
+                end_points, CONFIG_DICT, sampling=FLAGS.SAMPLING
             )
             # print(batch_pred_map_cls)
             batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
@@ -123,14 +129,14 @@ def evaluate_with_sampling(FLAGS):
         metrics_dict = ap_calculator.compute_metrics()
         for key in metrics_dict:
             log_string(FLAGS.LOGGER, "eval %s: %f" % (key, metrics_dict[key]))
-        dump_results_mini(
-            end_points,
-            config=FLAGS.DATASET_CONFIG,
-            dump_dir=FLAGS.DUMP_DIR + str(T.dataset.thresh),
-        )
+        # dump_results_mini(
+        #     end_points,
+        #     config=FLAGS.DATASET_CONFIG,
+        #     dump_dir=FLAGS.DUMP_DIR + str(T.dataset.thresh),
+        # )
 
-        dump_only_boxes(selected_raw_boxes, FLAGS.DUMP_DIR)
-        dump_only_boxes_gt(batch_gt_map_cls, FLAGS.DUMP_DIR)
+        # dump_only_boxes(selected_raw_boxes, FLAGS.DUMP_DIR)
+        # dump_only_boxes_gt(batch_gt_map_cls, FLAGS.DUMP_DIR)
 
 
 def save_datas(FLAGS):
@@ -143,7 +149,7 @@ def save_datas(FLAGS):
         "use_old_type_nms": False,
         "cls_nms": True,
         "per_class_proposal": False,
-        "conf_thresh": 0.8,
+        "conf_thresh": 0.05,
         "dataset_config": FLAGS.DATASET_CONFIG,
     }
 
@@ -220,13 +226,14 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--config-path")
+    parser.add_argument("--sampling", action="store_true")
     args = parser.parse_args()
 
     spec = importlib.util.spec_from_file_location("C", args.config_path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     FLAGS = mod.C
-
+    FLAGS.SAMPLING = args.sampling
     initialize_dataloader(FLAGS)
     # save_datas(FLAGS)
     evaluate_with_sampling(FLAGS)

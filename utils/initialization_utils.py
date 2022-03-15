@@ -112,6 +112,7 @@ def initialize_dataloader(FLAGS):
             use_height=True,
             augment=False,
             overfit=FLAGS.OVERFIT,
+            center_noise_var=FLAGS.SIGMA,
         )
         TRAIN_DATASET = ScannetDetectionFramesDataset(
             data_setting,
@@ -121,6 +122,7 @@ def initialize_dataloader(FLAGS):
             use_height=True,
             augment=False,
             overfit=FLAGS.OVERFIT,
+            center_noise_var=FLAGS.SIGMA,
         )
     else:
         print("Unknown dataset %s. Exiting..." % (FLAGS.DATASET))
@@ -226,7 +228,7 @@ def initialize_model(FLAGS):
         checkpoint = torch.load(FLAGS.CHECKPOINT_PATH)
         net.load_state_dict(checkpoint["model_state_dict"])
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        start_epoch = 0  # checkpoint['epoch']
+        start_epoch = checkpoint["epoch"]
         log_string(
             FLAGS.LOGGER,
             "-> loaded checkpoint %s (epoch: %d)"
