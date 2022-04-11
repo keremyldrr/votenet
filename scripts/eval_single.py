@@ -5,6 +5,7 @@ from datetime import datetime
 import importlib.util
 import argparse
 import trimesh
+import pdb
 
 # pytorch stuff
 import torch
@@ -42,6 +43,8 @@ from initialization_utils import (
     log_string,
 )
 
+from box_util import get_3d_box
+
 
 def evaluate_with_sampling(FLAGS):
     net, criterion, optimizer, bnm_scheduler = initialize_model(FLAGS)
@@ -74,9 +77,11 @@ def evaluate_with_sampling(FLAGS):
                 if key != "name":
                     batch_data_label[key] = batch_data_label[key].to(FLAGS.DEVICE)
 
+            pdb.set_trace()
             # Forward pass
             inputs = {
                 "point_clouds": batch_data_label["point_clouds"],
+                "center_label": batch_data_label["center_label"],
                 "name": batch_data_label["name"],
             }
             # print(inputs)
@@ -87,48 +92,48 @@ def evaluate_with_sampling(FLAGS):
             # trimesh.points.PointCloud(pc[:, :3].cpu().numpy()).export(filename)
 
             # inputs = {'point_clouds': batch_data_label['point_clouds']}
-            with torch.no_grad():
-                end_points = net(inputs)
-            # Compute loss8
-            for key in batch_data_label:
-                assert key not in end_points
-                end_points[key] = batch_data_label[key]
-            loss, end_points = criterion(end_points, FLAGS.DATASET_CONFIG)
+            # with torch.no_grad():
+        #         end_points = net(inputs)
+        #     # Compute loss8
+        #     for key in batch_data_label:
+        #         assert key not in end_points
+        #         end_points[key] = batch_data_label[key]
+        #     loss, end_points = criterion(end_points, FLAGS.DATASET_CONFIG)
 
-            # Accumulate statistics and prin t out
-            # t ot
-            for key in end_points:
-                if "loss" in key or "acc" in key or "ratio" in key:
-                    if key not in stat_dict:
-                        stat_dict[key] = 0
-                    stat_dict[key] += end_points[key].item()
-            # batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT)
-            batch_pred_map_cls, selected_raw_boxes = parse_predictions_with_log_var(
-                end_points, CONFIG_DICT, sampling=FLAGS.SAMPLING
-            )
-            # print(batch_pred_map_cls)
-            batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
-            ap_calculator.step(batch_pred_map_cls, batch_gt_map_cls)
+        #     # Accumulate statistics and prin t out
+        #     # t ot
+        #     for key in end_points:
+        #         if "loss" in key or "acc" in key or "ratio" in key:
+        #             if key not in stat_dict:
+        #                 stat_dict[key] = 0
+        #             stat_dict[key] += end_points[key].item()
+        #     # batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT)
+        #     batch_pred_map_cls, selected_raw_boxes = parse_predictions_with_log_var(
+        #         end_points, CONFIG_DICT, sampling=FLAGS.SAMPLING
+        #     )
+        #     # print(batch_pred_map_cls)
+        #     batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
+        #     ap_calculator.step(batch_pred_map_cls, batch_gt_map_cls)
 
-            # Dump evaluation results for visualization
-            # if FLAGS.DUMP_RESULTS and batch_idx == 0 and EPOCH_CNT % 10 == 0:
-            # FLAGS.MODEL.DUMP_RESULTS(end_points, FLAGS.DUMP_DIR, FLAGS.DATASET_CONFIG)
-        # Log statistics
+        #     # Dump evaluation results for visualization
+        #     # if FLAGS.DUMP_RESULTS and batch_idx == 0 and EPOCH_CNT % 10 == 0:
+        #     # FLAGS.MODEL.DUMP_RESULTS(end_points, FLAGS.DUMP_DIR, FLAGS.DATASET_CONFIG)
+        # # Log statistics
 
-        # FLAGS.TEST_VISUALIZER.log_scalars(
-        #     {key: stat_dict[key] / float(batch_idx + 1) for key in stat_dict},
-        #     (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
-        # )
-        for key in sorted(stat_dict.keys()):
-            log_string(
-                FLAGS.LOGGER,
-                "eval mean %s: %f" % (key, stat_dict[key] / (float(batch_idx + 1))),
-            )
+        # # FLAGS.TEST_VISUALIZER.log_scalars(
+        # #     {key: stat_dict[key] / float(batch_idx + 1) for key in stat_dict},
+        # #     (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
+        # # )
+        # for key in sorted(stat_dict.keys()):
+        #     log_string(
+        #         FLAGS.LOGGER,
+        #         "eval mean %s: %f" % (key, stat_dict[key] / (float(batch_idx + 1))),
+        #     )
 
-        # Evaluate average precision
-        metrics_dict = ap_calculator.compute_metrics()
-        for key in metrics_dict:
-            log_string(FLAGS.LOGGER, "eval %s: %f" % (key, metrics_dict[key]))
+        # # Evaluate average precision
+        # metrics_dict = ap_calculator.compute_metrics()
+        # for key in metrics_dict:
+        #     log_string(FLAGS.LOGGER, "eval %s: %f" % (key, metrics_dict[key]))
         # dump_results_mini(
         #     end_points,
         #     config=FLAGS.DATASET_CONFIG,
@@ -172,28 +177,92 @@ def save_datas(FLAGS):
             inputs = {
                 "point_clouds": batch_data_label["point_clouds"],
                 "name": batch_data_label["name"],
+                "center_label": batch_data_label["center_label"],
             }
-            # inputs = {'point_clouds': batch_data_label['point_clouds']}
             with torch.no_grad():
                 end_points = net(inputs)
+            bsize = len(batch_data_label["name"])
+            for b in range(bsize):
+                pred_sizes = (
+                    end_points["size_preds"][b]
+                    + torch.from_numpy(FLAGS.DATASET_CONFIG.type_mean_size["chair"])
+                    .cuda()
+                    .float()
+                )
+                log_vars = torch.exp(end_points["log_vars"][b]) ** 0.5
+                name = batch_data_label["name"][b]
+                gt_centers = batch_data_label["center_label"][b][
+                    batch_data_label["box_label_mask"][b].bool()
+                ]
+                gt_sizes = (
+                    torch.from_numpy(FLAGS.DATASET_CONFIG.type_mean_size["chair"])
+                    .cuda()
+                    .float()
+                    + batch_data_label["size_residual_label"][b].float()
+                )[batch_data_label["box_label_mask"][b].bool()]
 
-            # Compute loss8
-            for key in batch_data_label:
-                assert key not in end_points
-                end_points[key] = batch_data_label[key]
-            loss, end_points = criterion(end_points, FLAGS.DATASET_CONFIG)
+                boxes = []
+                scene = trimesh.scene.Scene()
+                # scene.add_geometry(
 
-            # Accumulate statistics and prin t out
-            # t ot
-            for key in end_points:
-                if "loss" in key or "acc" in key or "ratio" in key:
-                    if key not in stat_dict:
-                        stat_dict[key] = 0
-                    stat_dict[key] += end_points[key].item()
+                #     trimesh.points.PointCloud(
+                #         batch_data_label["point_clouds"][b, :, :3].cpu().numpy()
+                #     )
+                # )
+                for idx in range(len(gt_centers)):
+                    corners = get_3d_box(
+                        gt_sizes[idx].cpu().numpy(), 0, gt_centers[idx].cpu().numpy()
+                    )
+                    scene.add_geometry(trimesh.points.PointCloud(corners).convex_hull)
+                # save to ply file
+                [
+                    a.export(name + "_gt_" + str(idx) + ".ply")
+                    for idx, a in enumerate(scene.dump())
+                ]
 
-            batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT)
-            batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
-            ap_calculator.step(batch_pred_map_cls, batch_gt_map_cls)
+                trimesh.points.PointCloud(
+                    batch_data_label["point_clouds"][b, :, :3].cpu().numpy()
+                ).export("{}.ply".format(name))
+
+                # pdb.set_trace()
+                boxes = []
+                scene = trimesh.scene.Scene()
+                for idx in range(len(gt_centers)):
+                    corners = get_3d_box(
+                        pred_sizes[idx].cpu().numpy(), 0, gt_centers[idx].cpu().numpy()
+                    )
+                    scene.add_geometry(trimesh.points.PointCloud(corners).convex_hull)
+                # save to ply file
+                [
+                    a.export(
+                        name
+                        + "_pred_"
+                        + str(idx)
+                        + "_{}.ply".format("%.2f" % log_vars[idx])
+                    )
+                    for idx, a in enumerate(scene.dump())
+                ]
+
+            # h
+            # inputs = {'point_clouds': batch_data_label['point_clouds']}
+            #
+            # # Compute loss8
+            # for key in batch_data_label:
+            #     assert key not in end_points
+            #     end_points[key] = batch_data_label[key]
+            # loss, end_points = criterion(end_points, FLAGS.DATASET_CONFIG)
+
+            # # Accumulate Statistics And Prin T out
+            # # t ot
+            # for key in end_points:
+            #     if "loss" in key or "acc" in key or "ratio" in key:
+            #         if key not in stat_dict:
+            #             stat_dict[key] = 0
+            #         stat_dict[key] += end_points[key].item()
+
+            # # batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT)
+            # batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
+            # ap_calculator.step(batch_pred_map_cls, batch_gt_map_cls)
 
             # Dump evaluation results for visualization
             # if FLAGS.DUMP_RESULTS and batch_idx == 0 and EPOCH_CNT % 10 == 0:
@@ -205,21 +274,21 @@ def save_datas(FLAGS):
         #     (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
         # )
 
-        for key in sorted(stat_dict.keys()):
-            log_string(
-                FLAGS.LOGGER,
-                "eval mean %s: %f" % (key, stat_dict[key] / (float(batch_idx + 1))),
-            )
+        # for key in sorted(stat_dict.keys()):
+        #     log_string(
+        #         FLAGS.LOGGER,
+        #         "eval mean %s: %f" % (key, stat_dict[key] / (float(batch_idx + 1))),
+        #     )
 
-        # Evaluate average precision
-        metrics_dict = ap_calculator.compute_metrics()
-        for key in metrics_dict:
-            log_string(FLAGS.LOGGER, "eval %s: %f" % (key, metrics_dict[key]))
-        dump_results_mini(
-            end_points,
-            config=FLAGS.DATASET_CONFIG,
-            dump_dir=FLAGS.DUMP_DIR + str(T.dataset.thresh),
-        )
+        # # Evaluate average precision
+        # metrics_dict = ap_calculator.compute_metrics()
+        # for key in metrics_dict:
+        #     log_string(FLAGS.LOGGER, "eval %s: %f" % (key, metrics_dict[key]))
+        # dump_results_mini(
+        #     end_points,
+        #     config=FLAGS.DATASET_CONFIG,
+        #     dump_dir=FLAGS.DUMP_DIR + str(T.dataset.thresh),
+        # )
 
 
 if __name__ == "__main__":
@@ -235,5 +304,5 @@ if __name__ == "__main__":
     FLAGS = mod.C
     FLAGS.SAMPLING = args.sampling
     initialize_dataloader(FLAGS)
-    # save_datas(FLAGS)
-    evaluate_with_sampling(FLAGS)
+    save_datas(FLAGS)
+    # evaluate_with_sampling(FLAGS)

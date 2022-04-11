@@ -82,9 +82,9 @@ class ScannetDetectionFramesDataset(Dataset):
         center_noise_var=0,
         overfit=False,
         box_noise_var=0,
-        bin_thresholds=[0.5, 0.7, 1.0],
-        classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
-        # classes=[2],
+        bin_thresholds=[1.0],
+        # classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
+        classes=[2],
     ):
         """[summary]
 
@@ -172,6 +172,8 @@ class ScannetDetectionFramesDataset(Dataset):
             "seconds",
         )
         if self.overfit:
+            return [["scene0015_00_2", None], ["scene0575_02_25", None]]
+            # return file_names[17:24]
             return [["scene0655_01_9", None]]  # , ["scene0000_00_3", None]]
         np.random.seed(10)
         np.random.shuffle(file_names)
@@ -233,6 +235,7 @@ class ScannetDetectionFramesDataset(Dataset):
             points=pts, boxes=boxes, classes=classes
         )
 
+        # print(classes, scores)
         # pdb.set_trace()
         VOX_SIZE = 1  # double check
         grid_shape = np.array([60, 36, 60])
@@ -312,13 +315,25 @@ class ScannetDetectionFramesDataset(Dataset):
 
         # NOTE: set size class as semantic class. Consider use size2class.
 
-        # np.random.seed()
-        # center_noise = (
-        #     np.random.randn(3) * self.center_noise_var + self.center_noise_mean
-        # )
-        # target_bboxes[0, :3] += center_noise
+        np.random.seed()
+        center_noise = (
+            np.random.randn(3) * self.center_noise_var * 0.5 + self.center_noise_mean
+        )
 
-        # print(center_noise)
+        center_noise2 = (
+            np.random.randn(3) * self.center_noise_var * 1 + self.center_noise_mean
+        )
+        center_noise3 = (
+            np.random.randn(3) * self.center_noise_var * 1.5 + self.center_noise_mean
+        )
+        center_noise4 = (
+            np.random.randn(3) * self.center_noise_var * 2 + self.center_noise_mean
+        )
+
+        center_noise5 = (
+            np.random.randn(3) * self.center_noise_var * 2.5 + self.center_noise_mean
+        )
+
         # print("**************************")
         # print(target_bboxes[0:instance_bboxes.shape[0],:3])
         # print("**************************")
@@ -327,6 +342,21 @@ class ScannetDetectionFramesDataset(Dataset):
             target_bboxes[0 : instance_bboxes.shape[0], 3:6]
             - DC.mean_size_arr[class_ind, :]
         )
+        # print(self.center_noise_var * 0.5)
+        # print(self.center_noise_var * 1)
+        # print(self.center_noise_var * 1.5)
+        # print(self.center_noise_var * 2)
+        # print(self.center_noise_var * 2.5)
+
+        size_residuals[0, :3] += center_noise
+
+        size_residuals[1, :3] += center_noise2
+        size_residuals[2, :3] += center_noise3
+
+        size_residuals[3, :3] += center_noise4
+        size_residuals[4, :3] += center_noise5
+
+        # print(size_residuals[:10])
         ret_dict = {}
         point_cloud = torch.from_numpy(point_cloud)
         ret_dict["point_clouds"] = point_cloud.float()
@@ -351,10 +381,12 @@ class ScannetDetectionFramesDataset(Dataset):
         for idx, trs in enumerate(self.bin_thresholds):
             # print(prev, trs)
 
-            mm = (scores >= prev) & (scores < trs)
+            mm = (scores >= prev) & (scores <= trs)
             prev = trs
 
             vis_masks[idx, :] = mm
+        target_bboxes_mask = vis_masks[0]
+
         ret_dict["vis_masks"] = torch.from_numpy(vis_masks)
         # print(scores)
         ret_dict["size_residual_label"] = torch.from_numpy(
@@ -366,6 +398,8 @@ class ScannetDetectionFramesDataset(Dataset):
         target_bboxes_semcls[0 : instance_bboxes.shape[0]] = [
             x for x in instance_bboxes[:, -1][0 : instance_bboxes.shape[0]]
         ]
+
+        gt_sizes = target_bboxes
         ret_dict["sem_cls_label"] = torch.from_numpy(
             target_bboxes_semcls.astype(np.int64)
         )
@@ -381,10 +415,10 @@ class ScannetDetectionFramesDataset(Dataset):
         )
 
         ret_dict["scan_idx"] = torch.from_numpy(np.array(idx).astype(np.int64))
-
+        ret_dict["gt_sizes"] = gt_sizes
         ret_dict["pcl_color"] = pcl_color
         ret_dict["name"] = item_idx
-        print(classes, item_idx)
+        # print(classes, item_idx)
 
         return ret_dict
 

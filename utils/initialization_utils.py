@@ -155,12 +155,13 @@ def initialize_model(FLAGS):
     # TFBoard Visualizers
     FLAGS.TRAIN_VISUALIZER = TfVisualizer(FLAGS, "train")
     FLAGS.TEST_VISUALIZER = TfVisualizer(FLAGS, "test")
-
+    print(FLAGS)
     if FLAGS.MODEL == "boxnet":
         Detector = MODEL.BoxNet
-    else:
+    elif FLAGS.MODEL == "votenet":
         Detector = MODEL.VoteNet
-
+    else:
+        Detector = MODEL.ChairNet
     FLAGS.MODEL = MODEL
     net = Detector(
         num_class=FLAGS.DATASET_CONFIG.num_class,

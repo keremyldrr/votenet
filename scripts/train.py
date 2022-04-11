@@ -129,8 +129,10 @@ def train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS):
 
             inputs = {
                 "point_clouds": batch_data_label["point_clouds"],
+                "center_label": batch_data_label["center_label"],
                 "name": batch_data_label["name"],
             }
+
         st = time.time()
         end_points = net(inputs)
 
@@ -138,22 +140,30 @@ def train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS):
         for key in batch_data_label:
             assert key not in end_points
             end_points[key] = batch_data_label[key]
+
+        L1_reg = torch.tensor(0.0, requires_grad=True).cuda()
+        for name, param in net.named_parameters():
+            if "weight" in name:
+                L1_reg = L1_reg + torch.norm(param, 1)
+
         loss, end_points = criterion(end_points, FLAGS.DATASET_CONFIG)
+
+        # end_points["loss"] += L1_reg * 1e-4
+        # loss += L1_reg * 1e-4
         loss.backward()
         optimizer.step()
-        print(time.time() - st, "seconds per iter")
         # # pdb.set_trace()
-        if FLAGS.OVERFIT:
-            print("ADDED SIGMA ", FLAGS.SIGMA)
-            for bdx, log_vars_frame in enumerate(end_points["log_var_per_gt"]):
-                for cdx, (box, sc) in enumerate(log_vars_frame):
-                    sigma = torch.exp(box.mean()) ** 0.5
-                    print(
-                        bdx,
-                        cdx,
-                        sigma.item(),
-                        np.unique(sc.detach().cpu(), return_counts=True),
-                    )
+        # if FLAGS.OVERFIT:
+        #     print("ADDED SIGMA ", FLAGS.SIGMA)
+        #     for bdx, log_vars_frame in enumerate(end_points["log_var_per_gt"]):
+        #         for cdx, (box, sc) in enumerate(log_vars_frame):
+        #             sigma = torch.exp(box.mean()) ** 0.5
+        #             print(
+        #                 bdx,
+        #                 cdx,
+        #                 sigma.item(),
+        #                 np.unique(sc.detach().cpu(), return_counts=True),
+        #             )
         # end_points["sigma"] = torch.exp(end_points["log_var"].mean())**0.5
         # Accumulate statistics and print out
         for key in end_points:
@@ -164,7 +174,8 @@ def train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS):
                 or "acc" in key
                 or "ratio" in key
             ):
-                # print(key,end_points[key].shape)
+
+                # print(key, end_points[key].shape)
                 if key not in stat_dict:
                     stat_dict[key] = 0
                 stat_dict[key] += end_points[key].item()
@@ -224,6 +235,7 @@ def evaluate_one_epoch(net, criterion, FLAGS):
 
             inputs = {
                 "point_clouds": batch_data_label["point_clouds"],
+                "center_label": batch_data_label["center_label"],
                 "name": batch_data_label["name"],
             }
 
@@ -237,17 +249,24 @@ def evaluate_one_epoch(net, criterion, FLAGS):
             end_points[key] = batch_data_label[key]
         loss, end_points = criterion(end_points, FLAGS.DATASET_CONFIG)
 
+        L1_reg = torch.tensor(0.0, requires_grad=False).cuda()
+        for name, param in net.named_parameters():
+            if "weight" in name:
+                L1_reg = L1_reg + torch.norm(param, 1)
+
         # Accumulate statistics and prin t out
         # t ot
+        # end_points["loss"] += L1_reg * 1e-4
+        loss = end_points["loss"]
         for key in end_points:
-            if "loss" in key or "acc" in key or "ratio" in key:
+            if "loss" in key or "acc" in key or "ratio" in key or "nll" in key:
                 if key not in stat_dict:
                     stat_dict[key] = 0
                 stat_dict[key] += end_points[key].item()
 
-        batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT)
-        batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
-        ap_calculator.step(batch_pred_map_cls, batch_gt_map_cls)
+        # batch_pred_map_cls = parse_predictions(end_points, CONFIG_DICT)
+        # batch_gt_map_cls = parse_groundtruths(end_points, CONFIG_DICT)
+        # ap_calculator.step(batch_pred_map_cls, batch_gt_map_cls)
 
         # Dump evaluation results for visualization
         if FLAGS.DUMP_RESULTS and batch_idx == 0 and EPOCH_CNT % 10 == 0:
@@ -270,12 +289,12 @@ def evaluate_one_epoch(net, criterion, FLAGS):
         )
 
     # Evaluate average precision
-    metrics_dict = ap_calculator.compute_metrics()
-    for key in metrics_dict:
-        log_string(FLAGS.LOGGER, "eval %s: %f" % (key, metrics_dict[key]))
+    # metrics_dict = ap_calculator.compute_metrics()
+    # for key in metrics_dict:
+    #     log_string(FLAGS.LOGGER, "eval %s: %f" % (key, metrics_dict[key]))
 
     mean_loss = stat_dict["loss"] / float(batch_idx + 1)
-    return mean_loss, metrics_dict["mAP"]
+    return mean_loss, mean_loss  # metrics_dict["mAP"]
 
 
 def train(FLAGS):
@@ -288,8 +307,6 @@ def train(FLAGS):
 
     net, criterion, optimizer, bnm_scheduler = initialize_model(FLAGS)
     # TODO: initialize everything here and create optimizer, net and criterion here, then pass it to the corresponding functions
-    if FLAGS.LOG_VAR:
-        torch.nn.init.normal_(net.pnet.conv4.weight, mean=0.0, std=1e-4)
     for epoch in range(FLAGS.START_EPOCH, FLAGS.MAX_EPOCH):
         EPOCH_CNT = epoch
         log_string(FLAGS.LOGGER, "**** EPOCH %03d ****" % (epoch))
@@ -313,26 +330,13 @@ def train(FLAGS):
         # REF: https://github.com/pytorc /pytorch/issues/5059
         np.random.seed()
         train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS)
-        if EPOCH_CNT % 3 == 1:  # Eval every 2 epochs
+        save_interval = 3 if (FLAGS.OVERFIT == False) else 100
+        if EPOCH_CNT % save_interval == 1:  # Eval every 2 epochs
             # TODO: make this dataset dependent, or iterations
             DATA_SIZE = len(FLAGS.TRAIN_DATALOADER)
             ITERS_PER_EPOCH = DATA_SIZE
 
             NUM_ITERS_TOTAL = FLAGS.START_ITER + ITERS_PER_EPOCH * epoch
-            # torch.save(
-            #     save_dict,
-            #     os.path.join(
-            #         FLAGS.LOG_DIR, "best_checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
-            #     ),
-            # )  #
-            if not FLAGS.OVERFIT:
-                loss, curr_map = evaluate_one_epoch(net, criterion, FLAGS)
-            FLAGS.TEST_VISUALIZER.log_scalars(
-                {"mAP": curr_map},
-                (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
-            )
-
-            # Save checkpoint
             save_dict = {
                 "epoch": epoch
                 + 1,  # after training one epoch, the start_epoch should be epoch+1
@@ -344,7 +348,21 @@ def train(FLAGS):
             except:
                 save_dict["model_state_dict"] = net.state_dict()
 
-            if curr_map > best_map:
+            torch.save(
+                save_dict,
+                os.path.join(
+                    FLAGS.LOG_DIR, "checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
+                ),
+            )  #
+
+            loss, curr_map = evaluate_one_epoch(net, criterion, FLAGS)
+            FLAGS.TEST_VISUALIZER.log_scalars(
+                {"mAP": curr_map},
+                (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
+            )
+
+            # Save checkpoint
+            if curr_map < best_map:
                 DATA_SIZE = len(FLAGS.TRAIN_DATALOADER)
                 ITERS_PER_EPOCH = DATA_SIZE
                 NUM_ITERS_TOTAL = FLAGS.START_ITER + ITERS_PER_EPOCH * epoch
