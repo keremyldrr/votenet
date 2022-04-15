@@ -8,6 +8,7 @@
 Author: Charles R. Qi and Or Litany
 """
 
+import pdb
 import torch
 import torch.nn as nn
 import numpy as np
@@ -21,7 +22,7 @@ from backbone_module import Pointnet2Backbone
 from voting_module import VotingModule
 from proposal_module import ProposalModule
 from dump_helper import dump_results, dump_results_with_color
-from loss_helper import get_loss
+from loss_helper import get_loss, get_size_loss
 
 
 class VoteNet(nn.Module):
@@ -103,7 +104,7 @@ class VoteNet(nn.Module):
         batch_size = inputs["point_clouds"].shape[0]
 
         end_points = self.backbone_net(inputs["point_clouds"], end_points)
-
+        pdb.set_trace()
         # --------- HOUGH VOTING ---------
         xyz = end_points["fp2_xyz"]
         features = end_points["fp2_features"]
@@ -112,7 +113,7 @@ class VoteNet(nn.Module):
         end_points["seed_features"] = features
 
         # features = self.drop(features)
-
+        # pdb.set_trace()
         xyz, features = self.vgen(xyz, features)
         features_norm = torch.norm(features, p=2, dim=1)
         features = features.div(features_norm.unsqueeze(1))

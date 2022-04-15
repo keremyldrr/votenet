@@ -24,28 +24,84 @@ GT_VOTE_FACTOR = 3  # number of GT votes per point
 OBJECTNESS_CLS_WEIGHTS = [0.2, 0.8]  # put larger weights on positive objectness
 
 
+def get_size_loss(end_points, config):
+    size_preds = end_points["size_preds"]
+
+    # size_preds = size_preds.permute(0, 2, 1)
+    batch_size = size_preds.shape[0]
+    log_vars = end_points["log_vars"]
+    precision = torch.exp(end_points["log_vars"]) ** 0.5
+    gt_residuals = end_points["size_residual_label"]
+    box_label_mask = end_points["box_label_mask"]
+    mean_size_arr = config.mean_size_arr
+    mean_size_arr = torch.index_select(
+        torch.from_numpy(mean_size_arr).cuda(),
+        0,
+        end_points["class_labels"][end_points["box_label_mask"].bool()].long(),
+    )
+
+    gt_residuals_fast = torch.div(
+        gt_residuals[end_points["box_label_mask"].bool()].float(), mean_size_arr.float()
+    )
+    gt_residuals[end_points["box_label_mask"].bool()] = gt_residuals_fast
+    l2_dists = (
+        torch.sqrt(((size_preds - gt_residuals) ** 2).sum(2))
+        # * end_points["box_label_mask"]
+    )
+    # l2_dists = torch.sqrt(
+    #     ((size_preds - gt_residuals) ** 2).sum(dim=2) * box_label_mask
+    # )
+    # pdb.set_trace()
+    nll = (
+        ((l2_dists / (precision + 1e-6)) + log_vars).sum(dim=1)
+        / (end_points["box_label_mask"].sum(dim=1))
+    ).sum()
+    if np.isnan(nll.item()):
+        print("nan detected breakpoint inserted")
+        print(end_points["name"])
+        pdb.set_trace()
+    # l1_loss = l1_dists.sum() / (end_points["box_label_mask"].sum())
+    l2_loss = (l2_dists.sum(dim=1) / box_label_mask.sum(dim=1)).sum()
+    # # loss = 0.001 * nll + l2_loss
+    # loss = l2_loss
+    # print(precision[box_label_mask.bool()])
+    object_assignment = torch.cat(
+        [torch.arange(64).unsqueeze(0) for a in range(batch_size)],
+        dim=0,
+    ).cuda()
+    #
+    size_residual_normalized_loss = (
+        torch.mean(
+            huber_loss(
+                size_preds - gt_residuals,
+                delta=1.0,
+            ),
+            -1,
+        )
+        * end_points["box_label_mask"]
+    )
+
+    # (B,K,3) -> (B,K)
+    # size_residual_normalized_loss = torch.sum(
+    #     size_residual_normalized_loss * box_label_mask
+    # ) / (torch.sum(box_label_mask) + 1e-6)
+    size_residual_normalized_loss = (
+        torch.sum(size_residual_normalized_loss, dim=1)
+        / (box_label_mask.sum(dim=1) + 1e-6)
+    ).sum()
+    end_points["nll"] = nll
+    # end_points["l2_loss"] = l2_loss
+    end_points["huber_loss"] = size_residual_normalized_loss
+    loss = size_residual_normalized_loss  # + nll * 1e-2
+    # loss *= 10
+    end_points["loss"] = loss  # size_residual_normalized_loss
+
+    # end_points["loss"] = loss
+    # print(gt_residuals[:, :5, :] - size_preds[:, :5, :])
+    return loss, end_points
+
+
 def compute_vote_loss(end_points):
-    """Compute vote loss: Match predicted votes to GT votes.
-
-    Args:
-        end_points: dict (read-only)
-
-    Returns:
-        vote_loss: scalar Tensor
-
-    Overall idea:
-        If the seed point belongs to an object (votes_label_mask == 1),
-        then we require it to vote for the object center.
-
-        Each seed point may vote for multiple translations v1,v2,v3
-        A seed point may also be in the boxes of multiple objects:
-        o1,o2,o3 with corresponding GT votes c1,c2,c3
-
-        Then the loss for this seed point is:
-            min(d(v_i,c_j)) for i=1,2,3 and j=1,2,3
-    """
-
-    # Load ground truth votes and assign them to seed points
     batch_size = end_points["seed_xyz"].shape[0]
     num_seed = end_points["seed_xyz"].shape[1]  # B,num_seed,3
     vote_xyz = end_points["vote_xyz"]  # B,num_seed*vote_factor,3
@@ -148,7 +204,7 @@ def compute_box_and_sem_cls_loss(end_points, config):
     num_size_cluster = config.num_size_cluster
     num_class = config.num_class
     mean_size_arr = config.mean_size_arr
-
+    pdb.set_trace()
     object_assignment = end_points["object_assignment"]
     batch_size = object_assignment.shape[0]
 
@@ -269,7 +325,7 @@ def compute_box_and_sem_cls_loss(end_points, config):
     predicted_size_residual_normalized = torch.sum(
         end_points["size_residuals_normalized"] * size_label_one_hot_tiled, 2
     )  # (B,K,3)s
-
+    pdb.set_trace()
     mean_size_arr_expanded = (
         torch.from_numpy(mean_size_arr.astype(np.float32))
         .cuda()
@@ -354,7 +410,7 @@ def get_loss(end_points, config):
     end_points["objectness_mask"] = objectness_mask
     end_points["object_assignment"] = object_assignment
 
-    sample_centers(end_points, {"num_samples": config.num_samples})
+    # sample_centers(end_points, {"num_samples": config.num_samples})
     dist1, ind1, dist2, _ = nn_distance(
         end_points["center"], end_points["center_label"]
     )  # dist1: BxK, dist2: BxK2

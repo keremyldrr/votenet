@@ -258,6 +258,12 @@ def end_pts_to_bb(
 ):
     pred_center = end_points["center"]  # B,num_proposal,3
     # pred_variances = torch.exp(end_points["log_vars"]) ** 0.5
+    sem_cls_probs = softmax(
+        end_points["sem_cls_scores"].detach().cpu().numpy()
+    )  # B,num_proposal,10
+
+    bsize = pred_center.shape[0]
+    pred_sem_cls = torch.argmax(end_points["sem_cls_scores"], -1)  # B,num_proposal
 
     pred_heading_class = torch.argmax(
         end_points["heading_scores"], -1
@@ -1845,6 +1851,88 @@ def parse_predictions_augmented(
     return batch_pred_map_cls
 
 
+def compute_batch_iou(end_points, FLAGS):
+    bsize = end_points["box_label_mask"].shape[0]  # FLAGS.BATCH_SIZE
+    batch_iou = 0
+    for b in range(bsize):
+
+        mean_size_arr = FLAGS.DATASET_CONFIG.mean_size_arr[2]
+        pred_sizes = (
+            torch.from_numpy(
+                np.multiply(mean_size_arr, end_points["size_preds"][b].cpu().numpy())
+            )
+            .cuda()
+            .float()
+            + torch.from_numpy(FLAGS.DATASET_CONFIG.type_mean_size["chair"])
+            .cuda()
+            .float()
+        )
+        if end_points["box_label_mask"][b].sum() == 0:
+            continue
+        log_vars = torch.exp(end_points["log_vars"][b]) ** 0.5
+        gt_centers = end_points["center_label"][b][
+            end_points["box_label_mask"][b].bool()
+        ]
+        gt_sizes = (
+            torch.from_numpy(FLAGS.DATASET_CONFIG.type_mean_size["chair"])
+            .cuda()
+            .float()
+            + torch.from_numpy(
+                np.multiply(
+                    mean_size_arr, end_points["size_residual_label"][b].cpu().numpy()
+                )
+            )
+            .cuda()
+            .float()
+        )[end_points["box_label_mask"][b].bool()]
+        # gt_centers = torch.from_numpy(flip_axis_to_camera(gt_sizes.cpu()))
+
+        # print(gt_sizes, gt_centers)
+        # gt_sizes = torch.from_numpy(flip_axis_to_depth(gt_sizes.cpu()))
+        # pred_sizes = torch.from_numpy(flip_axis_to_depth(pred_sizes.cpu()))
+        # print(gt_sizes, gt_centers)
+        gt_centers = torch.from_numpy(flip_axis_to_camera(gt_centers.cpu()))
+
+        gt_boxes = []
+        for idx in range(len(gt_centers)):
+            corners = get_3d_box(
+                gt_sizes[idx].cpu().numpy(), 0, gt_centers[idx].cpu().numpy()
+            )
+
+            gt_boxes.append(corners)
+            # print(corners)
+        pred_boxes = []
+        # sampled_sizes = []
+        #  sampled_dists = []
+        #  for j in range(20):
+        #      sampled_sizes_per_item = [
+        #          torch.from_numpy(np.random.rand(3)).cuda().float() * log_vars[i]
+        #          + pred_sizes[i]
+        #          for i in range(len(gt_sizes))
+        #      ]
+        #      dists = [
+        #          gt_sizes[i] - sampled_sizes_per_item[i] for i in range(len(gt_sizes))
+        #      ]
+
+        #      sampled_sizes.append(sampled_sizes_per_item)
+        #      sampled_dists.append(torch.stack(dists).norm(dim=1))
+        # best_samples = torch.min(torch.stack(sampled_dists), dim=0)[1]
+        # for idx, s in enumerate(best_samples):
+        # pred_sizes[idx] = sampled_sizes[s][idx]
+        for idx in range(len(gt_centers)):
+            corners = get_3d_box(
+                pred_sizes[idx].cpu().numpy(), 0, gt_centers[idx].cpu().numpy()
+            )
+            pred_boxes.append(corners)
+        # save to ply file
+        for pred, gt in zip(pred_boxes, gt_boxes):
+
+            iou, iou_2d = box3d_iou(pred, gt)
+            # print(iou, iou_2d)
+            batch_iou += iou
+    return batch_iou, end_points["box_label_mask"].sum().cpu().item()
+
+
 def parse_groundtruths(end_points, config_dict):
     """Parse groundtruth labels to OBB parameters.
 
@@ -1890,24 +1978,25 @@ def parse_groundtruths(end_points, config_dict):
                 int(size_class_label[i, j].detach().cpu().numpy()),
                 size_residual_label[i, j].detach().cpu().numpy(),
             )
+            print(box_size, center_label[i, j])
             corners_3d_upright_camera = get_3d_box(
                 box_size, heading_angle, gt_center_upright_camera[i, j, :]
             )
+            # print(corners_3d_upright_camera)
             gt_corners_3d_upright_camera[i, j] = corners_3d_upright_camera
-            gt_box_sizes[i, j] = (
-                np.linalg.norm(
-                    corners_3d_upright_camera[0] - corners_3d_upright_camera[1]
-                )
-                * np.linalg.norm(
-                    corners_3d_upright_camera[2] - corners_3d_upright_camera[1]
-                )
-                * np.linalg.norm(
-                    corners_3d_upright_camera[4] - corners_3d_upright_camera[1]
-                )
-            )
+            # gt_box_sizes[i, j] = (
+            #     np.linalg.norm(
+            #         corners_3d_upright_camera[0] - corners_3d_upright_camera[1]
+            #     )
+            #     * np.linalg.norm(
+            #         corners_3d_upright_camera[2] - corners_3d_upright_camera[1]
+            #     )
+            #     * np.linalg.norm(
+            #         corners_3d_upright_camera[4] - corners_3d_upright_camera[1]
+            #     )
+            # )
 
         # gt_box_sizes[i] = gt_box_sizes[i,:np.argmin(gt_box_sizes[i])]
-
     end_points["gt_box_sizes"] = gt_box_sizes
     end_points["raw_gt_boxes"] = gt_corners_3d_upright_camera
     batch_gt_map_cls = []

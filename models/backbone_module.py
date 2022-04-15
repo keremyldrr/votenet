@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+import pdb
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -68,9 +69,28 @@ class Pointnet2Backbone(nn.Module):
             use_xyz=True,
             normalize_xyz=True,
         )
+        # self.sa5 = PointnetSAModuleVotes(
+        #     npoint=128,
+        #     radius=1.6,
+        #     nsample=16,
+        #     mlp=[256, 128, 128, 256],
+        #     use_xyz=True,
+        #     normalize_xyz=True,
+        # )
 
-        self.fp1 = PointnetFPModule(mlp=[256 + 256, 256, 256])
-        self.fp2 = PointnetFPModule(mlp=[256 + 256, 256, 256])
+        # self.sa6 = PointnetSAModuleVotes(
+        #     npoint=64,
+        #     radius=2.0,
+        #     nsample=8,
+        #     mlp=[256, 128, 128, 256],
+        #     use_xyz=True,
+        #     normalize_xyz=True,
+        # )
+        self.fp1 = PointnetFPModule(mlp=[512, 256, 256])
+        self.fp2 = PointnetFPModule(mlp=[512, 256, 256])
+
+        # self.fp3 = PointnetFPModule(mlp=[256 + 255, 128, 64])
+        # self.fp4 = PointnetFPModule(mlp=[256 + 256, 256, 256])
 
     def _break_up_pc(self, pc):
         xyz = pc[..., 0:3].contiguous()
@@ -102,14 +122,12 @@ class Pointnet2Backbone(nn.Module):
         batch_size = pointcloud.shape[0]
 
         xyz, features = self._break_up_pc(pointcloud)
-
-        # --------- 4 SET ABSTRACTION LAYERS ---------
+        # --------- 6 SET ABSTRACTION LAYERS ---------
         xyz, features, fps_inds = self.sa1(xyz, features)
         # features = self.drop1(features)
         end_points["sa1_inds"] = fps_inds
         end_points["sa1_xyz"] = xyz
         end_points["sa1_features"] = features
-
         xyz, features, fps_inds = self.sa2(
             xyz, features
         )  # this fps_inds is just 0,1,...,1023
@@ -124,28 +142,63 @@ class Pointnet2Backbone(nn.Module):
         # features = self.drop3(features)
         end_points["sa3_xyz"] = xyz
         end_points["sa3_features"] = features
-
         xyz, features, fps_inds = self.sa4(
             xyz, features
         )  # this fps_inds is just 0,1,...,255
         # features = self.drop4(features)
+        #
         end_points["sa4_xyz"] = xyz
         end_points["sa4_features"] = features
+        # xyz, features, fps_inds = self.sa5(
+        #     xyz, features
+        # )
+        # this fps_inds is just 0,1,...,255
+        # features = self.drop4(features)
+        # end_points["sa5_xyz"] = xyz
+        # end_points["sa5_features"] = features
+
+        # print("sa5", features.shape, xyz.shape)
+        # xyz, features, fps_inds = self.sa6(
+        #     xyz, features
+        # )  # this fps_inds is just 0,1,...,255
+        # # features = self.drop4(features)
+        # end_points["sa6_xyz"] = xyz
+        # end_points["sa6_features"] = features
+
+        # print("sa6", features.shape, xyz.shape)
+        # pdb.set_trace()
+        # features = self.fp4(
+        #     end_points["sa5_xyz"],
+        #     end_points["sa6_xyz"],
+        #     end_points["sa5_features"],
+        #     end_points["sa6_features"],
+        # )
+
+        # # features = self.drop5(features)
+        # features = self.fp3(
+        #     end_points["sa4_xyz"],
+        #     end_points["sa5_xyz"],
+        #     end_points["sa4_features"],
+        #     features,
+        # )
 
         # --------- 2 FEATURE UPSAMPLING LAYERS --------
-        features = self.fp1(
+        features = self.fp2(
             end_points["sa3_xyz"],
             end_points["sa4_xyz"],
             end_points["sa3_features"],
             end_points["sa4_features"],
         )
+
         # features = self.drop5(features)
-        features = self.fp2(
+        features = self.fp1(
             end_points["sa2_xyz"],
             end_points["sa3_xyz"],
             end_points["sa2_features"],
             features,
         )
+
+        # pdb.set_trace()
         # features = self.drop6(features)
         end_points["fp2_features"] = features
         end_points["fp2_xyz"] = end_points["sa2_xyz"]

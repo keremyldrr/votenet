@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+import pdb
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -115,6 +116,8 @@ class ProposalModule(nn.Module):
         )
         if log_var:
             self.conv4 = torch.nn.Conv1d(128, 1, 1)
+
+            torch.nn.init.normal_(self.conv4.weight, mean=0.0, std=1e-4)
         else:
             self.conv4 = None
         self.bn1 = torch.nn.BatchNorm1d(128)
@@ -156,6 +159,7 @@ class ProposalModule(nn.Module):
         ] = sample_inds  # (batch_size, num_proposal,) # should be 0,1,2,...,num_PROPOSAL
 
         # --------- Proposal Generation with Variational Inference ---------
+        pdb.set_trace()
         net = F.relu(self.bn1(self.conv1(self.drop1(features))))
         net = F.relu(self.bn2(self.conv2(self.drop2(net))))
         # net = self.conv3(self.drop3(net)) # (batch_size, 2+3+num_heading_bin*2+num_size_cluster*4, num_proposal)

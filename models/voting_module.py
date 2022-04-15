@@ -69,6 +69,9 @@ class VotingModule(nn.Module):
         residual_features = net[
             :, :, :, 3:
         ]  # (batch_size, num_seed, vote_factor, out_dim)
+        import pdb
+
+        # pdb.set_trace()
         vote_features = seed_features.transpose(2, 1).unsqueeze(2) + residual_features
         vote_features = vote_features.contiguous().view(
             batch_size, num_vote, self.out_dim

@@ -6,12 +6,15 @@ import importlib.util
 import argparse
 import trimesh
 import pdb
+import glob
+from natsort import natsorted  # pip install natsort
 
 # pytorch stuff
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim import lr_scheduler
+
 
 BASE_DIR = os.path.dirname(
     os.path.abspath("/home/yildirir/workspace/votenet/README.md")
@@ -22,6 +25,8 @@ sys.path.append(os.path.join(ROOT_DIR, "utils"))
 sys.path.append(os.path.join(ROOT_DIR, "pointnet2"))
 sys.path.append(os.path.join(ROOT_DIR, "models"))
 sys.path.append(BASE_DIR)
+
+from ap_helper import flip_axis_to_depth
 
 np.random.seed(31)
 # project stuff
@@ -36,6 +41,7 @@ from ap_helper import (
     parse_predictions,
     parse_groundtruths,
     parse_predictions_with_log_var,
+    compute_batch_iou,
 )
 from initialization_utils import (
     initialize_dataloader,
@@ -69,7 +75,12 @@ def evaluate_with_sampling(FLAGS):
             ap_iou_thresh=FLAGS.AP_IOU_THRESH,
             class2type_map=FLAGS.DATASET_CONFIG.class2type,
         )
-
+        total_iou = 0
+        total_num_boxes = 0
+        bins = T.dataset.bin_thresholds
+        res_bins = {}
+        for b in bins:
+            res_bins[b] = [0, 0, 0]
         for batch_idx, batch_data_label in enumerate(T):
             if batch_idx % 10 == 0:
                 print("Eval batch: %d" % (batch_idx))
@@ -77,7 +88,6 @@ def evaluate_with_sampling(FLAGS):
                 if key != "name":
                     batch_data_label[key] = batch_data_label[key].to(FLAGS.DEVICE)
 
-            pdb.set_trace()
             # Forward pass
             inputs = {
                 "point_clouds": batch_data_label["point_clouds"],
@@ -91,9 +101,29 @@ def evaluate_with_sampling(FLAGS):
             #     )
             # trimesh.points.PointCloud(pc[:, :3].cpu().numpy()).export(filename)
 
-            # inputs = {'point_clouds': batch_data_label['point_clouds']}
-            # with torch.no_grad():
-        #         end_points = net(inputs)
+            with torch.no_grad():
+                end_points = net(inputs)
+            for key in batch_data_label:
+                end_points[key] = batch_data_label[key]
+
+            box_label_mask_vanilla = end_points["box_label_mask"].float().clone()
+            iou, num_boxes = compute_batch_iou(end_points, FLAGS)
+            total_iou += iou
+            total_num_boxes += num_boxes
+            for idx, b in enumerate(bins):
+                end_points["box_label_mask"] = (
+                    box_label_mask_vanilla
+                    * batch_data_label["vis_masks"][:, idx, :].float()
+                )
+                iou, num_boxes = compute_batch_iou(end_points, FLAGS)
+                res_bins[b][0] += iou
+                res_bins[b][1] += num_boxes
+                res_bins[b][2] += (
+                    torch.exp(
+                        end_points["log_vars"][end_points["box_label_mask"].bool()]
+                    )
+                    ** 0.5
+                ).sum()
         #     # Compute loss8
         #     for key in batch_data_label:
         #         assert key not in end_points
@@ -139,9 +169,21 @@ def evaluate_with_sampling(FLAGS):
         #     config=FLAGS.DATASET_CONFIG,
         #     dump_dir=FLAGS.DUMP_DIR + str(T.dataset.thresh),
         # )
+        print(total_iou / total_num_boxes, total_num_boxes)
+        res_bins["all"] = total_iou / total_num_boxes
+        for b in bins:
 
+            print(
+                "Average IOU bin ",
+                b,
+                res_bins[b][0] / res_bins[b][1],
+                "sigma",
+                res_bins[b][2] / res_bins[b][1],
+                res_bins[b][1],
+            )
         # dump_only_boxes(selected_raw_boxes, FLAGS.DUMP_DIR)
         # dump_only_boxes_gt(batch_gt_map_cls, FLAGS.DUMP_DIR)
+        return res_bins
 
 
 def save_datas(FLAGS):
@@ -200,6 +242,12 @@ def save_datas(FLAGS):
                     .float()
                     + batch_data_label["size_residual_label"][b].float()
                 )[batch_data_label["box_label_mask"][b].bool()]
+                # gt_centers = torch.from_numpy(flip_axis_to_camera(gt_sizes.cpu()))
+
+                # print(gt_sizes, gt_centers)
+                gt_sizes = torch.from_numpy(flip_axis_to_depth(gt_sizes.cpu()))
+                pred_sizes = torch.from_numpy(flip_axis_to_depth(pred_sizes.cpu()))
+                # print(gt_sizes, gt_centers)
 
                 boxes = []
                 scene = trimesh.scene.Scene()
@@ -213,8 +261,10 @@ def save_datas(FLAGS):
                     corners = get_3d_box(
                         gt_sizes[idx].cpu().numpy(), 0, gt_centers[idx].cpu().numpy()
                     )
+                    # print(corners)
                     scene.add_geometry(trimesh.points.PointCloud(corners).convex_hull)
                 # save to ply file
+                #
                 [
                     a.export(name + "_gt_" + str(idx) + ".ply")
                     for idx, a in enumerate(scene.dump())
@@ -296,13 +346,29 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config-path")
     parser.add_argument("--sampling", action="store_true")
+    parser.add_argument("--multi_cp")
     args = parser.parse_args()
 
     spec = importlib.util.spec_from_file_location("C", args.config_path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     FLAGS = mod.C
-    FLAGS.SAMPLING = args.sampling
-    initialize_dataloader(FLAGS)
-    save_datas(FLAGS)
-    # evaluate_with_sampling(FLAGS)
+    if args.multi_cp:
+        files = natsorted(glob.glob(args.multi_cp + "/*.tar"))
+        # print(files)
+        for f in files:
+            spec = importlib.util.spec_from_file_location("C", args.config_path)
+            mod = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(mod)
+            FLAGS = mod.C
+
+            FLAGS.CHECKPOINT_PATH = f
+            # FLAGS.SAMPLING = args.sampling
+            initialize_dataloader(FLAGS)
+            # save_datas(FLAGS)
+            evaluate_with_sampling(FLAGS)
+
+    else:
+        initialize_dataloader(FLAGS)
+        # save_datas(FLAGS)
+        evaluate_with_sampling(FLAGS)

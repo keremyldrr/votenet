@@ -44,7 +44,12 @@ sys.path.append(os.path.join(ROOT_DIR, "models"))
 
 # project stuff
 
-from ap_helper import APCalculator, parse_predictions, parse_groundtruths
+from ap_helper import (
+    APCalculator,
+    parse_predictions,
+    parse_groundtruths,
+    compute_batch_iou,
+)
 from initialization_utils import initialize_dataloader, initialize_model, log_string
 
 
@@ -221,6 +226,14 @@ def evaluate_one_epoch(net, criterion, FLAGS):
         class2type_map=FLAGS.DATASET_CONFIG.class2type,
     )
     net.eval()  # set model to eval mode (for bn and dp)
+
+    total_iou = 0
+    total_num_boxes = 0
+    bins = FLAGS.TEST_DATALOADER.dataset.bin_thresholds
+    res_bins = {}
+    for b in bins:
+        res_bins[b] = [0, 0, 0]
+
     for batch_idx, batch_data_label in enumerate(FLAGS.TEST_DATALOADER):
         if batch_idx % 10 == 0:
             print("Eval batch: %d" % (batch_idx))
@@ -258,6 +271,23 @@ def evaluate_one_epoch(net, criterion, FLAGS):
         # t ot
         # end_points["loss"] += L1_reg * 1e-4
         loss = end_points["loss"]
+        box_label_mask_vanilla = end_points["box_label_mask"].float().clone()
+        iou, num_boxes = compute_batch_iou(end_points, FLAGS)
+        total_iou += iou
+        total_num_boxes += num_boxes
+        for idx, b in enumerate(bins):
+            end_points["box_label_mask"] = (
+                box_label_mask_vanilla
+                * batch_data_label["vis_masks"][:, idx, :].float()
+            )
+            iou, num_boxes = compute_batch_iou(end_points, FLAGS)
+            res_bins[b][0] += iou
+            res_bins[b][1] += num_boxes
+            res_bins[b][2] += (
+                torch.exp(end_points["log_vars"][end_points["box_label_mask"].bool()])
+                ** 0.5
+            ).sum()
+
         for key in end_points:
             if "loss" in key or "acc" in key or "ratio" in key or "nll" in key:
                 if key not in stat_dict:
@@ -276,6 +306,21 @@ def evaluate_one_epoch(net, criterion, FLAGS):
                 best_map = -1
                 break
     # Log statistics
+
+    FLAGS.TEST_VISUALIZER.log_scalars(
+        {"Avg IOU Total": total_iou / total_num_boxes},
+        (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
+    )
+    res_bins["all"] = total_iou / total_num_boxes
+    for b in bins:
+
+        FLAGS.TEST_VISUALIZER.log_scalars(
+            {
+                "Average IOU {}".format(b): res_bins[b][0] / res_bins[b][1],
+                "sigma {}".format(b): res_bins[b][2] / res_bins[b][1],
+            },
+            (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
+        )
 
     FLAGS.TEST_VISUALIZER.log_scalars(
         {key: stat_dict[key] / float(batch_idx + 1) for key in stat_dict},
@@ -330,7 +375,7 @@ def train(FLAGS):
         # REF: https://github.com/pytorc /pytorch/issues/5059
         np.random.seed()
         train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS)
-        save_interval = 3 if (FLAGS.OVERFIT == False) else 100
+        save_interval = 3  # if (FLAGS.OVERFIT == False) else 100
         if EPOCH_CNT % save_interval == 1:  # Eval every 2 epochs
             # TODO: make this dataset dependent, or iterations
             DATA_SIZE = len(FLAGS.TRAIN_DATALOADER)
