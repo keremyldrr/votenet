@@ -183,7 +183,7 @@ class Pointnet2Backbone(nn.Module):
         # )
 
         # --------- 2 FEATURE UPSAMPLING LAYERS --------
-        features = self.fp2(
+        features = self.fp1(
             end_points["sa3_xyz"],
             end_points["sa4_xyz"],
             end_points["sa3_features"],
@@ -191,7 +191,7 @@ class Pointnet2Backbone(nn.Module):
         )
 
         # features = self.drop5(features)
-        features = self.fp1(
+        features = self.fp2(
             end_points["sa2_xyz"],
             end_points["sa3_xyz"],
             end_points["sa2_features"],

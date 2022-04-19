@@ -146,10 +146,10 @@ def train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS):
             assert key not in end_points
             end_points[key] = batch_data_label[key]
 
-        L1_reg = torch.tensor(0.0, requires_grad=True).cuda()
-        for name, param in net.named_parameters():
-            if "weight" in name:
-                L1_reg = L1_reg + torch.norm(param, 1)
+        # L1_reg = torch.tensor(0.0, requires_grad=True).cuda()
+        # for name, param in net.named_parameters():
+        #     if "weight" in name:
+        #         L1_reg = L1_reg + torch.norm(param, 1)
 
         loss, end_points = criterion(end_points, FLAGS.DATASET_CONFIG)
 
@@ -400,23 +400,23 @@ def train(FLAGS):
                 ),
             )  #
 
-            loss, curr_map = evaluate_one_epoch(net, criterion, FLAGS)
+            # loss, curr_map = evaluate_one_epoch(net, criterion, FLAGS)
             FLAGS.TEST_VISUALIZER.log_scalars(
                 {"mAP": curr_map},
                 (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
             )
 
             # Save checkpoint
-            if curr_map < best_map:
+            if curr_map > best_map:
                 DATA_SIZE = len(FLAGS.TRAIN_DATALOADER)
                 ITERS_PER_EPOCH = DATA_SIZE
                 NUM_ITERS_TOTAL = FLAGS.START_ITER + ITERS_PER_EPOCH * epoch
-                torch.save(
-                    save_dict,
-                    os.path.join(
-                        FLAGS.LOG_DIR, "best_checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
-                    ),
-                )  # FIXME re enable
+                # torch.save(
+                #     save_dict,
+                #     os.path.join(
+                #         FLAGS.LOG_DIR, "best_checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
+                #     ),
+                # )  # FIXME re enable
                 log_string(
                     FLAGS.LOGGER,
                     "Best changed from {} to {}".format(best_map, curr_map),

@@ -82,7 +82,7 @@ class ScannetDetectionFramesDataset(Dataset):
         center_noise_var=0,
         overfit=False,
         box_noise_var=0,
-        bin_thresholds=[0.6, 1.0],
+        bin_thresholds=[1.0],
         # classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
         classes=[2, 4],
     ):
@@ -172,7 +172,8 @@ class ScannetDetectionFramesDataset(Dataset):
             "seconds",
         )
         if self.overfit:
-            return [["scene0015_00_2", None], ["scene0575_02_25", None]]
+            # return [["scene0015_00_2", None]]
+            return [["scene0575_02_25", None]]
             # return [["scene0655_01_9", None]]  # , ["scene0000_00_3", None]]
         np.random.seed(10)
         np.random.shuffle(file_names)
@@ -316,23 +317,8 @@ class ScannetDetectionFramesDataset(Dataset):
 
         np.random.seed()
         center_noise = (
-            np.random.randn(3) * self.center_noise_var * 0.5 + self.center_noise_mean
+            np.random.randn(3) * self.center_noise_var + self.center_noise_mean
         )
-
-        center_noise2 = (
-            np.random.randn(3) * self.center_noise_var * 1 + self.center_noise_mean
-        )
-        center_noise3 = (
-            np.random.randn(3) * self.center_noise_var * 1.5 + self.center_noise_mean
-        )
-        center_noise4 = (
-            np.random.randn(3) * self.center_noise_var * 2 + self.center_noise_mean
-        )
-
-        center_noise5 = (
-            np.random.randn(3) * self.center_noise_var * 2.5 + self.center_noise_mean
-        )
-
         # print("**************************")
         # print(target_bboxes[0:instance_bboxes.shape[0],:3])
         # print("**************************")
@@ -348,12 +334,6 @@ class ScannetDetectionFramesDataset(Dataset):
         # print(self.center_noise_var * 2.5)
 
         size_residuals[0, :3] += center_noise
-
-        size_residuals[1, :3] += center_noise2
-        size_residuals[2, :3] += center_noise3
-
-        size_residuals[3, :3] += center_noise4
-        size_residuals[4, :3] += center_noise5
 
         # print(size_residuals[:10])
         ret_dict = {}
@@ -380,19 +360,19 @@ class ScannetDetectionFramesDataset(Dataset):
         ret_dict["size_class_label"] = torch.from_numpy(size_classes.astype(np.int64))
         ret_dict["score_labels"] = scores
         ret_dict["class_labels"] = classes
-        vis_masks = np.zeros([len(self.bin_thresholds), len(scores)])
-        prev = 0.3
-        for idx, trs in enumerate(self.bin_thresholds):
-            # print(prev, trs)
+        # vis_masks = np.zeros([len(self.bin_thresholds), len(scores)])
+        # prev = 0.3
+        # for idx, trs in enumerate(self.bin_thresholds):
+        #     # print(prev, trs)
 
-            mm = (scores > prev) & (scores <= trs)
-            prev = trs
+        #     mm = (scores > prev) & (scores <= trs)
+        #     prev = trs
 
-            vis_masks[idx, :] = mm
-        target_bboxes_mask = vis_masks.sum(0).astype(bool)
+        #     vis_masks[idx, :] = mm
+        # target_bboxes_mask = vis_masks.sum(0).astype(bool)
 
-        ret_dict["vis_masks"] = torch.from_numpy(vis_masks)
-        # print(scores)
+        # ret_dict["vis_masks"] = torch.from_numpy(vis_masks)
+        # # print(scores)
         ret_dict["size_residual_label"] = torch.from_numpy(
             size_residuals.astype(np.float32)
         )
@@ -403,7 +383,6 @@ class ScannetDetectionFramesDataset(Dataset):
             x for x in instance_bboxes[:, -1][0 : instance_bboxes.shape[0]]
         ]
 
-        gt_sizes = target_bboxes
         ret_dict["sem_cls_label"] = torch.from_numpy(
             target_bboxes_semcls.astype(np.int64)
         )
@@ -419,7 +398,7 @@ class ScannetDetectionFramesDataset(Dataset):
         )
 
         ret_dict["scan_idx"] = torch.from_numpy(np.array(idx).astype(np.int64))
-        ret_dict["gt_sizes"] = gt_sizes
+        ret_dict["gt_boxes"] = target_bboxes
         ret_dict["pcl_color"] = pcl_color
         ret_dict["name"] = item_idx
         # print(classes, item_idx)

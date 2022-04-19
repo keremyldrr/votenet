@@ -29,47 +29,40 @@ def get_size_loss(end_points, config):
 
     # size_preds = size_preds.permute(0, 2, 1)
     batch_size = size_preds.shape[0]
-    log_vars = end_points["log_vars"]
-    precision = torch.exp(end_points["log_vars"]) ** 0.5
     gt_residuals = end_points["size_residual_label"]
     box_label_mask = end_points["box_label_mask"]
     mean_size_arr = config.mean_size_arr
     mean_size_arr = torch.index_select(
         torch.from_numpy(mean_size_arr).cuda(),
         0,
-        end_points["class_labels"][end_points["box_label_mask"].bool()].long(),
+        end_points["class_labels"][box_label_mask.bool()].long(),
+    )
+    log_vars = box_label_mask * end_points["log_vars"]
+    precision = box_label_mask * torch.exp(end_points["log_vars"])
+    size_preds[~box_label_mask.bool()] = torch.zeros(3).cuda().float()
+    # gt_residuals = torch.div(gt_residuals, mean_size_arr)
+    # gt_residuals_fast = torch.div(
+    # gt_residuals[box_label_mask.bool()].float(), mean_size_arr.float()
+    # )
+    # gt_residuals[box_label_mask.bool()] = gt_residuals_fast
+    l2_loss = torch.nn.MSELoss(reduction="none")
+    l2_dists = l2_loss(size_preds, gt_residuals).mean(2)
+    # pdb.set_trace()
+    # l2_dists = (
+    #     torch.sqrt(((size_preds - gt_residuals) ** 2).sum(2))
+    #     # * end_points["box_label_mask"]
+    # )  # l2_dists *= box_label_mask
+    nll = ((l2_dists / (2 * (precision + 1e-6))) + 0.5 * log_vars).sum(dim=1) / (
+        box_label_mask.sum(dim=1)
     )
 
-    gt_residuals_fast = torch.div(
-        gt_residuals[end_points["box_label_mask"].bool()].float(), mean_size_arr.float()
-    )
-    gt_residuals[end_points["box_label_mask"].bool()] = gt_residuals_fast
-    l2_dists = (
-        torch.sqrt(((size_preds - gt_residuals) ** 2).sum(2))
-        # * end_points["box_label_mask"]
-    )
-    # l2_dists = torch.sqrt(
-    #     ((size_preds - gt_residuals) ** 2).sum(dim=2) * box_label_mask
-    # )
     # pdb.set_trace()
-    nll = (
-        ((l2_dists / (precision + 1e-6)) + log_vars).sum(dim=1)
-        / (end_points["box_label_mask"].sum(dim=1))
-    ).sum()
+
     if np.isnan(nll.item()):
         print("nan detected breakpoint inserted")
         print(end_points["name"])
         pdb.set_trace()
-    # l1_loss = l1_dists.sum() / (end_points["box_label_mask"].sum())
-    l2_loss = (l2_dists.sum(dim=1) / box_label_mask.sum(dim=1)).sum()
-    # # loss = 0.001 * nll + l2_loss
-    # loss = l2_loss
-    # print(precision[box_label_mask.bool()])
-    object_assignment = torch.cat(
-        [torch.arange(64).unsqueeze(0) for a in range(batch_size)],
-        dim=0,
-    ).cuda()
-    #
+
     size_residual_normalized_loss = (
         torch.mean(
             huber_loss(
@@ -78,21 +71,21 @@ def get_size_loss(end_points, config):
             ),
             -1,
         )
-        * end_points["box_label_mask"]
+        * box_label_mask
     )
 
+    print(precision[box_label_mask.bool()] ** 0.5)
     # (B,K,3) -> (B,K)
     # size_residual_normalized_loss = torch.sum(
     #     size_residual_normalized_loss * box_label_mask
     # ) / (torch.sum(box_label_mask) + 1e-6)
-    size_residual_normalized_loss = (
-        torch.sum(size_residual_normalized_loss, dim=1)
-        / (box_label_mask.sum(dim=1) + 1e-6)
-    ).sum()
-    end_points["nll"] = nll
-    # end_points["l2_loss"] = l2_loss
+    size_residual_normalized_loss = torch.sum(size_residual_normalized_loss) / (
+        box_label_mask.sum() + 1e-6
+    )
+    # end_points["nll"] = nll
+    # end_points["l2_loss"] = l2_dists.sum()
     end_points["huber_loss"] = size_residual_normalized_loss
-    loss = size_residual_normalized_loss  # + nll * 1e-2
+    loss = size_residual_normalized_loss  # + nll   * 1e-2
     # loss *= 10
     end_points["loss"] = loss  # size_residual_normalized_loss
 
