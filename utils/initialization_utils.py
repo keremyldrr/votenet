@@ -113,6 +113,7 @@ def initialize_dataloader(FLAGS):
             augment=False,
             overfit=FLAGS.OVERFIT,
             center_noise_var=FLAGS.SIGMA,
+            classes=FLAGS.CLASSES,
         )
         TRAIN_DATASET = ScannetDetectionFramesDataset(
             data_setting,
@@ -123,6 +124,7 @@ def initialize_dataloader(FLAGS):
             augment=False,
             overfit=FLAGS.OVERFIT,
             center_noise_var=FLAGS.SIGMA,
+            classes=FLAGS.CLASSES,
         )
     else:
         print("Unknown dataset %s. Exiting..." % (FLAGS.DATASET))

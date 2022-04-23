@@ -82,7 +82,7 @@ class ScannetDetectionFramesDataset(Dataset):
         center_noise_var=0,
         overfit=False,
         box_noise_var=0,
-        bin_thresholds=[1.0],
+        bin_thresholds=[0.6, 1.0],
         # classes=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17],
         classes=[2, 4],
     ):
@@ -171,12 +171,18 @@ class ScannetDetectionFramesDataset(Dataset):
             time.time() - st,
             "seconds",
         )
-        if self.overfit:
-            # return [["scene0015_00_2", None]]
-            return [["scene0575_02_25", None]]
-            # return [["scene0655_01_9", None]]  # , ["scene0000_00_3", None]]
         np.random.seed(10)
         np.random.shuffle(file_names)
+
+        if self.overfit:
+            return file_names[16:24]
+            # return [["scene0015_00_2", None]]
+            # return [["scene0575_02_25", None]]
+            # return [["scene0655_01_9", None]]  # , ["scene0000_00_3", None]]
+        with open("{}_{}.txt".format(str(thresh), split_name), "w") as out:
+            for f in file_names[:500]:
+                out.write(f[0] + "\n")
+
         return file_names  # [:500]
 
     def __getitem__(self, idx):
@@ -360,19 +366,19 @@ class ScannetDetectionFramesDataset(Dataset):
         ret_dict["size_class_label"] = torch.from_numpy(size_classes.astype(np.int64))
         ret_dict["score_labels"] = scores
         ret_dict["class_labels"] = classes
-        # vis_masks = np.zeros([len(self.bin_thresholds), len(scores)])
-        # prev = 0.3
-        # for idx, trs in enumerate(self.bin_thresholds):
-        #     # print(prev, trs)
+        vis_masks = np.zeros([len(self.bin_thresholds), len(scores)])
+        prev = self.thresh
+        for idx, trs in enumerate(self.bin_thresholds):
+            # print(prev, trs)
 
-        #     mm = (scores > prev) & (scores <= trs)
-        #     prev = trs
+            mm = (scores > prev) & (scores <= trs)
+            prev = trs
 
-        #     vis_masks[idx, :] = mm
-        # target_bboxes_mask = vis_masks.sum(0).astype(bool)
+            vis_masks[idx, :] = mm
+        target_bboxes_mask = vis_masks.sum(0).astype(bool)
 
-        # ret_dict["vis_masks"] = torch.from_numpy(vis_masks)
-        # # print(scores)
+        ret_dict["vis_masks"] = torch.from_numpy(vis_masks)
+        # print(scores)
         ret_dict["size_residual_label"] = torch.from_numpy(
             size_residuals.astype(np.float32)
         )
@@ -389,7 +395,7 @@ class ScannetDetectionFramesDataset(Dataset):
 
         ret_dict["box_label_mask"] = torch.from_numpy(
             target_bboxes_mask.astype(np.float32)
-        )
+        ).bool()
 
         ret_dict["vote_label"] = torch.from_numpy(point_votes.astype(np.float32))
 

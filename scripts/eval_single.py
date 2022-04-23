@@ -42,6 +42,7 @@ from ap_helper import (
     parse_groundtruths,
     parse_predictions_with_log_var,
     compute_batch_iou,
+    flip_axis_to_camera,
 )
 from initialization_utils import (
     initialize_dataloader,
@@ -77,6 +78,7 @@ def evaluate_with_sampling(FLAGS):
         )
         total_iou = 0
         total_num_boxes = 0
+        total_sigma = 0
         bins = T.dataset.bin_thresholds
         res_bins = {}
         for b in bins:
@@ -99,31 +101,53 @@ def evaluate_with_sampling(FLAGS):
             #     filename = os.path.join(
             #         FLAGS.DUMP_DIR, "{}.ply".format(batch_data_label["name"][idx])
             #     )
-            # trimesh.points.PointCloud(pc[:, :3].cpu().numpy()).export(filename)
+            for idx, name in enumerate(inputs["name"]):
+                trimesh.points.PointCloud(
+                    # flip_axis_to_depth(
+                    batch_data_label["point_clouds"][idx, :, :3]
+                    .cpu()
+                    .numpy()
+                    # )
+                ).export("{}.ply".format(batch_data_label["name"][idx]))
 
             with torch.no_grad():
                 end_points = net(inputs)
             for key in batch_data_label:
                 end_points[key] = batch_data_label[key]
 
+            # end_points["box_label_mask"] = (
+            #     end_points["box_label_mask"] * (end_points["class_labels"] == 4).cuda()
+            # )
+            prev = 0.3
+            b = 1.0
+            end_points["box_label_mask"] = (
+                (end_points["score_labels"] > prev) & (end_points["score_labels"] <= b)
+            ).cuda() * end_points["box_label_mask"]
             box_label_mask_vanilla = end_points["box_label_mask"].float().clone()
             iou, num_boxes = compute_batch_iou(end_points, FLAGS)
             total_iou += iou
             total_num_boxes += num_boxes
-            for idx, b in enumerate(bins):
-                end_points["box_label_mask"] = (
-                    box_label_mask_vanilla
-                    * batch_data_label["vis_masks"][:, idx, :].float()
-                )
-                iou, num_boxes = compute_batch_iou(end_points, FLAGS)
-                res_bins[b][0] += iou
-                res_bins[b][1] += num_boxes
-                res_bins[b][2] += (
-                    torch.exp(
-                        end_points["log_vars"][end_points["box_label_mask"].bool()]
-                    )
-                    ** 0.5
-                ).sum()
+            total_sigma += (
+                torch.exp(end_points["log_vars"][end_points["box_label_mask"].bool()])
+                ** 0.5
+            ).sum()
+
+            # for idx, b in enumerate(bins):
+            #     end_points["box_label_mask"] = (
+            #         (end_points["score_labels"] > prev)
+            #         & (end_points["score_labels"] <= b)
+            #     ).cuda().float() * box_label_mask_vanilla
+            #     # print(end_points["box_label_mask"])
+            #     iou, num_boxes = compute_batch_iou(end_points, FLAGS)
+            #     res_bins[b][0] += iou
+            #     res_bins[b][1] += num_boxes
+            #     res_bins[b][2] += (
+            #         torch.exp(
+            #             end_points["log_vars"][end_points["box_label_mask"].bool()]
+            #         )
+            #         ** 0.5
+            #     ).sum()
+            #     prev = b
         #     # Compute loss8
         #     for key in batch_data_label:
         #         assert key not in end_points
@@ -169,18 +193,21 @@ def evaluate_with_sampling(FLAGS):
         #     config=FLAGS.DATASET_CONFIG,
         #     dump_dir=FLAGS.DUMP_DIR + str(T.dataset.thresh),
         # )
-        print(total_iou / total_num_boxes, total_num_boxes)
-        res_bins["all"] = total_iou / total_num_boxes
-        for b in bins:
+        print(
+            total_iou / total_num_boxes, total_sigma / total_num_boxes, total_num_boxes
+        )
+        # print(res_bins)
+        # res_bins["all"] = total_iou / total_num_boxes
+        # for b in bins:
 
-            print(
-                "Average IOU bin ",
-                b,
-                res_bins[b][0] / res_bins[b][1],
-                "sigma",
-                res_bins[b][2] / res_bins[b][1],
-                res_bins[b][1],
-            )
+        #     print(
+        #         "Average IOU bin ",
+        #         b,
+        #         res_bins[b][0] / res_bins[b][1],
+        #         "sigma",
+        #         res_bins[b][2] / res_bins[b][1],
+        #         res_bins[b][1],
+        #     )
         # dump_only_boxes(selected_raw_boxes, FLAGS.DUMP_DIR)
         # dump_only_boxes_gt(batch_gt_map_cls, FLAGS.DUMP_DIR)
         return res_bins

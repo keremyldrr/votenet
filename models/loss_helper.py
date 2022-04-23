@@ -23,38 +23,45 @@ NEAR_THRESHOLD = 0.3
 GT_VOTE_FACTOR = 3  # number of GT votes per point
 OBJECTNESS_CLS_WEIGHTS = [0.2, 0.8]  # put larger weights on positive objectness
 
+torch.autograd.set_detect_anomaly(True)
+
 
 def get_size_loss(end_points, config):
-    size_preds = end_points["size_preds"]
 
-    # size_preds = size_preds.permute(0, 2, 1)
-    batch_size = size_preds.shape[0]
-    gt_residuals = end_points["size_residual_label"]
     box_label_mask = end_points["box_label_mask"]
-    mean_size_arr = config.mean_size_arr
-    mean_size_arr = torch.index_select(
-        torch.from_numpy(mean_size_arr).cuda(),
+    size_preds_normalized = end_points["size_preds"]
+    size_preds_normalized[~box_label_mask] = torch.zeros(3).cuda().float()
+    size_preds = end_points["size_preds"]
+    size_preds[~box_label_mask] = torch.zeros(3).cuda().float()
+    batch_size = size_preds_normalized.shape[0]
+    gt_residuals = end_points["size_residual_label"]
+    gt_residuals_normalized = end_points["size_residual_label"]
+    mean_size_arr = torch.ones_like(size_preds)
+    mean_size_arr_correct = torch.index_select(
+        torch.from_numpy(config.mean_size_arr).cuda(),
         0,
-        end_points["class_labels"][box_label_mask.bool()].long(),
-    )
-    log_vars = box_label_mask * end_points["log_vars"]
-    precision = box_label_mask * torch.exp(end_points["log_vars"])
-    size_preds[~box_label_mask.bool()] = torch.zeros(3).cuda().float()
+        end_points["class_labels"][box_label_mask].long(),
+    ).float()
+    mean_size_arr[box_label_mask] = mean_size_arr_correct
+    log_vars = box_label_mask.float() * end_points["log_vars"]
+    precision = box_label_mask.float() * torch.exp(end_points["log_vars"])
     # gt_residuals = torch.div(gt_residuals, mean_size_arr)
-    # gt_residuals_fast = torch.div(
-    # gt_residuals[box_label_mask.bool()].float(), mean_size_arr.float()
-    # )
-    # gt_residuals[box_label_mask.bool()] = gt_residuals_fast
+    gt_residuals_normalized = torch.div(gt_residuals, mean_size_arr)
     l2_loss = torch.nn.MSELoss(reduction="none")
+    size_preds = torch.mul(size_preds, mean_size_arr)
+
     l2_dists = l2_loss(size_preds, gt_residuals).mean(2)
     # pdb.set_trace()
     # l2_dists = (
     #     torch.sqrt(((size_preds - gt_residuals) ** 2).sum(2))
     #     # * end_points["box_label_mask"]
     # )  # l2_dists *= box_label_mask
-    nll = ((l2_dists / (2 * (precision + 1e-6))) + 0.5 * log_vars).sum(dim=1) / (
-        box_label_mask.sum(dim=1)
-    )
+    nll = (
+        (
+            l2_dists[box_label_mask] / (2 * (precision[box_label_mask]) + 1e-6)
+            + 0.5 * log_vars[box_label_mask]
+        ).sum()
+    ) / (1e-6 + box_label_mask.float().sum())
 
     # pdb.set_trace()
 
@@ -66,31 +73,29 @@ def get_size_loss(end_points, config):
     size_residual_normalized_loss = (
         torch.mean(
             huber_loss(
-                size_preds - gt_residuals,
+                size_preds_normalized - gt_residuals_normalized,
                 delta=1.0,
             ),
             -1,
         )
-        * box_label_mask
+        * box_label_mask.float()
     )
 
-    print(precision[box_label_mask.bool()] ** 0.5)
+    # print(precision[box_label_mask] ** 0.5)
     # (B,K,3) -> (B,K)
     # size_residual_normalized_loss = torch.sum(
     #     size_residual_normalized_loss * box_label_mask
     # ) / (torch.sum(box_label_mask) + 1e-6)
     size_residual_normalized_loss = torch.sum(size_residual_normalized_loss) / (
-        box_label_mask.sum() + 1e-6
+        box_label_mask.float().sum() + 1e-6
     )
-    # end_points["nll"] = nll
-    # end_points["l2_loss"] = l2_dists.sum()
+    end_points["nll"] = nll
+    end_points["l2_loss"] = l2_dists.sum()
     end_points["huber_loss"] = size_residual_normalized_loss
-    loss = size_residual_normalized_loss  # + nll   * 1e-2
+    loss = nll
     # loss *= 10
     end_points["loss"] = loss  # size_residual_normalized_loss
 
-    # end_points["loss"] = loss
-    # print(gt_residuals[:, :5, :] - size_preds[:, :5, :])
     return loss, end_points
 
 

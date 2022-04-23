@@ -157,6 +157,9 @@ def train_one_epoch(net, optimizer, criterion, bnm_scheduler, FLAGS):
         # loss += L1_reg * 1e-4
         loss.backward()
         optimizer.step()
+        # with torch.no_grad():
+        #     iou, num_boxes = compute_batch_iou(end_points, FLAGS)
+        #     print("batch IOU ", iou / num_boxes)
         # # pdb.set_trace()
         # if FLAGS.OVERFIT:
         #     print("ADDED SIGMA ", FLAGS.SIGMA)
@@ -251,7 +254,6 @@ def evaluate_one_epoch(net, criterion, FLAGS):
                 "center_label": batch_data_label["center_label"],
                 "name": batch_data_label["name"],
             }
-
         # inputs = {'point_clouds': batch_data_label['point_clouds']}
         with torch.no_grad():
             end_points = net(inputs)
@@ -262,31 +264,28 @@ def evaluate_one_epoch(net, criterion, FLAGS):
             end_points[key] = batch_data_label[key]
         loss, end_points = criterion(end_points, FLAGS.DATASET_CONFIG)
 
-        L1_reg = torch.tensor(0.0, requires_grad=False).cuda()
-        for name, param in net.named_parameters():
-            if "weight" in name:
-                L1_reg = L1_reg + torch.norm(param, 1)
-
         # Accumulate statistics and prin t out
         # t ot
         # end_points["loss"] += L1_reg * 1e-4
-        loss = end_points["loss"]
         box_label_mask_vanilla = end_points["box_label_mask"].float().clone()
         iou, num_boxes = compute_batch_iou(end_points, FLAGS)
         total_iou += iou
         total_num_boxes += num_boxes
-        for idx, b in enumerate(bins):
-            end_points["box_label_mask"] = (
-                box_label_mask_vanilla
-                * batch_data_label["vis_masks"][:, idx, :].float()
-            )
-            iou, num_boxes = compute_batch_iou(end_points, FLAGS)
-            res_bins[b][0] += iou
-            res_bins[b][1] += num_boxes
-            res_bins[b][2] += (
-                torch.exp(end_points["log_vars"][end_points["box_label_mask"].bool()])
-                ** 0.5
-            ).sum()
+        if len(bins) > 1:
+            for idx, b in enumerate(bins):
+                end_points["box_label_mask"] = (
+                    box_label_mask_vanilla
+                    * batch_data_label["vis_masks"][:, idx, :].float()
+                )
+                iou, num_boxes = compute_batch_iou(end_points, FLAGS)
+                res_bins[b][0] += iou
+                res_bins[b][1] += num_boxes
+                res_bins[b][2] += (
+                    torch.exp(
+                        end_points["log_vars"][end_points["box_label_mask"].bool()]
+                    )
+                    ** 0.5
+                ).sum()
 
         for key in end_points:
             if "loss" in key or "acc" in key or "ratio" in key or "nll" in key:
@@ -312,15 +311,17 @@ def evaluate_one_epoch(net, criterion, FLAGS):
         (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
     )
     res_bins["all"] = total_iou / total_num_boxes
-    for b in bins:
 
-        FLAGS.TEST_VISUALIZER.log_scalars(
-            {
-                "Average IOU {}".format(b): res_bins[b][0] / res_bins[b][1],
-                "sigma {}".format(b): res_bins[b][2] / res_bins[b][1],
-            },
-            (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
-        )
+    if len(bins) > 1:
+        for b in bins:
+
+            FLAGS.TEST_VISUALIZER.log_scalars(
+                {
+                    "Average IOU {}".format(b): res_bins[b][0] / res_bins[b][1],
+                    "sigma {}".format(b): res_bins[b][2] / res_bins[b][1],
+                },
+                (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
+            )
 
     FLAGS.TEST_VISUALIZER.log_scalars(
         {key: stat_dict[key] / float(batch_idx + 1) for key in stat_dict},
@@ -339,7 +340,8 @@ def evaluate_one_epoch(net, criterion, FLAGS):
     #     log_string(FLAGS.LOGGER, "eval %s: %f" % (key, metrics_dict[key]))
 
     mean_loss = stat_dict["loss"] / float(batch_idx + 1)
-    return mean_loss, mean_loss  # metrics_dict["mAP"]
+    print(total_iou, total_num_boxes, total_iou / total_num_boxes)
+    return total_iou / total_num_boxes, mean_loss  # metrics_dict["mAP"]
 
 
 def train(FLAGS):
@@ -399,8 +401,8 @@ def train(FLAGS):
                     FLAGS.LOG_DIR, "checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
                 ),
             )  #
-
-            # loss, curr_map = evaluate_one_epoch(net, criterion, FLAGS)
+            with torch.no_grad():
+                curr_map, loss = evaluate_one_epoch(net, criterion, FLAGS)
             FLAGS.TEST_VISUALIZER.log_scalars(
                 {"mAP": curr_map},
                 (EPOCH_CNT + 1) * len(FLAGS.TRAIN_DATALOADER) * FLAGS.BATCH_SIZE,
@@ -411,12 +413,12 @@ def train(FLAGS):
                 DATA_SIZE = len(FLAGS.TRAIN_DATALOADER)
                 ITERS_PER_EPOCH = DATA_SIZE
                 NUM_ITERS_TOTAL = FLAGS.START_ITER + ITERS_PER_EPOCH * epoch
-                # torch.save(
-                #     save_dict,
-                #     os.path.join(
-                #         FLAGS.LOG_DIR, "best_checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
-                #     ),
-                # )  # FIXME re enable
+                torch.save(
+                    save_dict,
+                    os.path.join(
+                        FLAGS.LOG_DIR, "best_checkpoint_{}.tar".format(NUM_ITERS_TOTAL)
+                    ),
+                )  # FIXME re enable
                 log_string(
                     FLAGS.LOGGER,
                     "Best changed from {} to {}".format(best_map, curr_map),

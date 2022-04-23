@@ -9,6 +9,7 @@ import sys
 import numpy as np
 import torch
 import pdb
+import trimesh
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ROOT_DIR = os.path.dirname(BASE_DIR)
@@ -1852,85 +1853,150 @@ def parse_predictions_augmented(
 
 
 def compute_batch_iou(end_points, FLAGS):
-    bsize = end_points["box_label_mask"].shape[0]  # FLAGS.BATCH_SIZE
     batch_iou = 0
+    total_iou = 0
+    cnt = 0
+    box_label_mask = end_points["box_label_mask"].bool()
+    # print(box_label_mask)
+    size_pred_residuals = end_points["size_preds"]
+    size_pred_residuals[~box_label_mask] = torch.zeros(3).cuda().float()
+    bsize = size_pred_residuals.shape[0]
+    gt_residuals = end_points["size_residual_label"]
+    mean_size_arr = torch.ones_like(size_pred_residuals)
+    mean_size_arr_correct = torch.index_select(
+        torch.from_numpy(FLAGS.DATASET_CONFIG.mean_size_arr).cuda(),
+        0,
+        end_points["class_labels"][box_label_mask].long(),
+    ).float()
+    mean_size_arr[box_label_mask] = mean_size_arr_correct
+    mean_size_arr[~box_label_mask] = torch.zeros(3).cuda().float()
+    log_vars = box_label_mask.float() * end_points["log_vars"]
+    precision = box_label_mask.float() * torch.exp(end_points["log_vars"])
+    # mean_size_arr = (
+    #     torch.from_numpy(FLAGS.DATASET_CONFIG.mean_size_arr[2]).cuda().float()
+    # )
+
+    # gt_residuals = torch.from_numpy(
+    #     flip_axis_to_camera(gt_residuals.cpu().numpy())
+    # ).cuda()
+    # size_pred_residuals = torch.from_numpy(
+    #     flip_axis_to_camera(size_pred_residuals.cpu().numpy())
+    # ).cuda()
+    size_preds = torch.mul(size_pred_residuals, mean_size_arr)
+    # gt_residuals = torch.mul(gt_residuals, mean_size_arr)
+    gt_sizes = mean_size_arr + gt_residuals
+    pred_sizes = mean_size_arr + size_preds
+    # gt_sizes = (
+    #     torch.from_numpy(
+    #         flip_axis_to_depth((mean_size_arr + gt_residuals).cpu().numpy())
+    #     )
+    #     .cuda()
+    #     .float()
+    # )
+
+    # pred_sizes = (
+    #     torch.from_numpy(flip_axis_to_depth((mean_size_arr + size_preds).cpu().numpy()))
+    #     .cuda()
+    #     .float()
+    # )
+
+    gt_centers = end_points["center_label"]
+    # pdb.set_trace()
+    gt_centers = torch.from_numpy(flip_axis_to_camera(gt_centers.cpu().numpy()))
     for b in range(bsize):
-
-        mean_size_arr = FLAGS.DATASET_CONFIG.mean_size_arr[2]
-        pred_sizes = (
-            torch.from_numpy(
-                np.multiply(mean_size_arr, end_points["size_preds"][b].cpu().numpy())
-            )
-            .cuda()
-            .float()
-            + torch.from_numpy(FLAGS.DATASET_CONFIG.type_mean_size["chair"])
-            .cuda()
-            .float()
-        )
         if end_points["box_label_mask"][b].sum() == 0:
+            # print("skipping cuz no label")
             continue
+        # print(b)
+        num_boxes = box_label_mask[b].sum()
         log_vars = torch.exp(end_points["log_vars"][b]) ** 0.5
-        gt_centers = end_points["center_label"][b][
-            end_points["box_label_mask"][b].bool()
-        ]
-        gt_sizes = (
-            torch.from_numpy(FLAGS.DATASET_CONFIG.type_mean_size["chair"])
-            .cuda()
-            .float()
-            + torch.from_numpy(
-                np.multiply(
-                    mean_size_arr, end_points["size_residual_label"][b].cpu().numpy()
-                )
-            )
-            .cuda()
-            .float()
-        )[end_points["box_label_mask"][b].bool()]
-        # gt_centers = torch.from_numpy(flip_axis_to_camera(gt_sizes.cpu()))
-
-        # print(gt_sizes, gt_centers)
-        # gt_sizes = torch.from_numpy(flip_axis_to_depth(gt_sizes.cpu()))
-        # pred_sizes = torch.from_numpy(flip_axis_to_depth(pred_sizes.cpu()))
-        # print(gt_sizes, gt_centers)
-        gt_centers = torch.from_numpy(flip_axis_to_camera(gt_centers.cpu()))
-
+        # gt_sizes = (
+        #     torch.from_numpy(FLAGS.DATASET_CONFIG.type_mean_size["chair"])
+        #     .cuda()
+        #     .float()
+        #     + torch.from_numpy(
+        #         np.multiply(
+        #             mean_size_arr, end_points["size_residual_label"][b].cpu().numpy()
+        #         )
+        #     )
+        #     .cuda()
+        #     .float()
+        # )[end_points["box_label_mask"][b].bool()]
+        # print(
+        #     num_boxes,
+        # )
         gt_boxes = []
-        for idx in range(len(gt_centers)):
+        valid_inds = []
+        for idx in range(box_label_mask.shape[1]):
+            if box_label_mask[b][idx] == 0:
+                continue
             corners = get_3d_box(
-                gt_sizes[idx].cpu().numpy(), 0, gt_centers[idx].cpu().numpy()
+                gt_sizes[b][idx].cpu().numpy(), 0, gt_centers[b][idx].cpu().numpy()
             )
-
+            # corners = flip_axis_to_camera(corners)
+            trimesh.points.PointCloud(flip_axis_to_depth(corners)).convex_hull.export(
+                "gt_{}.ply".format(idx)
+            )
+            valid_inds.append(idx)
             gt_boxes.append(corners)
             # print(corners)
         pred_boxes = []
-        # sampled_sizes = []
-        #  sampled_dists = []
-        #  for j in range(20):
-        #      sampled_sizes_per_item = [
-        #          torch.from_numpy(np.random.rand(3)).cuda().float() * log_vars[i]
-        #          + pred_sizes[i]
-        #          for i in range(len(gt_sizes))
-        #      ]
-        #      dists = [
-        #          gt_sizes[i] - sampled_sizes_per_item[i] for i in range(len(gt_sizes))
-        #      ]
+        sampling = False
+        if sampling:
+            sampled_sizes = []
+            sampled_dists = []
+            for j in range(20):
+                sampled_sizes_per_item = [
+                    torch.from_numpy(np.random.rand(3)).cuda().float() * log_vars[i]
+                    + pred_sizes[b][i]
+                    for i in range(len(gt_sizes))
+                ]
+                dists = [
+                    gt_sizes[b][i] - sampled_sizes_per_item[i]
+                    for i in range(len(gt_sizes))
+                ]
 
-        #      sampled_sizes.append(sampled_sizes_per_item)
-        #      sampled_dists.append(torch.stack(dists).norm(dim=1))
-        # best_samples = torch.min(torch.stack(sampled_dists), dim=0)[1]
-        # for idx, s in enumerate(best_samples):
-        # pred_sizes[idx] = sampled_sizes[s][idx]
-        for idx in range(len(gt_centers)):
+                sampled_sizes.append(sampled_sizes_per_item)
+                sampled_dists.append(torch.stack(dists).norm(dim=1))
+                best_samples = torch.min(torch.stack(sampled_dists), dim=0)[1]
+            for idx, samp in enumerate(best_samples):
+                # pdb.set_trace()
+                pred_sizes[b][idx] = sampled_sizes[samp][idx]
+        for idx in range(box_label_mask.shape[1]):
+            if box_label_mask[b][idx] == 0:
+                continue
             corners = get_3d_box(
-                pred_sizes[idx].cpu().numpy(), 0, gt_centers[idx].cpu().numpy()
+                pred_sizes[b][idx].cpu().numpy(), 0, gt_centers[b][idx].cpu().numpy()
             )
+
+            # corners = flip_axis_to_camera(corners)
             pred_boxes.append(corners)
         # save to ply file
-        for pred, gt in zip(pred_boxes, gt_boxes):
+        name = end_points["name"][b]
+        for pred, gt, idx in zip(pred_boxes, gt_boxes, valid_inds):
 
+            # print(pred, gt)
+            #
             iou, iou_2d = box3d_iou(pred, gt)
+            cnt += 1
+            trimesh.points.PointCloud(flip_axis_to_depth(gt)).convex_hull.export(
+                "{}_gt_cls_{}_{}.ply".format(
+                    name,
+                    FLAGS.DATASET_CONFIG.class2type[
+                        end_points["class_labels"][b][idx].int().cpu().item()
+                    ],
+                    idx,
+                )
+            )
+            trimesh.points.PointCloud(flip_axis_to_depth(pred)).convex_hull.export(
+                "{}_pred_{}_sigma_{}_iou_{}.ply".format(
+                    name, idx, "{:.2f}".format(log_vars[idx]), "{:.2f}".format(iou)
+                )
+            )
+
             # print(iou, iou_2d)
             batch_iou += iou
-    return batch_iou, end_points["box_label_mask"].sum().cpu().item()
+    return batch_iou, cnt
 
 
 def parse_groundtruths(end_points, config_dict):
